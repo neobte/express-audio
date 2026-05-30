@@ -4,19 +4,568 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Express Audio</title>
+    <title>Audio Player</title>
+    <!-- <h1>h1 -> 32px</h1>
+    <h2>h2 -> 24px</h2>
+    <h3>h3 -> 18.72px</h3>
+    <h4>h4 -> 16px</h4>
+    <h5>h5 -> 13.28px</h5>
+    <h6>h6 -> 10.72px</h6> -->
+    <style>
+        :root {
+            /* BACKGROUND */
+            --bg: #000;
+            --bg-2: #212121;
+
+            /* TEXT */
+            --text-primary: #fff;
+            --text-secondary: #afafaf;
+            --text-tertiary: rgb(96, 215, 30);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-primary);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 528px;
+            margin: auto;
+            padding: 1rem;
+            border-radius: .5rem;
+            border: 3px solid #ffffff0d;
+        }
+
+        .player-track {
+            text-align: center;
+            height: 41px;
+        }
+
+        .player-track #player-track-title {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .player-track #player-track-artist {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .current-time-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .25rem;
+            height: 48px;
+        }
+
+        .current-time-container .time {
+            min-width: 48px;
+            font-size: 14px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            cursor: pointer;
+            color: var(--text-primary);
+            width: 44px;
+            height: 44px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            aspect-ratio: 1/1;
+            /* border-radius: 50%; */
+            border-radius: 4px;
+
+            outline: none;
+            background: none;
+            border: none;
+
+            transition: all .2s ease;
+        }
+
+        .btn:hover {
+            background-color: #141414;
+        }
+
+        .btn svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        #play-pause-btn {
+            width: 48px;
+            height: 48px;
+        }
+
+        #play-pause-btn svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .25rem;
+        }
+
+        .volume-container {
+            /* width: 100%;
+            max-width: 424px;
+            margin: auto; */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .25rem;
+        }
+
+        .volume-container #volume-value {
+            min-width: 44px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        #volume-btn svg {
+            width: 1.2rem;
+            height: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            background-color: transparent;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        /* Mozilla Firefox */
+        .slider::-moz-range-track {
+            background-color: #1f1f1f;
+            height: 4px;
+            border-radius: 4px;
+        }
+
+        .slider::-moz-range-progress {
+            background-color: var(--text-tertiary);
+            height: 4px;
+            border-radius: 4px;
+        }
+
+        .slider::-moz-range-thumb {
+            border: none;
+            background-color: rgba(96, 215, 30, .5);
+            border-radius: 50%;
+            width: 4px;
+            height: 4px;
+        }
+
+        .slider:not(:disabled):hover::-moz-range-thumb {
+            background-color: var(--text-tertiary);
+            width: 10px;
+            height: 10px;
+            transform: scale(1.3);
+        }
+
+        .playlist-container {
+            height: 296px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        #playlist {
+            list-style-type: none;
+            margin-top: 1rem;
+        }
+
+        .playlist-track {
+            display: grid;
+            grid-template-columns: 48px auto 48px;
+            padding: .5rem 0;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .playlist-track__title {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .playlist-track__artist {
+            font-size: 14px;
+            color: #afafaf;
+        }
+
+        .playlist-track__number,
+        .playlist-track__duration {
+            font-size: 14px;
+            text-align: center;
+            color: #afafaf;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .playlist-track:hover {
+            background: #141414;
+            border-radius: 4px;
+        }
+
+        .playlist-track__info {
+            min-width: 0;
+        }
+
+        .playlist-track__title,
+        .playlist-track__artist,
+        #player-track-title,
+        #player-track-artist {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .d-none {
+            display: none;
+        }
+
+        .text-start {
+            text-align: start;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-end {
+            text-align: end;
+        }
+
+        .fs-14 {
+            font-size: 14px;
+        }
+
+        .mb-1 {
+            margin-bottom: 1rem;
+        }
+
+        .mt-1 {
+            margin-top: 1rem;
+        }
+    </style>
 </head>
 
 <body>
-    <header>
-        <h1>Express Audio</h1>
+
+    <header class="mt-1">
+
     </header>
-    <main></main>
-    <footer></footer>
+
+    <main class="container">
+
+        <div class="player-track">
+            <h3 id="player-track-title">Sin Disfraz</h3>
+            <p id="player-track-artist">Virus</p>
+        </div>
+
+        <div class="current-time-container">
+            <span id="current-time" class="time">0:00</span>
+            <input type="range" id="current-time-slider" class="slider" value="0">
+            <span id="duration-time" class="time">3:33</span>
+        </div>
+
+        <div class="controls">
+
+            <!-- Shuffle btn -->
+            <button id="shffle-btn" class="btn" title="Shuffle">
+                <!-- Shuffle icon -->
+                <svg id="shuffle-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                    <path fill="currentColor"
+                        d="M467.8 98.4C479.8 93.4 493.5 96.2 502.7 105.3L566.7 169.3C572.7 175.3 576.1 183.4 576.1 191.9C576.1 200.4 572.7 208.5 566.7 214.5L502.7 278.5C493.5 287.7 479.8 290.4 467.8 285.4C455.8 280.4 448 268.9 448 256L448 224L416 224C405.9 224 396.4 228.7 390.4 236.8L358 280L318 226.7L339.2 198.4C357.3 174.2 385.8 160 416 160L448 160L448 128C448 115.1 455.8 103.4 467.8 98.4zM218 360L258 413.3L236.8 441.6C218.7 465.8 190.2 480 160 480L96 480C78.3 480 64 465.7 64 448C64 430.3 78.3 416 96 416L160 416C170.1 416 179.6 411.3 185.6 403.2L218 360zM502.6 534.6C493.4 543.8 479.7 546.5 467.7 541.5C455.7 536.5 448 524.9 448 512L448 480L416 480C385.8 480 357.3 465.8 339.2 441.6L185.6 236.8C179.6 228.7 170.1 224 160 224L96 224C78.3 224 64 209.7 64 192C64 174.3 78.3 160 96 160L160 160C190.2 160 218.7 174.2 236.8 198.4L390.4 403.2C396.4 411.3 405.9 416 416 416L448 416L448 384C448 371.1 455.8 359.4 467.8 354.4C479.8 349.4 493.5 352.2 502.7 361.3L566.7 425.3C572.7 431.3 576.1 439.4 576.1 447.9C576.1 456.4 572.7 464.5 566.7 470.5L502.7 534.5z" />
+                </svg>
+            </button>
+
+            <!-- Backward-step btn -->
+            <button id="backward-step-btn" class="btn" title="Backward">
+                <!-- Backward-step icon -->
+                <svg id="backward-step-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                    <path fill="currentColor"
+                        d="M491 100.8C478.1 93.8 462.3 94.5 450 102.6L192 272.1L192 128C192 110.3 177.7 96 160 96C142.3 96 128 110.3 128 128L128 512C128 529.7 142.3 544 160 544C177.7 544 192 529.7 192 512L192 367.9L450 537.5C462.3 545.6 478 546.3 491 539.3C504 532.3 512 518.8 512 504.1L512 136.1C512 121.4 503.9 107.9 491 100.9z" />
+                </svg>
+            </button>
+
+            <!-- Play/pause btn -->
+            <button id="play-pause-btn" class="btn" title="Play">
+                <!-- Play icon -->
+                <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                    <path fill="currentColor"
+                        d="M187.2 100.9C174.8 94.1 159.8 94.4 147.6 101.6C135.4 108.8 128 121.9 128 136L128 504C128 518.1 135.5 531.2 147.6 538.4C159.7 545.6 174.8 545.9 187.2 539.1L523.2 355.1C536 348.1 544 334.6 544 320C544 305.4 536 291.9 523.2 284.9L187.2 100.9z" />
+                </svg>
+                <!-- Pause icon -->
+                <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" class="d-none">
+                    <path fill="currentColor"
+                        d="M176 96C149.5 96 128 117.5 128 144L128 496C128 522.5 149.5 544 176 544L240 544C266.5 544 288 522.5 288 496L288 144C288 117.5 266.5 96 240 96L176 96zM400 96C373.5 96 352 117.5 352 144L352 496C352 522.5 373.5 544 400 544L464 544C490.5 544 512 522.5 512 496L512 144C512 117.5 490.5 96 464 96L400 96z" />
+                </svg>
+            </button>
+
+            <!-- Forward-step btn -->
+            <button id="forward-step-btn" class="btn" title="Forward">
+                <!-- Forward-step icon-->
+                <svg id="forward-step-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                    <path fill="currentColor"
+                        d="M149 100.8C161.9 93.8 177.7 94.5 190 102.6L448 272.1L448 128C448 110.3 462.3 96 480 96C497.7 96 512 110.3 512 128L512 512C512 529.7 497.7 544 480 544C462.3 544 448 529.7 448 512L448 367.9L190 537.5C177.7 545.6 162 546.3 149 539.3C136 532.3 128 518.7 128 504L128 136C128 121.3 136.1 107.8 149 100.8z" />
+                </svg>
+            </button>
+
+            <!-- Repeat btn -->
+            <button id="repeat-btn" class="btn" title="Repeat">
+                <!-- Repeat icon -->
+                <svg id="repeat-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                    <path fill="currentColor"
+                        d="M534.6 182.6C547.1 170.1 547.1 149.8 534.6 137.3L470.6 73.3C461.4 64.1 447.7 61.4 435.7 66.4C423.7 71.4 416 83.1 416 96L416 128L256 128C150 128 64 214 64 320C64 337.7 78.3 352 96 352C113.7 352 128 337.7 128 320C128 249.3 185.3 192 256 192L416 192L416 224C416 236.9 423.8 248.6 435.8 253.6C447.8 258.6 461.5 255.8 470.7 246.7L534.7 182.7zM105.4 457.4C92.9 469.9 92.9 490.2 105.4 502.7L169.4 566.7C178.6 575.9 192.3 578.6 204.3 573.6C216.3 568.6 224 556.9 224 544L224 512L384 512C490 512 576 426 576 320C576 302.3 561.7 288 544 288C526.3 288 512 302.3 512 320C512 390.7 454.7 448 384 448L224 448L224 416C224 403.1 216.2 391.4 204.2 386.4C192.2 381.4 178.5 384.2 169.3 393.3L105.3 457.3z" />
+                </svg>
+                <!-- Repeat-1 icon -->
+                <svg id="repeat-1-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" class="d-none">
+                    <path fill="currentColor"
+                        d="M534.6 137.4C547.1 149.9 547.1 170.2 534.6 182.7L470.6 246.7C461.4 255.9 447.7 258.6 435.7 253.6C423.7 248.6 416 236.9 416 224L416 192L256 192C185.3 192 128 249.3 128 320C128 337.7 113.7 352 96 352C78.3 352 64 337.7 64 320C64 214 150 128 256 128L416 128L416 96C416 83.1 423.8 71.4 435.8 66.4C447.8 61.4 461.5 64.2 470.7 73.3L534.7 137.3zM105.4 502.6C92.9 490.1 92.9 469.8 105.4 457.3L169.4 393.3C178.6 384.1 192.3 381.4 204.3 386.4C216.3 391.4 224 403.1 224 416L224 448L384 448C454.7 448 512 390.7 512 320C512 302.3 526.3 288 544 288C561.7 288 576 302.3 576 320C576 426 490 512 384 512L224 512L224 544C224 556.9 216.2 568.6 204.2 573.6C192.2 578.6 178.5 575.8 169.3 566.7L105.3 502.7zM352 280L352 360C352 373.3 341.3 384 328 384C314.7 384 304 373.3 304 360L304 312C294 312 284.6 305.6 281.2 295.6C277 283 283.8 269.4 296.4 265.2L320.4 257.2C327.7 254.8 335.8 256 342 260.5C348.2 265 352 272.3 352 280z" />
+                </svg>
+            </button>
+
+        </div>
+
+        <div class="volume-container">
+            <!-- Volume btn -->
+            <button id="volume-btn" class="btn" title="Volume">
+                <!-- Volume icon -->
+                <svg id="volume-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                    <path fill="currentColor"
+                        d="M112 416L160 416L294.1 535.2C300.5 540.9 308.7 544 317.2 544C336.4 544 352 528.4 352 509.2L352 130.8C352 111.6 336.4 96 317.2 96C308.7 96 300.5 99.1 294.1 104.8L160 224L112 224C85.5 224 64 245.5 64 272L64 368C64 394.5 85.5 416 112 416zM505.1 171C494.8 162.6 479.7 164.2 471.3 174.5C462.9 184.8 464.5 199.9 474.8 208.3C507.3 234.7 528 274.9 528 320C528 365.1 507.3 405.3 474.8 431.8C464.5 440.2 463 455.3 471.3 465.6C479.6 475.9 494.8 477.4 505.1 469.1C548.3 433.9 576 380.2 576 320.1C576 260 548.3 206.3 505.1 171.1zM444.6 245.5C434.3 237.1 419.2 238.7 410.8 249C402.4 259.3 404 274.4 414.3 282.8C425.1 291.6 432 305 432 320C432 335 425.1 348.4 414.3 357.3C404 365.7 402.5 380.8 410.8 391.1C419.1 401.4 434.3 402.9 444.6 394.6C466.1 376.9 480 350.1 480 320C480 289.9 466.1 263.1 444.5 245.5z" />
+                </svg>
+                <!-- Volume-slash icon-->
+                <svg id="volume-slash-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" class="d-none">
+                    <path fill="currentColor"
+                        d="M73 39.1C63.6 29.7 48.4 29.7 39.1 39.1C29.8 48.5 29.7 63.7 39 73.1L567 601.1C576.4 610.5 591.6 610.5 600.9 601.1C610.2 591.7 610.3 576.5 600.9 567.2L351.9 318.2L351.9 130.9C351.9 111.7 336.3 96.1 317.1 96.1C308.6 96.1 300.4 99.2 294 104.9L211.8 178L73 39.1zM122.2 224L112 224C85.5 224 64 245.5 64 272L64 368C64 394.5 85.5 416 112 416L160 416L294.1 535.2C300.5 540.9 308.7 544 317.2 544C336.4 544 352 528.4 352 509.2L352 453.8L122.2 224zM471.3 174.4C462.9 184.7 464.5 199.8 474.8 208.2C507.3 234.6 528 274.9 528 320C528 353 516.9 383.4 498.2 407.7L532.4 441.9C559.6 408.8 576 366.3 576 320C576 259.9 548.3 206.2 505.1 171C494.8 162.6 479.7 164.2 471.3 174.5zM428.5 338L463.8 373.3C474 358.1 480 339.7 480 320C480 289.9 466.1 263.1 444.5 245.5C434.2 237.1 419.1 238.7 410.7 249C402.3 259.3 403.9 274.4 414.2 282.8C425.1 291.6 431.9 305 431.9 320.1C431.9 326.5 430.7 332.5 428.4 338.1z" />
+                </svg>
+            </button>
+
+            <input type="range" id="volume-slider" class="slider">
+
+            <span id="volume-value">50</span>
+        </div>
+
+        <div class="playlist-container">
+
+            <ul id="playlist">
+                <li class="playlist-track">
+                    <div class="playlist-track__number">
+                        <span>1</span>
+                    </div>
+                    <div class="playlist-track__info">
+                        <h3 class="playlist-track__title">Sin Disfraz</h3>
+                        <p class="playlist-track__artist">Virus</p>
+                    </div>
+                    <div class="playlist-track__duration">
+                        <span>3:33</span>
+                    </div>
+                </li>
+                <li class="playlist-track">
+                    <div class="playlist-track__number">
+                        <span>10</span>
+                    </div>
+                    <div class="playlist-track__info">
+                        <h3 class="playlist-track__title">Todo Estaba Bien</h3>
+                        <p class="playlist-track__artist">Grupo Río</p>
+                    </div>
+                    <div class="playlist-track__duration">
+                        <span>4:22</span>
+                    </div>
+                </li>
+                <li class="playlist-track">
+                    <div class="playlist-track__number">
+                        <span>100</span>
+                    </div>
+                    <div class="playlist-track__info">
+                        <h3 class="playlist-track__title">Always On My Mind</h3>
+                        <p class="playlist-track__artist">Pet Shop Boys</p>
+                    </div>
+                    <div class="playlist-track__duration">
+                        <span>3:53</span>
+                    </div>
+                </li>
+            </ul>
+
+        </div>
+
+    </main>
+
+    <footer class="text-center fs-14 mt-1">
+        <p>Copyright ©️ 2025 | Made with ❤️ by Julio</p>
+    </footer>
+
+    <script>
+
+        "use strict";
+
+        const sendFetchHttpRequest = async (url, callback, method = "GET", data = {}) => {
+            method = method.toUpperCase();
+
+            const options = {
+                method,
+                headers: {}
+            };
+
+            if (method === 'GET') {
+                const queryString = new URLSearchParams(data).toString();
+                url += queryString ? `?${queryString}` : '';
+            }
+
+            if (method === 'POST') {
+                options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+                // options.headers['Accept'] = "application/json, text/javascript, */*; q=0.01";
+                // options.headers['Accept-Language'] = "es-AR,es;q=0.9,en-US;q=0.8,en;q=0.7";
+                // options.headers['Sec-Fetch-Mode'] = "cors";
+                // options.headers['Sec-Fetch-Site'] = "same-origin";
+                options.body = new URLSearchParams(data).toString();
+                // options.mode = "cors";
+                // options.referrer = "https://www.correoargentino.com.ar/";
+                // options.body = "action=localidades&localidad=none&calle=&altura=&provincia=B"
+            }
+
+            try {
+                const response = await fetch(url + (/\?/.test(url) ? "&" : "?") + new Date().getTime(), options);
+                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+
+                const contentType = response.headers.get("content-type");
+                // console.log(contentType); // application/json; charset=utf-8
+                if (contentType &&
+                    contentType.toLowerCase().indexOf("application/json") >= 0) {
+                    // Content-Type: text/html; charset=UTF-8
+                    callback(await response.json()); // Esto asignaría la referencia a la variable "songs"
+                    // callback(await response.text()); // Para parsear el string con JSON.parse y asignar a la variable
+                }
+            } catch (error) {
+                console.log(error.message);
+            }
+        }
+
+        // Format time in hh:mm:ss or mm:ss
+        const formatTime = (seconds, format = 0) => {
+            if (!isFinite(seconds) || seconds <= 0) return "0:00";
+            // Int mod Int = Int
+            const h = Math.floor(seconds / 3600); // hours calculation
+            const min = Math.floor(seconds / 60) % 60; // min calculation
+            const s = Math.floor(seconds) % 60; // Whole seconds
+
+            if (format === 0) {
+                return h > 0
+                    ? `${/*h < 10 ? "0" + h : */h}:${min < 10 ? "0" + min : min}:${s < 10 ? "0" + s : s}`
+                    : `${/*min < 10 ? "0" + min : */min}:${s < 10 ? "0" + s : s}`;
+            }
+
+            return h > 0
+                ? // Show hours min seconds format => 10 h 8 min 47 s
+                `${h} h ${min} min ${s} s`
+                : // Show min seconds format => 8 min 47 s
+                `${min} min ${s} s`;
+        };
+
+        const renderTracks = () => {
+            const container = document.getElementById('playlist');
+
+            container.innerHTML = '';
+
+            const fragment = document.createDocumentFragment();
+
+            tracks.forEach((track, index) => {
+                const li = document.createElement("li");
+                li.dataset.trackId = track.id;
+                li.classList.add("playlist-track");
+                li.innerHTML = `
+                    <div class="playlist-track__number">
+                        <span>${track.id}</span>
+                    </div>
+                    <div class="playlist-track__info">
+                        <h3 class="playlist-track__title">${track.title}</h3>
+                        <p class="playlist-track__artist">${track.artist}</p>
+                    </div>
+                    <div class="playlist-track__duration">
+                        <span>${formatTime(track.duration)}</span>
+                    </div>
+                `;
+                fragment.appendChild(li);
+            });
+
+            container.appendChild(fragment);
+        }
+
+        const handleResponse = res => {
+            // tracks = res.tracks.items.slice(0, 5);
+            tracks = res.tracks.items;
+
+            const audio = new Audio();
+            audio.src = "https://neobte.github.io/musica/playlists/salsa/" + tracks[currentIndex].name;
+
+            playerTrackTitle.textContent = tracks[currentIndex].title;
+            playerTrackArtist.textContent = tracks[currentIndex].artist;
+
+            renderTracks();
+        }
+
+        let tracks = null;
+
+        const playerTrackTitle = document.getElementById("player-track-title");
+        const playerTrackArtist = document.getElementById("player-track-artist");
+
+        let currentIndex = 33;
+
+        const request_url = "https://neobte.github.io/musica/playlists/salsa/playlist.json";
+
+        // Call the function
+        sendFetchHttpRequest(request_url, handleResponse);
 
 
+        const volumeBtn = document.getElementById("volume-btn");
+        const volumeIcon = document.getElementById("volume-icon");
+        const volumeSlashIcon = document.getElementById("volume-slash-icon");
+        const volumeSlider = document.getElementById("volume-slider");
+        const volumeSliderValue = volumeSlider.value;
+        const volumeValue = document.getElementById("volume-value");
 
-    <script src="script.js"></script>
+        volumeBtn.addEventListener("click", toggleVolume);
+
+        volumeSlider.addEventListener("input", () => {
+            volumeValue.textContent = volumeSlider.value;
+            volumeSliderValue = volumeSlider.value
+        });
+
+        function toggleVolume() {
+
+            volumeIcon.classList.toggle("d-none");
+            if (volumeSlider.value > 0) {
+                volumeSlider.value = 0;
+            } else {
+                volumeSlider.value = volumeSliderValue;
+            }
+
+            volumeSlashIcon.classList.toggle("d-none");
+
+            // volumeBtn.title = isVolume ? "Deactive" : "Active";
+        }
+
+    </script>
+
 </body>
 
 </html>
