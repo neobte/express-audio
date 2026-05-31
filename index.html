@@ -40,7 +40,7 @@
 
         .container {
             width: 100%;
-            max-width: 528px;
+            max-width: 448px;
             margin: auto;
             padding: 1rem;
             border-radius: 1rem;
@@ -187,6 +187,11 @@
             overflow-y: auto;
             overflow-x: hidden;
             margin-top: 1rem;
+        }
+
+        .playlist-container::before {
+            content: "";
+
         }
 
         #playlist {
@@ -523,6 +528,8 @@
             // tracks = res.tracks.items.slice(0, 5);
             tracks = res.tracks.items;
 
+            tracksMap = new Map(tracks.map(t => [t.id, t]));
+
             const audio = new Audio();
             audio.src = "https://neobte.github.io/musica/playlists/salsa/" + tracks[currentIndex].name;
 
@@ -533,6 +540,7 @@
         }
 
         let tracks = null;
+        let tracksMap = null;
 
         const playerTrackTitle = document.getElementById("player-track-title");
         const playerTrackArtist = document.getElementById("player-track-artist");
@@ -572,6 +580,24 @@
 
             // volumeBtn.title = isVolume ? "Deactive" : "Active";
         }
+
+        function handlePlaylist(e) {
+            const li = e.target.closest("li");
+
+            if (!li) return;
+
+            const trackId = Number(li.dataset.trackId);
+            const track = tracksMap.get(trackId);
+
+            playerTrackTitle.textContent = track.title;
+            playerTrackArtist.textContent = track.artist;
+        }
+
+        const playlist = document.getElementById("playlist");
+
+        playlist.addEventListener("click", e => handlePlaylist(e));
+
+
 
     </script>
 
