@@ -14,15 +14,15 @@
     <style>
         :root {
             /* BACKGROUND */
-            --bg: rgba(3, 3, 3, 1);
-            --bg-2: rgba(33, 33, 33, 1);
-            /* --bg: rgb(8, 8, 8);
-            --bg-2: rgb(32, 32, 32); */
+            --bg: #121212;
 
             /* TEXT */
-            --text-primary: rgba(252, 252, 252, 1);
-            --text-secondary: rgba(156, 156, 156, 1);
+            --text-primary: #E8E8E8;
+            --text-secondary: #AFAFAF;
             --text-tertiary: rgb(96, 215, 30);
+
+            --hover: #202020;
+            --selected: #2C2C2C;
         }
 
         * {
@@ -100,7 +100,7 @@
         }
 
         .btn:hover {
-            background-color: #141414;
+            background-color: var(--hover);
         }
 
         .btn svg {
@@ -126,9 +126,6 @@
         }
 
         .volume-container {
-            /* width: 100%;
-            max-width: 424px;
-            margin: auto; */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -159,7 +156,7 @@
 
         /* Mozilla Firefox */
         .slider::-moz-range-track {
-            background-color: #1f1f1f;
+            background-color: var(--selected);
             height: 4px;
             border-radius: 4px;
         }
@@ -189,11 +186,11 @@
             height: 296px;
             overflow-y: auto;
             overflow-x: hidden;
+            margin-top: 1rem;
         }
 
         #playlist {
             list-style-type: none;
-            margin-top: 1rem;
         }
 
         .playlist-track {
@@ -203,6 +200,7 @@
             align-items: center;
             cursor: pointer;
             user-select: none;
+            border-radius: 4px;
         }
 
         .playlist-track__title {
@@ -224,8 +222,11 @@
         }
 
         .playlist-track:hover {
-            background: #141414;
-            border-radius: 4px;
+            background-color: var(--hover);
+        }
+
+        .playlist-track.playing {
+            background: rgba(96, 215, 30, .16);
         }
 
         .playlist-track__info {
