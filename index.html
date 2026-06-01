@@ -54,13 +54,13 @@
         }
 
         #player-track-title {
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: 500;
         }
 
         #player-track-artist {
             color: var(--text-secondary);
-            font-size: 14px;
+            font-size: .875rem;
         }
 
         .current-time-container {
@@ -183,15 +183,11 @@
         }
 
         .playlist-container {
-            height: 296px;
+            /* Altura fija teniendo en cuenta font-size de title 14 y font-size de artist 12 */
+            height: 306px;
             overflow-y: auto;
             overflow-x: hidden;
-            margin-top: 1rem;
-        }
-
-        .playlist-container::before {
-            content: "";
-
+            /* margin-top: 1rem; */
         }
 
         #playlist {
@@ -209,12 +205,12 @@
         }
 
         .playlist-track__title {
-            font-size: 1rem;
+            font-size: .875rem;
             font-weight: 500;
         }
 
         .playlist-track__artist {
-            font-size: 14px;
+            font-size: .75rem;
             color: #afafaf;
         }
 
@@ -423,7 +419,7 @@
         </div>
 
     </main>
-
+    <!-- DOMException: The fetching process for the media resource was aborted by the user agent at the user's request. -->
     <footer class="text-center fs-14 mt-1">
         <p>Copyright ©️ 2025 | Made with ❤️ by Julio</p>
     </footer>
@@ -505,10 +501,12 @@
             tracks.forEach((track, index) => {
                 const li = document.createElement("li");
                 li.dataset.trackId = track.id;
+                li.dataset.trackIndex = index;
+
                 li.classList.add("playlist-track");
                 li.innerHTML = `
                     <div class="playlist-track__number">
-                        <span>${track.id}</span>
+                        <span>${index + 1}</span>
                     </div>
                     <div class="playlist-track__info">
                         <h3 class="playlist-track__title">${track.title}</h3>
@@ -525,7 +523,8 @@
         }
 
         const handleResponse = res => {
-            // tracks = res.tracks.items.slice(0, 5);
+            // tracks = res.tracks.items.slice(0, 6);
+            // console.log(tracks);
             tracks = res.tracks.items;
 
             tracksMap = new Map(tracks.map(t => [t.id, t]));
@@ -545,7 +544,7 @@
         const playerTrackTitle = document.getElementById("player-track-title");
         const playerTrackArtist = document.getElementById("player-track-artist");
 
-        let currentIndex = 33;
+        let currentIndex = 0;
 
         const request_url = "https://neobte.github.io/musica/playlists/salsa/playlist.json";
 
@@ -581,23 +580,29 @@
             // volumeBtn.title = isVolume ? "Deactive" : "Active";
         }
 
-        function handlePlaylist(e) {
-            const li = e.target.closest("li");
+        const playlist = document.getElementById("playlist");
+
+        playlist.addEventListener("click", e => {
+            const li = e.target.closest(".playlist-track");
 
             if (!li) return;
+
+            const trackIndex = Number(li.dataset.trackIndex);
+
+            if (trackIndex === currentIndex) {
+                console.log("Son iguales!!!");
+                return;
+            }
+
+            currentIndex = trackIndex
 
             const trackId = Number(li.dataset.trackId);
             const track = tracksMap.get(trackId);
 
             playerTrackTitle.textContent = track.title;
             playerTrackArtist.textContent = track.artist;
-        }
 
-        const playlist = document.getElementById("playlist");
-
-        playlist.addEventListener("click", e => handlePlaylist(e));
-
-
+        });
 
     </script>
 
