@@ -184,7 +184,7 @@
 
         .playlist-container {
             /* Altura fija teniendo en cuenta font-size de title 14 y font-size de artist 12 */
-            height: 306px;
+            height: 280px;
             overflow-y: auto;
             overflow-x: hidden;
             /* margin-top: 1rem; */
@@ -205,12 +205,12 @@
         }
 
         .playlist-track__title {
-            font-size: .875rem;
+            font-size: 1rem;
             font-weight: 500;
         }
 
         .playlist-track__artist {
-            font-size: .75rem;
+            font-size: .875rem;
             color: #afafaf;
         }
 
@@ -228,6 +228,7 @@
 
         .playlist-track.playing {
             background: rgba(96, 215, 30, .16);
+            color: rgba(96, 215, 30, .9);
         }
 
         .playlist-track__info {
@@ -523,7 +524,7 @@
         }
 
         const handleResponse = res => {
-            // tracks = res.tracks.items.slice(0, 6);
+            // tracks = res.tracks.items.slice(0, 5);
             // console.log(tracks);
             tracks = res.tracks.items;
 
