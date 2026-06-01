@@ -19,7 +19,7 @@
             /* TEXT */
             --text-primary: #E8E8E8;
             --text-secondary: #AFAFAF;
-            --text-tertiary: rgb(96, 215, 30);
+            --text-tertiary: rgb(96, 30, 215);
 
             --hover: #202020;
             --selected: #2C2C2C;
@@ -105,6 +105,7 @@
         }
 
         .btn svg {
+            /* Esto hará que el icono escale en función del font-size del button */
             width: 1.5em;
             height: auto;
         }
@@ -112,7 +113,7 @@
         #play-pause-btn {
             width: 48px;
             height: 48px;
-            font-size: 1.3rem;
+            font-size: 1.25rem;
         }
 
         .controls {
@@ -165,7 +166,7 @@
 
         .slider::-moz-range-thumb {
             border: none;
-            background-color: rgba(96, 215, 30, .5);
+            background-color: rgba(96, 30, 215, .5);
             border-radius: 50%;
             width: 4px;
             height: 4px;
@@ -224,8 +225,7 @@
         }
 
         .playlist-track.playing {
-            background: rgba(96, 215, 30, .16);
-            color: rgba(96, 215, 30, .9);
+            color: var(--text-tertiary);
         }
 
         .playlist-track__info {
