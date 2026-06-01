@@ -184,7 +184,9 @@
 
         .playlist-container {
             /* Altura fija teniendo en cuenta font-size de title 14 y font-size de artist 12 */
-            height: 280px;
+            /* 280 para 5 registros */
+            /* 336 para 6 registros */
+            height: 336px;
             overflow-y: auto;
             overflow-x: hidden;
             /* margin-top: 1rem; */
@@ -276,7 +278,7 @@
 
 <body>
 
-    <header class="mt-1">
+    <header class="">
 
     </header>
 
@@ -372,7 +374,7 @@
             <span id="volume-value">50</span>
         </div>
 
-        <div class="text-center fs-14 mb-1" style="display: flex;align-items: center;justify-content: center;">
+        <div class="text-center fs-14" style="display: flex;align-items: center;justify-content: center;">
             <span>3/33</span>
         </div>
 
@@ -524,9 +526,9 @@
         }
 
         const handleResponse = res => {
-            // tracks = res.tracks.items.slice(0, 5);
             // console.log(tracks);
             tracks = res.tracks.items;
+            // tracks = res.tracks.items.slice(0, 6);
 
             tracksMap = new Map(tracks.map(t => [t.id, t]));
 
