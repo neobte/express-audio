@@ -312,9 +312,9 @@
 
         <div class="track-position-container">
             <div class="player-track-position">
-                <span class="player-current-track">1</span>
+                <span id="player-current-track">-</span>
                 /
-                <span class="player-total-tracks">114</span>
+                <span id="player-total-tracks">-</span>
             </div>
         </div>
 
@@ -362,9 +362,9 @@
         </div>
 
         <div class="current-time-container">
-            <span id="current-time" class="time">0:00</span>
+            <span id="current-time" class="time">-:--</span>
             <input type="range" id="current-time-slider" class="slider" value="0">
-            <span id="duration-time" class="time">3:33</span>
+            <span id="duration-time" class="time">-:--</span>
         </div>
 
         <div class="controls">
@@ -484,12 +484,17 @@
         const forwardStepBtn = doc.getElementById("forward-step-btn");
         const repeatBtn = doc.getElementById("repeat-btn");
 
-        let tracks = null;
-        let tracksMap = null;
+        let state = {
+            originalPlaylist: [],
+            playbackQueue: [],
+            tracksMap: new Map(),
+            currentIndex: 0, // Podemos setear a null, si es que no queremos cargar nada por defecto, o -1 nada cargado aún
+            isShuffle: false
+        };
 
         let previousLisItem = null;
 
-        let currentTrackIndex = 2;
+        const audio = new Audio();
 
         // URL para petición de los datos de la playlist "salsa" al backend
         const request_url = "https://neobte.github.io/musica/playlists/salsa/playlist.json";
@@ -499,34 +504,44 @@
         });
 
         const init = () => {
-            // Call the function
-            sendFetchHttpRequest(request_url, handleResponse);
+            // Petición de los datos al servidor
+            sendFetchHttpRequest(request_url, loadPlaylist);
         }
 
-        const handleResponse = res => {
-            // console.log(tracks);
-            tracks = res.tracks.items;
+        const loadPlaylist = res => {
+            const tracks = res.tracks.items;
             // tracks = res.tracks.items.slice(0, 6);
+            state.originalPlaylist = tracks;
+            state.playbackQueue = [...tracks];
 
-            tracksMap = new Map(tracks.map(t => [t.id, t]));
+            state.tracksMap = new Map(tracks.map(track => [track.id, track]));
 
-            const audio = new Audio();
-            audio.src = "https://neobte.github.io/musica/playlists/salsa/" + tracks[currentTrackIndex].name;
+            // Esto seleccionará una canción aleatoria siempre. Para que no siempre inicie en 0
+            state.currentIndex = getRandomInt(0, state.playbackQueue.length - 1);
 
-            playerTrackTitle.textContent = tracks[currentTrackIndex].title;
-            playerTrackArtist.textContent = tracks[currentTrackIndex].artist;
+            // Seteamos el src del objeto audio
+            audio.src = "https://neobte.github.io/musica/playlists/salsa/" + state.playbackQueue[state.currentIndex].name;
 
+            // UI
             renderTracks();
+
+            playerTrackTitle.textContent = state.playbackQueue[state.currentIndex].title;
+            playerTrackArtist.textContent = state.playbackQueue[state.currentIndex].artist;
+
+            currentTrack.textContent = state.currentIndex + 1;
+            totalTracks.textContent = `${state.playbackQueue.length}`;
+
         }
 
         const renderTracks = () => {
-            const container = doc.getElementById('playlist');
+            // La variable "playlist" solo vive en este ámbito, no colisionará con la variable "playlist" del HTML
+            const playlist = doc.getElementById('playlist');
 
-            container.innerHTML = '';
+            playlist.innerHTML = '';
 
             const fragment = doc.createDocumentFragment();
 
-            tracks.forEach((track, index) => {
+            state.playbackQueue.forEach((track, index) => {
                 const li = doc.createElement("li");
                 li.dataset.trackId = track.id;
                 li.dataset.trackIndex = index;
@@ -547,13 +562,42 @@
                 fragment.appendChild(li);
             });
 
-            container.appendChild(fragment);
+            playlist.appendChild(fragment);
 
             // Esta lógica es para cuando se carga por default una canción x en el reproductor
-            const listItem = container.children[currentTrackIndex];
+            const listItem = playlist.children[state.currentIndex];
             listItem.classList.add("playing");
             previousLisItem = listItem;
         }
+
+        playlist.addEventListener("click", e => {
+            const li = e.target.closest(".playlist-track");
+
+            if (!li) return;
+
+            const trackIndex = Number(li.dataset.trackIndex);
+
+            if (trackIndex === state.currentIndex) {
+                console.log("Son iguales!!!");
+                return;
+            }
+
+            if (previousLisItem) previousLisItem.classList.remove("playing");
+
+            li.classList.add("playing");
+            previousLisItem = li;
+
+            state.currentIndex = trackIndex;
+
+            const trackId = Number(li.dataset.trackId);
+            const track = state.tracksMap.get(trackId);
+
+            playerTrackTitle.textContent = track.title;
+            playerTrackArtist.textContent = track.artist;
+
+            currentTrack.textContent = state.currentIndex + 1;
+
+        });
 
         volumeBtn.addEventListener("click", toggleVolume);
 
@@ -576,35 +620,7 @@
             // volumeBtn.title = isVolume ? "Deactive" : "Active";
         }
 
-        playlist.addEventListener("click", e => {
-            const li = e.target.closest(".playlist-track");
-
-            if (!li) return;
-
-            const trackIndex = Number(li.dataset.trackIndex);
-
-            if (trackIndex === currentTrackIndex) {
-                console.log("Son iguales!!!");
-                return;
-            }
-
-            if (previousLisItem) {
-                previousLisItem.classList.remove("playing");
-            }
-
-            li.classList.add("playing");
-            previousLisItem = li;
-
-            currentTrackIndex = trackIndex
-
-            const trackId = Number(li.dataset.trackId);
-            const track = tracksMap.get(trackId);
-
-            playerTrackTitle.textContent = track.title;
-            playerTrackArtist.textContent = track.artist;
-
-        });
-
+        // Eventos de controles del reproductor
         shuffleBtn.addEventListener("click", e => {
             shuffleBtn.classList.toggle("active");
         });
@@ -675,6 +691,10 @@
                 : // Show min seconds format => 8 min 47 s
                 `${min} min ${s} s`;
         };
+
+        const getRandomInt = (min, max) => {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
 
     </script>
 
