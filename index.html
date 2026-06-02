@@ -19,7 +19,8 @@
             /* TEXT */
             --text-primary: #E8E8E8;
             --text-secondary: #AFAFAF;
-            --text-tertiary: rgb(96, 30, 215);
+            /* --text-tertiary: rgb(96, 30, 215); */
+            --accent: rgb(139, 92, 246);
 
             --hover: #202020;
             --selected: #2C2C2C;
@@ -89,7 +90,6 @@
             justify-content: center;
 
             aspect-ratio: 1/1;
-            /* border-radius: 50%; */
             border-radius: .25rem;
             font-size: 1rem;
 
@@ -159,21 +159,21 @@
         }
 
         .slider::-moz-range-progress {
-            background-color: var(--text-tertiary);
+            background-color: var(--accent);
             height: 4px;
             border-radius: 4px;
         }
 
         .slider::-moz-range-thumb {
             border: none;
-            background-color: rgba(96, 30, 215, .5);
+            background-color: rgba(139, 92, 246, .5);
             border-radius: 50%;
             width: 4px;
             height: 4px;
         }
 
         .slider:not(:disabled):hover::-moz-range-thumb {
-            background-color: var(--text-tertiary);
+            background-color: var(--accent);
             width: 10px;
             height: 10px;
             transform: scale(1.3);
@@ -225,7 +225,7 @@
         }
 
         .playlist-track.playing {
-            color: var(--text-tertiary);
+            color: var(--accent);
         }
 
         .playlist-track__info {
@@ -268,6 +268,11 @@
         .mt-1 {
             margin-top: 1rem;
         }
+
+        #repeat-btn.active,
+        #shuffle-btn.active {
+            color: var(--accent);
+        }
     </style>
 </head>
 
@@ -292,7 +297,7 @@
         <div class="controls">
 
             <!-- Shuffle btn -->
-            <button id="shffle-btn" class="btn" title="Shuffle">
+            <button id="shuffle-btn" class="btn" title="Shuffle">
                 <!-- Shuffle icon -->
                 <svg id="shuffle-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
                     <path fill="currentColor"
@@ -521,6 +526,11 @@
             });
 
             container.appendChild(fragment);
+
+            // Esta lógica es para cuando se carga por default una canción x en el reproductor
+            const listItem = container.children[currentIndex];
+            listItem.classList.add("playing");
+            previousLisItem = listItem;
         }
 
         const handleResponse = res => {
@@ -545,7 +555,7 @@
         const playerTrackTitle = document.getElementById("player-track-title");
         const playerTrackArtist = document.getElementById("player-track-artist");
 
-        let currentIndex = 0;
+        let currentIndex = 2;
 
         const request_url = "https://neobte.github.io/musica/playlists/salsa/playlist.json";
 
@@ -582,6 +592,7 @@
         }
 
         const playlist = document.getElementById("playlist");
+        let previousLisItem = null;
 
         playlist.addEventListener("click", e => {
             const li = e.target.closest(".playlist-track");
@@ -595,6 +606,13 @@
                 return;
             }
 
+            if (previousLisItem) {
+                previousLisItem.classList.remove("playing");
+            }
+
+            li.classList.add("playing");
+            previousLisItem = li;
+
             currentIndex = trackIndex
 
             const trackId = Number(li.dataset.trackId);
@@ -603,6 +621,16 @@
             playerTrackTitle.textContent = track.title;
             playerTrackArtist.textContent = track.artist;
 
+        });
+
+        const shuffleBtn = document.getElementById("shuffle-btn");
+        shuffleBtn.addEventListener("click", e => {
+            shuffleBtn.classList.toggle("active");
+        });
+
+        const repeatBtn = document.getElementById("repeat-btn");
+        repeatBtn.addEventListener("click", e => {
+            repeatBtn.classList.toggle("active");
         });
 
     </script>
