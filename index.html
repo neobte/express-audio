@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Player</title>
+    <title>Express Audio</title>
     <!-- <h1>h1 -> 32px</h1>
     <h2>h2 -> 24px</h2>
     <h3>h3 -> 18.72px</h3>
@@ -289,6 +289,78 @@
             <p id="player-track-artist">Virus</p>
         </div>
 
+        <style>
+            .track-position-container {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: .5rem;
+                border: 3px solid #ffffff0d;
+                margin: 1rem 0;
+            }
+
+            .player-track-position {
+                width: 80px;
+                font-size: .875rem;
+                text-align: center;
+            }
+
+            .player-track-position>* {
+                font-variant-numeric: tabular-nums;
+            }
+        </style>
+
+        <div class="track-position-container">
+            <div class="player-track-position">
+                <span class="player-current-track">1</span>
+                /
+                <span class="player-total-tracks">114</span>
+            </div>
+        </div>
+
+        <div class="playlist-container">
+
+            <ul id="playlist">
+                <li class="playlist-track">
+                    <div class="playlist-track__number">
+                        <span>1</span>
+                    </div>
+                    <div class="playlist-track__info">
+                        <h3 class="playlist-track__title">Sin Disfraz</h3>
+                        <p class="playlist-track__artist">Virus</p>
+                    </div>
+                    <div class="playlist-track__duration">
+                        <span>3:33</span>
+                    </div>
+                </li>
+                <li class="playlist-track">
+                    <div class="playlist-track__number">
+                        <span>10</span>
+                    </div>
+                    <div class="playlist-track__info">
+                        <h3 class="playlist-track__title">Todo Estaba Bien</h3>
+                        <p class="playlist-track__artist">Grupo Río</p>
+                    </div>
+                    <div class="playlist-track__duration">
+                        <span>4:22</span>
+                    </div>
+                </li>
+                <li class="playlist-track">
+                    <div class="playlist-track__number">
+                        <span>100</span>
+                    </div>
+                    <div class="playlist-track__info">
+                        <h3 class="playlist-track__title">Always On My Mind</h3>
+                        <p class="playlist-track__artist">Pet Shop Boys</p>
+                    </div>
+                    <div class="playlist-track__duration">
+                        <span>3:53</span>
+                    </div>
+                </li>
+            </ul>
+
+        </div>
+
         <div class="current-time-container">
             <span id="current-time" class="time">0:00</span>
             <input type="range" id="current-time-slider" class="slider" value="0">
@@ -374,57 +446,6 @@
             <span id="volume-value">50</span>
         </div>
 
-        <div class="text-center fs-14" style="display: flex;align-items: center;justify-content: center;
-                    border-radius: .5rem;
-            border: 3px solid #ffffff0d;
-        margin: 1rem 0;
-        ">
-            <span>1/114</span>
-        </div>
-
-        <div class="playlist-container">
-
-            <ul id="playlist">
-                <li class="playlist-track">
-                    <div class="playlist-track__number">
-                        <span>1</span>
-                    </div>
-                    <div class="playlist-track__info">
-                        <h3 class="playlist-track__title">Sin Disfraz</h3>
-                        <p class="playlist-track__artist">Virus</p>
-                    </div>
-                    <div class="playlist-track__duration">
-                        <span>3:33</span>
-                    </div>
-                </li>
-                <li class="playlist-track">
-                    <div class="playlist-track__number">
-                        <span>10</span>
-                    </div>
-                    <div class="playlist-track__info">
-                        <h3 class="playlist-track__title">Todo Estaba Bien</h3>
-                        <p class="playlist-track__artist">Grupo Río</p>
-                    </div>
-                    <div class="playlist-track__duration">
-                        <span>4:22</span>
-                    </div>
-                </li>
-                <li class="playlist-track">
-                    <div class="playlist-track__number">
-                        <span>100</span>
-                    </div>
-                    <div class="playlist-track__info">
-                        <h3 class="playlist-track__title">Always On My Mind</h3>
-                        <p class="playlist-track__artist">Pet Shop Boys</p>
-                    </div>
-                    <div class="playlist-track__duration">
-                        <span>3:53</span>
-                    </div>
-                </li>
-            </ul>
-
-        </div>
-
     </main>
     <!-- DOMException: The fetching process for the media resource was aborted by the user agent at the user's request. -->
     <footer class="text-center fs-14 mt-1">
@@ -434,6 +455,163 @@
     <script>
 
         "use strict";
+
+        const doc = document;
+
+        // Detalles de Título y Artista, componente superior
+        const playerTrackTitle = doc.getElementById("player-track-title");
+        const playerTrackArtist = doc.getElementById("player-track-artist");
+
+        // Detalles de número de track del total de tracks
+        const currentTrack = doc.getElementById("player-current-track");
+        const totalTracks = doc.getElementById("player-total-tracks");
+
+        // Detalles de la playlist
+        const playlist = doc.getElementById("playlist");
+
+        // Detalles de los componente de volumen
+        const volumeBtn = doc.getElementById("volume-btn");
+        const volumeIcon = doc.getElementById("volume-icon");
+        const volumeSlashIcon = doc.getElementById("volume-slash-icon");
+        const volumeSlider = doc.getElementById("volume-slider");
+        const volumeSliderValue = volumeSlider.value; // El valor por defecto es "50"
+        const volumeValue = doc.getElementById("volume-value");
+
+        // Controles del reproductor
+        const shuffleBtn = doc.getElementById("shuffle-btn");
+        const backwardStepBtn = doc.getElementById("backward-step-btn");
+        const playPauseBtn = doc.getElementById("play-pause-btn");
+        const forwardStepBtn = doc.getElementById("forward-step-btn");
+        const repeatBtn = doc.getElementById("repeat-btn");
+
+        let tracks = null;
+        let tracksMap = null;
+
+        let previousLisItem = null;
+
+        let currentTrackIndex = 2;
+
+        // URL para petición de los datos de la playlist "salsa" al backend
+        const request_url = "https://neobte.github.io/musica/playlists/salsa/playlist.json";
+
+        doc.addEventListener("DOMContentLoaded", e => {
+            init();
+        });
+
+        const init = () => {
+            // Call the function
+            sendFetchHttpRequest(request_url, handleResponse);
+        }
+
+        const handleResponse = res => {
+            // console.log(tracks);
+            tracks = res.tracks.items;
+            // tracks = res.tracks.items.slice(0, 6);
+
+            tracksMap = new Map(tracks.map(t => [t.id, t]));
+
+            const audio = new Audio();
+            audio.src = "https://neobte.github.io/musica/playlists/salsa/" + tracks[currentTrackIndex].name;
+
+            playerTrackTitle.textContent = tracks[currentTrackIndex].title;
+            playerTrackArtist.textContent = tracks[currentTrackIndex].artist;
+
+            renderTracks();
+        }
+
+        const renderTracks = () => {
+            const container = doc.getElementById('playlist');
+
+            container.innerHTML = '';
+
+            const fragment = doc.createDocumentFragment();
+
+            tracks.forEach((track, index) => {
+                const li = doc.createElement("li");
+                li.dataset.trackId = track.id;
+                li.dataset.trackIndex = index;
+
+                li.classList.add("playlist-track");
+                li.innerHTML = `
+                    <div class="playlist-track__number">
+                        <span>${index + 1}</span>
+                    </div>
+                    <div class="playlist-track__info">
+                        <h3 class="playlist-track__title">${track.title}</h3>
+                        <p class="playlist-track__artist">${track.artist}</p>
+                    </div>
+                    <div class="playlist-track__duration">
+                        <span>${formatTime(track.duration)}</span>
+                    </div>
+                `;
+                fragment.appendChild(li);
+            });
+
+            container.appendChild(fragment);
+
+            // Esta lógica es para cuando se carga por default una canción x en el reproductor
+            const listItem = container.children[currentTrackIndex];
+            listItem.classList.add("playing");
+            previousLisItem = listItem;
+        }
+
+        volumeBtn.addEventListener("click", toggleVolume);
+
+        volumeSlider.addEventListener("input", () => {
+            volumeValue.textContent = volumeSlider.value;
+            volumeSliderValue = volumeSlider.value
+        });
+
+        function toggleVolume() {
+
+            volumeIcon.classList.toggle("d-none");
+            if (volumeSlider.value > 0) {
+                volumeSlider.value = 0;
+            } else {
+                volumeSlider.value = volumeSliderValue;
+            }
+
+            volumeSlashIcon.classList.toggle("d-none");
+
+            // volumeBtn.title = isVolume ? "Deactive" : "Active";
+        }
+
+        playlist.addEventListener("click", e => {
+            const li = e.target.closest(".playlist-track");
+
+            if (!li) return;
+
+            const trackIndex = Number(li.dataset.trackIndex);
+
+            if (trackIndex === currentTrackIndex) {
+                console.log("Son iguales!!!");
+                return;
+            }
+
+            if (previousLisItem) {
+                previousLisItem.classList.remove("playing");
+            }
+
+            li.classList.add("playing");
+            previousLisItem = li;
+
+            currentTrackIndex = trackIndex
+
+            const trackId = Number(li.dataset.trackId);
+            const track = tracksMap.get(trackId);
+
+            playerTrackTitle.textContent = track.title;
+            playerTrackArtist.textContent = track.artist;
+
+        });
+
+        shuffleBtn.addEventListener("click", e => {
+            shuffleBtn.classList.toggle("active");
+        });
+
+        repeatBtn.addEventListener("click", e => {
+            repeatBtn.classList.toggle("active");
+        });
 
         const sendFetchHttpRequest = async (url, callback, method = "GET", data = {}) => {
             method = method.toUpperCase();
@@ -497,142 +675,6 @@
                 : // Show min seconds format => 8 min 47 s
                 `${min} min ${s} s`;
         };
-
-        const renderTracks = () => {
-            const container = document.getElementById('playlist');
-
-            container.innerHTML = '';
-
-            const fragment = document.createDocumentFragment();
-
-            tracks.forEach((track, index) => {
-                const li = document.createElement("li");
-                li.dataset.trackId = track.id;
-                li.dataset.trackIndex = index;
-
-                li.classList.add("playlist-track");
-                li.innerHTML = `
-                    <div class="playlist-track__number">
-                        <span>${index + 1}</span>
-                    </div>
-                    <div class="playlist-track__info">
-                        <h3 class="playlist-track__title">${track.title}</h3>
-                        <p class="playlist-track__artist">${track.artist}</p>
-                    </div>
-                    <div class="playlist-track__duration">
-                        <span>${formatTime(track.duration)}</span>
-                    </div>
-                `;
-                fragment.appendChild(li);
-            });
-
-            container.appendChild(fragment);
-
-            // Esta lógica es para cuando se carga por default una canción x en el reproductor
-            const listItem = container.children[currentIndex];
-            listItem.classList.add("playing");
-            previousLisItem = listItem;
-        }
-
-        const handleResponse = res => {
-            // console.log(tracks);
-            tracks = res.tracks.items;
-            // tracks = res.tracks.items.slice(0, 6);
-
-            tracksMap = new Map(tracks.map(t => [t.id, t]));
-
-            const audio = new Audio();
-            audio.src = "https://neobte.github.io/musica/playlists/salsa/" + tracks[currentIndex].name;
-
-            playerTrackTitle.textContent = tracks[currentIndex].title;
-            playerTrackArtist.textContent = tracks[currentIndex].artist;
-
-            renderTracks();
-        }
-
-        let tracks = null;
-        let tracksMap = null;
-
-        const playerTrackTitle = document.getElementById("player-track-title");
-        const playerTrackArtist = document.getElementById("player-track-artist");
-
-        let currentIndex = 2;
-
-        const request_url = "https://neobte.github.io/musica/playlists/salsa/playlist.json";
-
-        // Call the function
-        sendFetchHttpRequest(request_url, handleResponse);
-
-
-        const volumeBtn = document.getElementById("volume-btn");
-        const volumeIcon = document.getElementById("volume-icon");
-        const volumeSlashIcon = document.getElementById("volume-slash-icon");
-        const volumeSlider = document.getElementById("volume-slider");
-        const volumeSliderValue = volumeSlider.value;
-        const volumeValue = document.getElementById("volume-value");
-
-        volumeBtn.addEventListener("click", toggleVolume);
-
-        volumeSlider.addEventListener("input", () => {
-            volumeValue.textContent = volumeSlider.value;
-            volumeSliderValue = volumeSlider.value
-        });
-
-        function toggleVolume() {
-
-            volumeIcon.classList.toggle("d-none");
-            if (volumeSlider.value > 0) {
-                volumeSlider.value = 0;
-            } else {
-                volumeSlider.value = volumeSliderValue;
-            }
-
-            volumeSlashIcon.classList.toggle("d-none");
-
-            // volumeBtn.title = isVolume ? "Deactive" : "Active";
-        }
-
-        const playlist = document.getElementById("playlist");
-        let previousLisItem = null;
-
-        playlist.addEventListener("click", e => {
-            const li = e.target.closest(".playlist-track");
-
-            if (!li) return;
-
-            const trackIndex = Number(li.dataset.trackIndex);
-
-            if (trackIndex === currentIndex) {
-                console.log("Son iguales!!!");
-                return;
-            }
-
-            if (previousLisItem) {
-                previousLisItem.classList.remove("playing");
-            }
-
-            li.classList.add("playing");
-            previousLisItem = li;
-
-            currentIndex = trackIndex
-
-            const trackId = Number(li.dataset.trackId);
-            const track = tracksMap.get(trackId);
-
-            playerTrackTitle.textContent = track.title;
-            playerTrackArtist.textContent = track.artist;
-
-        });
-
-        const shuffleBtn = document.getElementById("shuffle-btn");
-        shuffleBtn.addEventListener("click", e => {
-            shuffleBtn.classList.toggle("active");
-        });
-
-        const repeatBtn = document.getElementById("repeat-btn");
-        repeatBtn.addEventListener("click", e => {
-            repeatBtn.classList.toggle("active");
-        });
 
     </script>
 
