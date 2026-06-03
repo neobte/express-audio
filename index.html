@@ -499,8 +499,8 @@
             isPlaying: false
         };
 
-        // Variable para control de list item seleccionado previamente
-        let previousLisItem = null;
+        // Variable para control de list item seleccionado actualmente
+        let currentListItem = null;
 
         // Objeto audio
         const audio = new Audio();
@@ -581,15 +581,22 @@
                 fragment.appendChild(li);
             });
 
+            // Aquí los elementos ya existen en el DOM
             playlist.appendChild(fragment);
 
 
-            // A partir de aquí revisar 
+            // Solución técnica
+            // const track = state.playbackQueue[state.currentIndex];
+            // const listItem = playlist.querySelector(`[data-track-id="${track.id}"]`);
+            // listItem.classList.add("playing");
+            // currentListItem = listItem;
 
-            // Esta lógica es para cuando se carga por default una canción x en el reproductor
+            // O
+
+            // Utilizar lo siguiente por ser el render inicial
             const listItem = playlist.children[state.currentIndex];
             listItem.classList.add("playing");
-            previousLisItem = listItem;
+            currentListItem = listItem;
 
             scrollIntoView(listItem);
         }
@@ -607,10 +614,10 @@
                 return;
             }
 
-            if (previousLisItem) previousLisItem.classList.remove("playing");
+            if (currentListItem) currentListItem.classList.remove("playing");
 
             li.classList.add("playing");
-            previousLisItem = li;
+            currentListItem = li;
 
             state.currentIndex = trackIndex;
 
@@ -653,6 +660,7 @@
 
             updateCurrentTrackUI();
             updateTrackPositionUI();
+            updatePlaylistSelectionUI();
         }
 
         function loadTrack(track) {
@@ -686,6 +694,24 @@
             updateShuffleButtonUI();
         }
 
+        function updatePlaylistSelectionUI() {
+
+            const track = state.playbackQueue[state.currentIndex];
+
+            if (!track) return;
+
+            if (currentListItem) currentListItem.classList.remove("playing");
+
+            const listItem = doc.querySelector(`li[data-track-id="${track.id}"]`);
+
+            if (!listItem) return;
+
+            listItem.classList.add("playing");
+            currentListItem = listItem;
+
+            scrollIntoView(listItem);
+        }
+
         function updateCurrentTrackUI() {
             const track = state.playbackQueue[state.currentIndex];
 
@@ -696,9 +722,9 @@
         }
 
         function updateTrackPositionUI() {
-            const currentTrack = state.playbackQueue[state.currentIndex];
+            const track = state.playbackQueue[state.currentIndex];
 
-            const originalIndex = state.originalPlaylist.findIndex(track => track.id === currentTrack.id);
+            const originalIndex = state.originalPlaylist.findIndex(track => track.id === track.id);
 
             playerCurrentTrack.textContent = originalIndex + 1;
 
