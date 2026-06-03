@@ -50,7 +50,7 @@
 
         .player-track {
             text-align: center;
-            /* height: 41px; */
+            height: 56px;
             padding: .5rem;
         }
 
@@ -285,8 +285,8 @@
     <main class="container">
 
         <div class="player-track">
-            <h3 id="player-track-title">Sin Disfraz</h3>
-            <p id="player-track-artist">Virus</p>
+            <h3 id="player-track-title">Nada esta sonando...</h3>
+            <p id="player-track-artist"></p>
         </div>
 
         <style>
@@ -370,11 +370,12 @@
         <div class="controls">
 
             <!-- Shuffle btn -->
-            <button id="shuffle-btn" class="btn" title="Shuffle">
+            <button id="shuffle-btn" class="btn" title="Activar reproducción aleatoria">
                 <!-- Shuffle icon -->
                 <svg id="shuffle-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
                     <path fill="currentColor"
                         d="M467.8 98.4C479.8 93.4 493.5 96.2 502.7 105.3L566.7 169.3C572.7 175.3 576.1 183.4 576.1 191.9C576.1 200.4 572.7 208.5 566.7 214.5L502.7 278.5C493.5 287.7 479.8 290.4 467.8 285.4C455.8 280.4 448 268.9 448 256L448 224L416 224C405.9 224 396.4 228.7 390.4 236.8L358 280L318 226.7L339.2 198.4C357.3 174.2 385.8 160 416 160L448 160L448 128C448 115.1 455.8 103.4 467.8 98.4zM218 360L258 413.3L236.8 441.6C218.7 465.8 190.2 480 160 480L96 480C78.3 480 64 465.7 64 448C64 430.3 78.3 416 96 416L160 416C170.1 416 179.6 411.3 185.6 403.2L218 360zM502.6 534.6C493.4 543.8 479.7 546.5 467.7 541.5C455.7 536.5 448 524.9 448 512L448 480L416 480C385.8 480 357.3 465.8 339.2 441.6L185.6 236.8C179.6 228.7 170.1 224 160 224L96 224C78.3 224 64 209.7 64 192C64 174.3 78.3 160 96 160L160 160C190.2 160 218.7 174.2 236.8 198.4L390.4 403.2C396.4 411.3 405.9 416 416 416L448 416L448 384C448 371.1 455.8 359.4 467.8 354.4C479.8 349.4 493.5 352.2 502.7 361.3L566.7 425.3C572.7 431.3 576.1 439.4 576.1 447.9C576.1 456.4 572.7 464.5 566.7 470.5L502.7 534.5z" />
+                    <circle r="50" cx="120" cy="320" fill="currentColor" class="d-none"></circle>
                 </svg>
             </button>
 
@@ -458,13 +459,15 @@
 
         const doc = document;
 
+        /*** Referencias Cacheadas ***/
+
         // Detalles de Título y Artista, componente superior
         const playerTrackTitle = doc.getElementById("player-track-title");
         const playerTrackArtist = doc.getElementById("player-track-artist");
 
-        // Detalles de número de track del total de tracks
-        const currentTrack = doc.getElementById("player-current-track");
-        const totalTracks = doc.getElementById("player-total-tracks");
+        // Detalles de número de track de total de tracks
+        const playerCurrentTrack = doc.getElementById("player-current-track");
+        const playerTotalTracks = doc.getElementById("player-total-tracks");
 
         // Detalles de la playlist
         const playlist = doc.getElementById("playlist");
@@ -479,57 +482,73 @@
 
         // Controles del reproductor
         const shuffleBtn = doc.getElementById("shuffle-btn");
+        const shuffleIconCircle = shuffleBtn.querySelector("circle");
+
         const backwardStepBtn = doc.getElementById("backward-step-btn");
         const playPauseBtn = doc.getElementById("play-pause-btn");
         const forwardStepBtn = doc.getElementById("forward-step-btn");
         const repeatBtn = doc.getElementById("repeat-btn");
 
+        // Estado del reproductor
         let state = {
             originalPlaylist: [],
             playbackQueue: [],
             tracksMap: new Map(),
             currentIndex: 0, // Podemos setear a null, si es que no queremos cargar nada por defecto, o -1 nada cargado aún
-            isShuffle: false
+            isShuffle: false,
+            isPlaying: false
         };
 
+        // Variable para control de list item seleccionado previamente
         let previousLisItem = null;
 
+        // Objeto audio
         const audio = new Audio();
 
         // URL para petición de los datos de la playlist "salsa" al backend
-        const request_url = "https://neobte.github.io/musica/playlists/salsa/playlist.json";
+        const BASE_URL = "https://neobte.github.io/musica/playlists/salsa/";
 
-        doc.addEventListener("DOMContentLoaded", e => {
+        doc.addEventListener("DOMContentLoaded", () => {
             init();
         });
 
         const init = () => {
+            const request_url = BASE_URL + "playlist.json"; // Aquí no hace falta encodeURIComponent()
             // Petición de los datos al servidor
             sendFetchHttpRequest(request_url, loadPlaylist);
         }
 
         const loadPlaylist = res => {
-            const tracks = res.tracks.items;
-            // tracks = res.tracks.items.slice(0, 6);
+            // Respuesta del backend
+            // const tracks = res.tracks.items;
+            const tracks = res.tracks.items.slice(0, 6);
             state.originalPlaylist = tracks;
             state.playbackQueue = [...tracks];
 
+            // Creamos un Mapper para ubicar los tracks más rapidamente
             state.tracksMap = new Map(tracks.map(track => [track.id, track]));
 
-            // Esto seleccionará una canción aleatoria siempre. Para que no siempre inicie en 0
+            // Obtenemos un currentIndex distinto, cada vez que cargamos la página. No queremos que siempre inicie en 0
             state.currentIndex = getRandomInt(0, state.playbackQueue.length - 1);
 
-            // Seteamos el src del objeto audio
-            audio.src = "https://neobte.github.io/musica/playlists/salsa/" + state.playbackQueue[state.currentIndex].name;
+            // Obtenemos el track en la posición de state.currentIndex por defecto
+            const track = state.playbackQueue[state.currentIndex];
+
+            // Cargamos el track
+            loadTrack(track);
 
             // UI
             renderTracks();
 
+            // Actualizamos la UI con el nombre del título y el artista
             playerTrackTitle.textContent = state.playbackQueue[state.currentIndex].title;
             playerTrackArtist.textContent = state.playbackQueue[state.currentIndex].artist;
 
-            currentTrack.textContent = state.currentIndex + 1;
-            totalTracks.textContent = `${state.playbackQueue.length}`;
+            // Actualizamos X número de canción de un total de Y canciones
+            playerCurrentTrack.textContent = state.currentIndex + 1;
+
+            // Seteamos una sola vez el número total de canciones
+            playerTotalTracks.textContent = `${state.playbackQueue.length}`;
 
         }
 
@@ -564,12 +583,18 @@
 
             playlist.appendChild(fragment);
 
+
+            // A partir de aquí revisar 
+
             // Esta lógica es para cuando se carga por default una canción x en el reproductor
             const listItem = playlist.children[state.currentIndex];
             listItem.classList.add("playing");
             previousLisItem = listItem;
+
+            scrollIntoView(listItem);
         }
 
+        // Delegación de eventos para seleccionar un track de la playlist
         playlist.addEventListener("click", e => {
             const li = e.target.closest(".playlist-track");
 
@@ -592,42 +617,134 @@
             const trackId = Number(li.dataset.trackId);
             const track = state.tracksMap.get(trackId);
 
+            // Actualizar UI
             playerTrackTitle.textContent = track.title;
             playerTrackArtist.textContent = track.artist;
 
-            currentTrack.textContent = state.currentIndex + 1;
+            playerCurrentTrack.textContent = state.currentIndex + 1;
 
         });
 
-        volumeBtn.addEventListener("click", toggleVolume);
-
-        volumeSlider.addEventListener("input", () => {
-            volumeValue.textContent = volumeSlider.value;
-            volumeSliderValue = volumeSlider.value
-        });
-
-        function toggleVolume() {
-
-            volumeIcon.classList.toggle("d-none");
-            if (volumeSlider.value > 0) {
-                volumeSlider.value = 0;
-            } else {
-                volumeSlider.value = volumeSliderValue;
-            }
-
-            volumeSlashIcon.classList.toggle("d-none");
-
-            // volumeBtn.title = isVolume ? "Deactive" : "Active";
+        const scrollIntoView = listItem => {
+            listItem.scrollIntoView({ behavior: "smooth", block: "center" });
         }
 
         // Eventos de controles del reproductor
-        shuffleBtn.addEventListener("click", e => {
-            shuffleBtn.classList.toggle("active");
+        shuffleBtn.addEventListener("click", toggleShuffle);
+
+        forwardStepBtn.addEventListener("click", () => {
+            // 1. Actualizar currentIndex
+            state.currentIndex = (state.currentIndex + 1) % state.playbackQueue.length;
+
+            loadCurrentTrack();
+
+            if (state.isPlaying) {
+                playAudio()
+            }
+
         });
 
-        repeatBtn.addEventListener("click", e => {
-            repeatBtn.classList.toggle("active");
-        });
+        function loadCurrentTrack() {
+            const track = state.playbackQueue[state.currentIndex];
+
+            if (!track) return;
+
+            loadTrack(track);
+
+            updateCurrentTrackUI();
+            updateTrackPositionUI();
+        }
+
+        function loadTrack(track) {
+            audio.pause();
+            audio.currentTime = 0;
+            audio.src = BASE_URL + encodeURIComponent(track.name);
+            // audio.dataset.trackId = track.id;
+        }
+
+        async function playAudio() {
+            try {
+                await audio.play();
+            } catch (err) {
+                console.error("Error al reproducir audio:", err);
+            }
+        }
+
+        function pauseAudio() {
+            audio.pause();
+        }
+
+        function toggleShuffle() {
+            state.isShuffle = !state.isShuffle;
+
+            if (state.isShuffle) {
+                enableShuffle();
+            } else {
+                disableShuffle();
+            }
+
+            updateShuffleButtonUI();
+        }
+
+        function updateCurrentTrackUI() {
+            const track = state.playbackQueue[state.currentIndex];
+
+            if (!track) return;
+
+            playerTrackTitle.textContent = track.title;
+            playerTrackArtist.textContent = track.artist;
+        }
+
+        function updateTrackPositionUI() {
+            const currentTrack = state.playbackQueue[state.currentIndex];
+
+            const originalIndex = state.originalPlaylist.findIndex(track => track.id === currentTrack.id);
+
+            playerCurrentTrack.textContent = originalIndex + 1;
+
+            // Implementación anterior
+            // playerCurrentTrack.textContent = state.isShuffle ? state.originalPlaylist[state.currentIndex].id : state.currentIndex + 1;
+        }
+
+        function updateShuffleButtonUI() {
+            shuffleBtn.classList.toggle("active", state.isShuffle);
+            shuffleBtn.title = state.isShuffle
+                ? "Desactivar reproducción aleatoria"
+                : "Activar reproducción aleatoria";
+
+            shuffleIconCircle.classList.toggle("d-none");
+        }
+
+        function enableShuffle() {
+            // Tracks que ya sonaron
+            const playedTracks = state.playbackQueue.slice(0, state.currentIndex);
+
+            // Track actualmente en reproducción
+            const currentTrack = state.playbackQueue[state.currentIndex];
+
+            // Tracks que aún no sonaron
+            const upcomingTracks = state.playbackQueue.slice(state.currentIndex + 1);
+
+            // No modificamos el array "upcomingTracks", recibimos una copia de el
+            const shuffledUpcoming = shuffleArray(upcomingTracks);
+
+            state.playbackQueue = [
+                ...playedTracks,
+                currentTrack,
+                ...shuffledUpcoming
+            ];
+        }
+
+        function disableShuffle() {
+            // Track actualmente en reproducción
+            const currentTrack = state.playbackQueue[state.currentIndex];
+
+            // Devolvemos el orden original al array "playbackQueue"
+            state.playbackQueue = [...state.originalPlaylist];
+
+            // Buscamos el "index" en el array original
+            state.currentIndex = state.originalPlaylist.findIndex(track => track.id === currentTrack.id);
+        }
 
         const sendFetchHttpRequest = async (url, callback, method = "GET", data = {}) => {
             method = method.toUpperCase();
@@ -695,6 +812,17 @@
         const getRandomInt = (min, max) => {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
+
+        // https://introcs.cs.princeton.edu/java/14array/Deck.java.html
+        const shuffleArray = arr => {
+            const copy = [...arr];
+            const n = copy.length;
+            for (let i = 0; i < n; i++) {
+                const r = i + Math.floor(Math.random() * (n - i));
+                [copy[i], copy[r]] = [copy[r], copy[i]];
+            }
+            return copy;
+        };
 
     </script>
 
