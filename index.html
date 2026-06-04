@@ -380,7 +380,7 @@
             </button>
 
             <!-- Backward-step btn -->
-            <button id="backward-step-btn" class="btn" title="Backward">
+            <button id="backward-step-btn" class="btn" title="Anterior">
                 <!-- Backward-step icon -->
                 <svg id="backward-step-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
                     <path fill="currentColor"
@@ -389,7 +389,7 @@
             </button>
 
             <!-- Play/pause btn -->
-            <button id="play-pause-btn" class="btn" title="Play">
+            <button id="play-pause-btn" class="btn" title="Reproducir">
                 <!-- Play icon -->
                 <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
                     <path fill="currentColor"
@@ -403,7 +403,7 @@
             </button>
 
             <!-- Forward-step btn -->
-            <button id="forward-step-btn" class="btn" title="Forward">
+            <button id="forward-step-btn" class="btn" title="Siguiente">
                 <!-- Forward-step icon-->
                 <svg id="forward-step-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
                     <path fill="currentColor"
@@ -412,11 +412,12 @@
             </button>
 
             <!-- Repeat btn -->
-            <button id="repeat-btn" class="btn" title="Repeat">
+            <button id="repeat-btn" class="btn" title="Repetir playlist">
                 <!-- Repeat icon -->
                 <svg id="repeat-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
                     <path fill="currentColor"
                         d="M534.6 182.6C547.1 170.1 547.1 149.8 534.6 137.3L470.6 73.3C461.4 64.1 447.7 61.4 435.7 66.4C423.7 71.4 416 83.1 416 96L416 128L256 128C150 128 64 214 64 320C64 337.7 78.3 352 96 352C113.7 352 128 337.7 128 320C128 249.3 185.3 192 256 192L416 192L416 224C416 236.9 423.8 248.6 435.8 253.6C447.8 258.6 461.5 255.8 470.7 246.7L534.7 182.7zM105.4 457.4C92.9 469.9 92.9 490.2 105.4 502.7L169.4 566.7C178.6 575.9 192.3 578.6 204.3 573.6C216.3 568.6 224 556.9 224 544L224 512L384 512C490 512 576 426 576 320C576 302.3 561.7 288 544 288C526.3 288 512 302.3 512 320C512 390.7 454.7 448 384 448L224 448L224 416C224 403.1 216.2 391.4 204.2 386.4C192.2 381.4 178.5 384.2 169.3 393.3L105.3 457.3z" />
+                    <circle r="50" cx="320" cy="320" fill="currentColor" class="d-none"></circle>
                 </svg>
                 <!-- Repeat-1 icon -->
                 <svg id="repeat-1-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" class="d-none">
@@ -485,9 +486,16 @@
         const shuffleIconCircle = shuffleBtn.querySelector("circle");
 
         const backwardStepBtn = doc.getElementById("backward-step-btn");
+
         const playPauseBtn = doc.getElementById("play-pause-btn");
+        const playIcon = doc.getElementById("play-icon");
+        const pauseIcon = doc.getElementById("pause-icon");
+
         const forwardStepBtn = doc.getElementById("forward-step-btn");
         const repeatBtn = doc.getElementById("repeat-btn");
+        const repeatIcon = doc.getElementById("repeat-icon");
+        const repeatIconCircle = repeatIcon.querySelector("circle");
+        const repeat1Icon = doc.getElementById("repeat-1-icon");
 
         // Estado del reproductor
         let state = {
@@ -496,7 +504,26 @@
             tracksMap: new Map(),
             currentIndex: 0, // Podemos setear a null, si es que no queremos cargar nada por defecto, o -1 nada cargado aún
             isShuffle: false,
-            isPlaying: false
+            isPlaying: false,
+            repeatMode: "none" // "none" | "all" | "one"
+        };
+
+        const repeatConfig = {
+            none: {
+                next: "all",
+                title: "Repetir playlist",
+                active: false
+            },
+            all: {
+                next: "one",
+                title: "Repetir canción indefinidamente",
+                active: true
+            },
+            one: {
+                next: "none",
+                title: "Desactivar la repetición indefinida",
+                active: true
+            }
         };
 
         // Variable para control de list item seleccionado actualmente
@@ -507,6 +534,8 @@
 
         // URL para petición de los datos de la playlist "salsa" al backend
         const BASE_URL = "https://neobte.github.io/musica/playlists/salsa/";
+
+        const PREVIOUS_TRACK_THRESHOLD = 3;
 
         doc.addEventListener("DOMContentLoaded", () => {
             init();
@@ -520,8 +549,8 @@
 
         const loadPlaylist = res => {
             // Respuesta del backend
-            // const tracks = res.tracks.items;
-            const tracks = res.tracks.items.slice(0, 6);
+            const tracks = res.tracks.items;
+            // const tracks = res.tracks.items.slice(0, 6);
             state.originalPlaylist = tracks;
             state.playbackQueue = [...tracks];
 
@@ -587,18 +616,18 @@
 
             // Solución técnica
             // const track = state.playbackQueue[state.currentIndex];
-            // const listItem = playlist.querySelector(`[data-track-id="${track.id}"]`);
+            // const listItem = playlist.querySelector(`li[data-track-id="${track.id}"]`);
             // listItem.classList.add("playing");
             // currentListItem = listItem;
 
             // O
 
             // Utilizar lo siguiente por ser el render inicial
-            const listItem = playlist.children[state.currentIndex];
-            listItem.classList.add("playing");
-            currentListItem = listItem;
+            const nextListItem = playlist.children[state.currentIndex];
+            nextListItem.classList.add("playing");
+            currentListItem = nextListItem;
 
-            scrollIntoView(listItem);
+            scrollIntoView(nextListItem);
         }
 
         // Delegación de eventos para seleccionar un track de la playlist
@@ -638,9 +667,105 @@
 
         // Eventos de controles del reproductor
         shuffleBtn.addEventListener("click", toggleShuffle);
+        backwardStepBtn.addEventListener("click", handleBackward);
+        playPauseBtn.addEventListener("click", handlePlayPause);
+        forwardStepBtn.addEventListener("click", handleForward);
+        repeatBtn.addEventListener("click", handleRepeat);
 
-        forwardStepBtn.addEventListener("click", () => {
-            // 1. Actualizar currentIndex
+        function handleRepeat() {
+            // state.repeatMode = "none",  default value
+            state.repeatMode = repeatConfig[state.repeatMode].next; // Aquí state.repeatMode empieza a cambiar de estado
+            updateRepeatUI();
+        }
+
+        function updateRepeatUI() {
+            // El primer clic en el button repeatBtn, origina que state.repeatMode = all
+            // El segundo clic en el button repeatBtn, origina que state.repeatMode = one
+            // El tercer clic en el button repeatBtn, origina que state.repeatMode = none
+            const mode = state.repeatMode;
+
+            repeatBtn.classList.remove("active");
+
+            if (mode === "none") {
+                repeatBtn.title = repeatConfig[mode].title;
+                repeat1Icon.classList.add("d-none"); // Ocultamos el icono de repeat-1-icon
+                repeatIcon.classList.remove("d-none"); // Mostramos el icono de repeat icon
+                return;
+            }
+
+            if (mode === "all") {
+                repeatIconCircle.classList.remove("d-none"); // Mostramos el circulo dentro del icono svg
+                repeatBtn.title = repeatConfig[mode].title;
+                repeatBtn.classList.add("active");
+                return;
+            }
+
+            if (mode === "one") {
+                repeat1Icon.classList.remove("d-none"); // Mostramos el icono repeat-1-icon
+                repeatBtn.title = repeatConfig[mode].title;
+                repeatBtn.classList.add("active");
+                repeatIconCircle.classList.add("d-none"); // Ocultamos el circulo dentro del icono svg
+                repeatIcon.classList.add("d-none"); // Ocultamos el icono de repeat icon
+                return;
+            }
+        }
+
+        audio.addEventListener("play", () => {
+            state.isPlaying = true;
+            updatePlayPauseUI();
+        });
+
+        audio.addEventListener("pause", () => {
+            state.isPlaying = false;
+            updatePlayPauseUI();
+        });
+
+        audio.addEventListener("ended", () => {
+            // handleTrackEnded();
+        });
+
+        audio.addEventListener("waiting", () => {
+            // showLoadingUI(true);
+        });
+
+        audio.addEventListener("canplay", () => {
+            // showLoadingUI(false);
+        });
+
+        function handlePlayPause() {
+
+            if (!audio.src) return;
+
+            if (state.isPlaying) {
+                pauseAudio();
+            } else {
+                playAudio();
+            }
+
+            updatePlayPauseUI();
+        }
+
+        function handleBackward() {
+
+            const shouldRestartTrack = audio.currentTime > PREVIOUS_TRACK_THRESHOLD;
+
+            if (shouldRestartTrack) {
+                audio.currentTime = 0;
+                return;
+            }
+            // 1. Actualizar state.currentIndex
+            state.currentIndex = (state.currentIndex - 1 + state.playbackQueue.length) % state.playbackQueue.length;
+
+            loadCurrentTrack();
+
+            if (state.isPlaying) {
+                playAudio()
+            }
+        }
+
+
+        function handleForward() {
+            // 1. Actualizar state.currentIndex
             state.currentIndex = (state.currentIndex + 1) % state.playbackQueue.length;
 
             loadCurrentTrack();
@@ -648,8 +773,7 @@
             if (state.isPlaying) {
                 playAudio()
             }
-
-        });
+        }
 
         function loadCurrentTrack() {
             const track = state.playbackQueue[state.currentIndex];
@@ -694,6 +818,14 @@
             updateShuffleButtonUI();
         }
 
+        function updatePlayPauseUI() {
+            const isPlaying = state.isPlaying;
+
+            playIcon.classList.toggle("d-none", isPlaying);
+            pauseIcon.classList.toggle("d-none", !isPlaying);
+            playPauseBtn.title = isPlaying ? "Pausar" : "Reproducir";
+        }
+
         function updatePlaylistSelectionUI() {
 
             const track = state.playbackQueue[state.currentIndex];
@@ -702,14 +834,14 @@
 
             if (currentListItem) currentListItem.classList.remove("playing");
 
-            const listItem = doc.querySelector(`li[data-track-id="${track.id}"]`);
+            const nextListItem = doc.querySelector(`li[data-track-id="${track.id}"]`);
 
-            if (!listItem) return;
+            if (!nextListItem) return;
 
-            listItem.classList.add("playing");
-            currentListItem = listItem;
+            nextListItem.classList.add("playing");
+            currentListItem = nextListItem;
 
-            scrollIntoView(listItem);
+            scrollIntoView(nextListItem);
         }
 
         function updateCurrentTrackUI() {
@@ -722,14 +854,11 @@
         }
 
         function updateTrackPositionUI() {
-            const track = state.playbackQueue[state.currentIndex];
+            const currentTrack = state.playbackQueue[state.currentIndex];
 
-            const originalIndex = state.originalPlaylist.findIndex(track => track.id === track.id);
+            const originalIndex = state.originalPlaylist.findIndex(track => track.id === currentTrack.id);
 
             playerCurrentTrack.textContent = originalIndex + 1;
-
-            // Implementación anterior
-            // playerCurrentTrack.textContent = state.isShuffle ? state.originalPlaylist[state.currentIndex].id : state.currentIndex + 1;
         }
 
         function updateShuffleButtonUI() {
