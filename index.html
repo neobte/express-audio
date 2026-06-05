@@ -545,6 +545,8 @@
 
         const PREVIOUS_TRACK_THRESHOLD = 3;
 
+        const VOLUME_DEFAULT_VALUE = .5; // 50%
+
         doc.addEventListener("DOMContentLoaded", () => {
 
             init();
@@ -561,8 +563,8 @@
 
         const loadPlaylist = response => {
             // Respuesta del backend
-            const tracks = response.tracks.items.slice(0, 10);
-            // const tracks = response.tracks.items;
+            // const tracks = response.tracks.items.slice(0, 10);
+            const tracks = response.tracks.items;
             state.originalPlaylist = tracks;
             state.playbackQueue = [...tracks];
             // console.log(state.playbackQueue);
@@ -570,7 +572,7 @@
             // Creamos un Mapper para ubicar los tracks más rapidamente por su ID
             state.tracksMap = new Map(tracks.map(track => [track.id, track]));
 
-            // Creamos un Mapper para ubicar el índice del objeto más rapidamente por su ID
+            // Creamos un Mapper para ubicar el índice del track más rapidamente por su ID
             state.trackIndexMap = new Map(tracks.map((track, index) => [track.id, index]));
 
             // Obtenemos un currentIndex distinto, cada vez que cargamos la página. No queremos que siempre inicie en 0
@@ -579,21 +581,20 @@
             // Obtenemos el track en la posición de state.currentIndex por defecto
             const track = state.playbackQueue[state.currentIndex];
 
-            // Cargamos el track
+            // Cargamos el track en el reproductor, no lo hacemos sonar
             loadTrack(track);
 
-            // UI
+            // Renderizamos en la UI la playlist de canciones
             renderTracks();
 
-            // Actualizamos la UI con el nombre del título y el artista
-            playerTrackTitle.textContent = state.playbackQueue[state.currentIndex].title;
-            playerTrackArtist.textContent = state.playbackQueue[state.currentIndex].artist;
+            // Actualizamos la UI, con el nombre del título y el artista
+            updateCurrentTrackUI(track);
 
-            // Actualizamos X número de canción de un total de Y canciones
+            // Actualizamos la UI, X número de canción de un total de Y canciones
             playerCurrentTrack.textContent = state.currentIndex + 1;
 
-            // Seteamos una sola vez el número total de canciones
-            playerTotalTracks.textContent = `${state.playbackQueue.length}`;
+            // Actulizamos la UI, número total de canciones
+            playerTotalTracks.textContent = state.playbackQueue.length;
 
         }
 
@@ -626,7 +627,6 @@
 
             // Aquí agregamos los elementos en el DOM, por lo tanto ya existen en el mismo
             playlist.appendChild(fragment);
-
 
             // Solución técnica
             // const track = state.playbackQueue[state.currentIndex];
@@ -662,7 +662,7 @@
             li.classList.add("playing");
             currentListItem = li;
 
-            // state.currentIndex = trackIndex;
+            state.currentIndex = trackIndex;
 
             const trackId = Number(li.dataset.trackId);
             const track = state.tracksMap.get(trackId);
@@ -672,8 +672,9 @@
             playAudio();
 
             // Actualizar UI
-            playerTrackTitle.textContent = track.title;
-            playerTrackArtist.textContent = track.artist;
+            updateCurrentTrackUI(track);
+
+            // Actualizamos la UI, X número de canción de un total de Y canciones
             playerCurrentTrack.textContent = state.currentIndex + 1;
 
         });
@@ -683,7 +684,7 @@
         }
 
         // Eventos de controles del reproductor
-        shuffleBtn.addEventListener("click", toggleShuffle);
+        shuffleBtn.addEventListener("click", handleShuffle);
         backwardStepBtn.addEventListener("click", handleBackward);
         playPauseBtn.addEventListener("click", handlePlayPause);
         forwardStepBtn.addEventListener("click", handleForward);
@@ -783,23 +784,26 @@
             if (isLastTrack && state.repeatMode === "none") {
 
                 state.currentIndex = 0;
-                setAudioTrack(getCurrentTrack());
-                syncPlayerUI();
+                const track = getCurrentTrack();
+                setAudioTrack(track);
+                syncPlayerUI(track);
                 return;
             }
 
             // repeat all o avance normal
             state.currentIndex = nextIndex();
-            setAudioTrack(getCurrentTrack());
-            syncPlayerUI();
+            const track = getCurrentTrack();
+            setAudioTrack(track);
+            syncPlayerUI(track);
             playAudio();
 
         }
 
-        function syncPlayerUI() {
-            updateCurrentTrackUI();
-            updateTrackPositionUI();
-            updatePlaylistSelectionUI();
+        function syncPlayerUI(track) {
+            if (!track) return;
+            updateCurrentTrackUI(track);
+            updateTrackPositionUI(track);
+            updatePlaylistSelectionUI(track);
         }
 
         function getCurrentTrack() {
@@ -879,7 +883,7 @@
 
             loadTrack(track);
 
-            syncPlayerUI();
+            syncPlayerUI(track);
         }
 
         function loadTrack(track) {
@@ -903,7 +907,7 @@
             audio.pause();
         }
 
-        function toggleShuffle() {
+        function handleShuffle() {
             state.isShuffle = !state.isShuffle;
 
             if (state.isShuffle) {
@@ -923,11 +927,7 @@
             playPauseBtn.title = isPlaying ? "Pausar" : "Reproducir";
         }
 
-        function updatePlaylistSelectionUI() {
-
-            const track = state.playbackQueue[state.currentIndex];
-
-            if (!track) return;
+        function updatePlaylistSelectionUI(track) {
 
             if (currentListItem) currentListItem.classList.remove("playing");
 
@@ -941,22 +941,18 @@
             scrollIntoView(nextListItem);
         }
 
-        function updateCurrentTrackUI() {
-            const track = state.playbackQueue[state.currentIndex];
-
-            if (!track) return;
+        function updateCurrentTrackUI(track) {
 
             playerTrackTitle.textContent = track.title;
             playerTrackArtist.textContent = track.artist;
         }
 
-        function updateTrackPositionUI() {
-            const currentTrack = state.playbackQueue[state.currentIndex];
-
+        function updateTrackPositionUI(track) {
+            // const currentTrack = track;
             // const originalIndex = state.originalPlaylist.findIndex(track => track.id === currentTrack.id);
 
             // Este es un Map creado con los índices originales
-            const originalIndex = state.trackIndexMap.get(currentTrack.id);
+            const originalIndex = state.trackIndexMap.get(track.id);
 
             playerCurrentTrack.textContent = originalIndex + 1;
         }
