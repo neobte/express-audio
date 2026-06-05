@@ -363,7 +363,7 @@
 
         <div class="current-time-container">
             <span id="current-time" class="time">-:--</span>
-            <input type="range" id="current-time-slider" class="slider" value="0">
+            <input type="range" id="current-time-slider" class="slider" min="0" max="100" value="0" step=".01">
             <span id="duration-time" class="time">-:--</span>
         </div>
 
@@ -470,8 +470,14 @@
         const playerCurrentTrack = doc.getElementById("player-current-track");
         const playerTotalTracks = doc.getElementById("player-total-tracks");
 
-        // Detalles de la playlist
+        // Cacheamos la playlist para agregar tracks
         const playlist = doc.getElementById("playlist");
+
+        // Detalles del tiempo de reproducción
+        const currentTime = doc.getElementById("current-time");
+        const currentTimeSlider = doc.getElementById("current-time-slider");
+        currentTimeSlider.value = 0;
+        const durationTime = doc.getElementById("duration-time");
 
         // Detalles de los componente de volumen
         const volumeBtn = doc.getElementById("volume-btn");
@@ -503,6 +509,7 @@
             originalPlaylist: [],
             playbackQueue: [],
             tracksMap: new Map(),
+            trackIndexMap: new Map(),
             currentIndex: 0, // Podemos setear a null, si es que no queremos cargar nada por defecto, o -1 nada cargado aún
             isShuffle: false,
             isPlaying: false,
@@ -527,7 +534,7 @@
             }
         };
 
-        // Variable para control de list item seleccionado actualmente
+        // Variable para control de list item seleccionado actualmente en la playlist del DOM
         let currentListItem = null;
 
         // Objeto audio
@@ -539,24 +546,32 @@
         const PREVIOUS_TRACK_THRESHOLD = 3;
 
         doc.addEventListener("DOMContentLoaded", () => {
+
             init();
+
         });
 
         const init = () => {
+
             const request_url = BASE_URL + "playlist.json"; // Aquí no hace falta encodeURIComponent()
+
             // Petición de los datos al servidor
             sendFetchHttpRequest(request_url, loadPlaylist);
         }
 
-        const loadPlaylist = res => {
+        const loadPlaylist = response => {
             // Respuesta del backend
-            const tracks = res.tracks.items;
-            // const tracks = res.tracks.items.slice(0, 6);
+            const tracks = response.tracks.items.slice(0, 10);
+            // const tracks = response.tracks.items;
             state.originalPlaylist = tracks;
             state.playbackQueue = [...tracks];
+            // console.log(state.playbackQueue);
 
-            // Creamos un Mapper para ubicar los tracks más rapidamente
+            // Creamos un Mapper para ubicar los tracks más rapidamente por su ID
             state.tracksMap = new Map(tracks.map(track => [track.id, track]));
+
+            // Creamos un Mapper para ubicar el índice del objeto más rapidamente por su ID
+            state.trackIndexMap = new Map(tracks.map((track, index) => [track.id, index]));
 
             // Obtenemos un currentIndex distinto, cada vez que cargamos la página. No queremos que siempre inicie en 0
             state.currentIndex = getRandomInt(0, state.playbackQueue.length - 1);
@@ -583,8 +598,6 @@
         }
 
         const renderTracks = () => {
-            // La variable "playlist" solo vive en este ámbito, no colisionará con la variable "playlist" del HTML
-            const playlist = doc.getElementById('playlist');
 
             playlist.innerHTML = '';
 
@@ -611,7 +624,7 @@
                 fragment.appendChild(li);
             });
 
-            // Aquí los elementos ya existen en el DOM
+            // Aquí agregamos los elementos en el DOM, por lo tanto ya existen en el mismo
             playlist.appendChild(fragment);
 
 
@@ -649,7 +662,7 @@
             li.classList.add("playing");
             currentListItem = li;
 
-            state.currentIndex = trackIndex;
+            // state.currentIndex = trackIndex;
 
             const trackId = Number(li.dataset.trackId);
             const track = state.tracksMap.get(trackId);
@@ -727,40 +740,75 @@
             updatePlayPauseUI();
         });
 
+        currentTimeSlider.addEventListener("input", handleCurrentTime);
+
+        audio.addEventListener("timeupdate", () => {
+            // Esta condición evita el error en el formateo de tiempo, por ejemplo: -5:NaN
+            if (isFinite(audio.duration) && audio.duration > 0) {
+                currentTime.textContent = formatTime(audio.currentTime);
+                currentTimeSlider.value = audio.currentTime;
+                // countdown.textContent = `-${formatTime(audio.duration - audioPlayer.currentTime)}`;
+            }
+        });
+
+        audio.addEventListener("loadedmetadata", () => {
+            if (isFinite(audio.duration) && audio.duration > 0) {
+                currentTime.textContent = "0:00";
+                durationTime.textContent = formatTime(audio.duration);
+                // countdown.textContent = `-${formatTime(audio.duration - 0)}`;
+
+                currentTimeSlider.max = audio.duration; // El maximo de la barra de progreso
+                currentTimeSlider.value = 0; // Inicia en 0
+            }
+        });
+
+        function handleCurrentTime() {
+            if (currentTimeSlider.disabled) return;
+            audio.currentTime = Number(currentTimeSlider.value);
+        }
+
         audio.addEventListener("ended", handleEnded);
 
         function handleEnded() {
 
             // Repeat one -> misma canción
             if (state.repeatMode === "one") {
-                audio.currentTime = 0;
+                audio.currentTime = 0; // Aquí si tiene sentido, por que queremos reproducir la canción ya cargada otra vez!!!
                 playAudio();
                 return;
             }
 
             const isLastTrack = state.currentIndex === state.playbackQueue.length - 1;
-            // songIndex >= numberOfSongs - 1 && !isRepeatAll
             // repeat none + última canción → reset sin reproducir
             if (isLastTrack && state.repeatMode === "none") {
 
-                // reset sin reproducir
                 state.currentIndex = 0;
-
-                loadCurrentTrack();
-
-                state.isPlaying = false;
-
-                updatePlayPauseUI();
-
+                setAudioTrack(getCurrentTrack());
+                syncPlayerUI();
                 return;
             }
 
             // repeat all o avance normal
             state.currentIndex = nextIndex();
-            console.log(state.isPlaying);
-            loadCurrentTrack();
+            setAudioTrack(getCurrentTrack());
+            syncPlayerUI();
             playAudio();
 
+        }
+
+        function syncPlayerUI() {
+            updateCurrentTrackUI();
+            updateTrackPositionUI();
+            updatePlaylistSelectionUI();
+        }
+
+        function getCurrentTrack() {
+            return state.playbackQueue[state.currentIndex];
+        }
+
+        function setAudioTrack(track) {
+            if (!track) return;
+            audio.src = BASE_URL + encodeURIComponent(track.name);
         }
 
         function nextIndex() {
@@ -783,6 +831,7 @@
 
             if (!audio.src) return;
 
+            // El estado original al inicio de la aplicación es false
             if (state.isPlaying) {
                 pauseAudio();
             } else {
@@ -830,13 +879,11 @@
 
             loadTrack(track);
 
-            updateCurrentTrackUI();
-            updateTrackPositionUI();
-            updatePlaylistSelectionUI();
+            syncPlayerUI();
         }
 
         function loadTrack(track) {
-            audio.pause();
+            pauseAudio();
             audio.currentTime = 0;
             audio.src = BASE_URL + encodeURIComponent(track.name);
             // audio.dataset.trackId = track.id;
@@ -851,6 +898,8 @@
         }
 
         function pauseAudio() {
+            // console.log(`Status: ${audio.paused}`);
+            if (audio.paused) return;
             audio.pause();
         }
 
@@ -904,7 +953,10 @@
         function updateTrackPositionUI() {
             const currentTrack = state.playbackQueue[state.currentIndex];
 
-            const originalIndex = state.originalPlaylist.findIndex(track => track.id === currentTrack.id);
+            // const originalIndex = state.originalPlaylist.findIndex(track => track.id === currentTrack.id);
+
+            // Este es un Map creado con los índices originales
+            const originalIndex = state.trackIndexMap.get(currentTrack.id);
 
             playerCurrentTrack.textContent = originalIndex + 1;
         }
@@ -936,6 +988,8 @@
                 currentTrack,
                 ...shuffledUpcoming
             ];
+            // console.log("Shuffle array playbackQueue");
+            // console.log(state.playbackQueue);
         }
 
         function disableShuffle() {
