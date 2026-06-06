@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Express Audio</title>
+    <title id="document-title"></title>
     <!-- <h1>h1 -> 32px</h1>
     <h2>h2 -> 24px</h2>
     <h3>h3 -> 18.72px</h3>
@@ -445,7 +445,7 @@
 
             <input type="range" id="volume-slider" class="slider" min="0" max="100" value="50" step="1">
 
-            <span id="volume-value">50</span>
+            <span id="volume-value"></span>
         </div>
 
     </main>
@@ -473,7 +473,11 @@
 
         const DEFAULT_AUDIO_VOLUME = .67; // 50%
 
+        const DOCUMENT_TITLE = "Neobte - Express Audio";
+
         /*** Referencias Cacheadas ***/
+        const documentTitle = doc.getElementById("document-title");
+        documentTitle.textContent = DOCUMENT_TITLE;
         // Detalles de Título y Artista, componente superior
         const playerTrackTitle = doc.getElementById("player-track-title");
         const playerTrackArtist = doc.getElementById("player-track-artist");
@@ -563,8 +567,8 @@
 
         const loadPlaylist = response => {
             // Respuesta del backend
-            // state.originalPlaylist = response.tracks.items.slice(0, 10);
-            state.originalPlaylist = response.tracks.items;
+            state.originalPlaylist = response.tracks.items.slice(0, 10);
+            // state.originalPlaylist = response.tracks.items;
             state.playbackQueue = [...state.originalPlaylist];
             // console.log(state.playbackQueue);
 
@@ -608,7 +612,7 @@
             state.playbackQueue.forEach((track, index) => {
                 const li = doc.createElement("li");
                 li.dataset.trackId = track.id;
-                li.dataset.trackIndex = index;
+                li.dataset.trackIndex = index; // Index original
 
                 li.classList.add("playlist-track");
                 li.innerHTML = `
@@ -644,10 +648,9 @@
 
             if (!li) return;
 
-            const trackIndex = Number(li.dataset.trackIndex);
-
-            if (trackIndex === state.currentIndex) {
+            if (li.classList.contains("playing")) {
                 console.log("Son iguales!!!");
+                state.isPlaying ? pauseAudio() : playAudio();
                 return;
             }
 
@@ -655,6 +658,9 @@
 
             li.classList.add("playing");
             currentListItem = li;
+
+            // En el primer render, el índice es 0
+            const trackIndex = Number(li.dataset.trackIndex);
 
             state.currentIndex = trackIndex;
 
@@ -669,7 +675,7 @@
             updateCurrentTrackUI(track);
 
             // Actualizamos la UI, X número de canción de un total de Y canciones
-            playerCurrentTrack.textContent = state.currentIndex + 1;
+            playerCurrentTrack.textContent = trackIndex + 1;
 
         });
 
@@ -880,8 +886,8 @@
                 currentTrack,
                 ...shuffledUpcoming
             ];
-            // console.log("Shuffle array playbackQueue");
-            // console.log(state.playbackQueue);
+            console.log("Shuffle array playbackQueue");
+            console.log(state.playbackQueue);
         }
 
         function disableShuffle() {
@@ -894,7 +900,6 @@
             // Este es un Map creado con los índices originales
             const originalIndex = state.trackIndexMap.get(currentTrack.id);
 
-            // Buscamos el "index" en el array original
             state.currentIndex = originalIndex;
         }
 
@@ -1012,7 +1017,7 @@
         }
 
         function updateCurrentTrackUI(track) {
-
+            documentTitle.textContent = `${track.title} - ${track.artist}`;
             playerTrackTitle.textContent = track.title;
             playerTrackArtist.textContent = track.artist;
         }
