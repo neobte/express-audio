@@ -471,7 +471,7 @@
 
         const PREVIOUS_TRACK_THRESHOLD = 3;
 
-        const DEFAULT_AUDIO_VOLUME = .67; // 50%
+        const DEFAULT_AUDIO_VOLUME = .33; // 50%
 
         const DOCUMENT_TITLE = "Neobte - Express Audio";
 
@@ -567,16 +567,16 @@
 
         const loadPlaylist = response => {
             // Respuesta del backend
-            // state.originalPlaylist = response.tracks.items.slice(0, 10);
-            state.originalPlaylist = response.tracks.items;
+            state.originalPlaylist = response.tracks.items.slice(0, 5);
+            // state.originalPlaylist = response.tracks.items;
             state.playbackQueue = [...state.originalPlaylist];
-            // console.log(state.playbackQueue);
 
             // Creamos un Mapper para ubicar los tracks más rapidamente por su ID
             state.tracksMap = new Map(state.originalPlaylist.map(track => [track.id, track]));
 
             // Creamos un Mapper para ubicar el índice del track más rapidamente por su ID
             state.trackIndexMap = new Map(state.originalPlaylist.map((track, index) => [track.id, index]));
+            // console.log(state.trackIndexMap);
 
             // Obtenemos un currentIndex distinto, cada vez que cargamos la página. No queremos que siempre inicie en 0
             // state.currentIndex = getRandomInt(0, state.playbackQueue.length - 1);
@@ -611,8 +611,8 @@
 
             state.playbackQueue.forEach((track, index) => {
                 const li = doc.createElement("li");
-                li.dataset.trackId = track.id;
                 li.dataset.trackIndex = index; // Index original
+                li.dataset.trackId = track.id;
 
                 li.classList.add("playlist-track");
                 li.innerHTML = `
@@ -648,34 +648,34 @@
 
             if (!li) return;
 
-            if (li.classList.contains("playing")) {
-                console.log("Son iguales!!!");
-                state.isPlaying ? pauseAudio() : playAudio();
-                return;
-            }
-
             if (currentListItem) currentListItem.classList.remove("playing");
 
+            // Actualizamos la UI
             li.classList.add("playing");
+
+            // Asignamos la referencia a la variable currentListItem cuyo valor original es null al principio del todo
             currentListItem = li;
 
-            // En el primer render, el índice es 0
-            const trackIndex = Number(li.dataset.trackIndex);
+            state.currentIndex = Number(li.dataset.trackIndex);
 
-            state.currentIndex = trackIndex;
-
+            // Obtenemos el ID del track
             const trackId = Number(li.dataset.trackId);
-            const track = state.tracksMap.get(trackId);
 
-            // 
+            // Obtenemos el track buscando en el tracksMap buscando por su ID
+            const track = state.tracksMap.get(trackId);
+            // const track = state.playbackQueue[state.currentIndex];
+
+            // Cargamos el audio
             loadTrack(track);
+
+            // Reproducimos el audio
             playAudio();
 
             // Actualizar UI
             updateCurrentTrackUI(track);
 
             // Actualizamos la UI, X número de canción de un total de Y canciones
-            playerCurrentTrack.textContent = trackIndex + 1;
+            playerCurrentTrack.textContent = state.currentIndex + 1;
 
         });
 
@@ -869,25 +869,31 @@
         }
 
         function enableShuffle() {
-            // Tracks que ya sonaron
-            const playedTracks = state.playbackQueue.slice(0, state.currentIndex);
 
-            // Track actualmente en reproducción
+            // Obtenemos la canción actualmente en reproducción
             const currentTrack = state.playbackQueue[state.currentIndex];
 
-            // Tracks que aún no sonaron
-            const upcomingTracks = state.playbackQueue.slice(state.currentIndex + 1);
+            // Obtenemos la longitud del arreglo de canciones
+            const len = state.playbackQueue.length;
 
-            // No modificamos el array "upcomingTracks", recibimos una copia de el
-            const shuffledUpcoming = shuffleArray(upcomingTracks);
+            // Construimos un array con un elemento menos, ej. si hay 5 canciones, entonces new Array tendra lugar para 4 canciones
+            let rest = new Array(len - 1);
 
-            state.playbackQueue = [
-                ...playedTracks,
-                currentTrack,
-                ...shuffledUpcoming
-            ];
-            console.log("Shuffle array playbackQueue");
-            console.log(state.playbackQueue);
+            // Llenamos el array, sin la canción actualmente en reproducción
+            let k = 0;
+            for (let i = 0; i < len; i++) {
+                if (i === state.currentIndex) continue;
+                rest[k++] = state.playbackQueue[i];
+            }
+
+            // Mezclamos el array
+            rest = shuffleArray(rest);
+
+            // Construimos la nueva cola
+            state.playbackQueue = [currentTrack, ...rest];
+
+            // Seteamos con 0, ya que la canción actualmente en reproducción esta en la posición 0
+            state.currentIndex = 0;
         }
 
         function disableShuffle() {
@@ -1111,13 +1117,12 @@
 
         // https://introcs.cs.princeton.edu/java/14array/Deck.java.html
         const shuffleArray = arr => {
-            const copy = [...arr];
-            const n = copy.length;
+            const n = arr.length;
             for (let i = 0; i < n; i++) {
                 const r = i + Math.floor(Math.random() * (n - i));
-                [copy[i], copy[r]] = [copy[r], copy[i]];
+                [arr[i], arr[r]] = [arr[r], arr[i]];
             }
-            return copy;
+            return arr;
         };
 
     </script>
