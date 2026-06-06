@@ -656,19 +656,14 @@
             // Asignamos la referencia a la variable currentListItem cuyo valor original es null al principio del todo
             currentListItem = li;
 
+            state.currentIndex = Number(li.dataset.trackIndex);
+
             // Obtenemos el ID del track
             const trackId = Number(li.dataset.trackId);
 
             // Obtenemos el track buscando en el tracksMap buscando por su ID
             const track = state.tracksMap.get(trackId);
             // const track = state.playbackQueue[state.currentIndex];
-
-            // state.currentIndex = Number(li.dataset.trackIndex);
-
-            const queueIndex = state.playbackQueue.findIndex(t => t.id === trackId);
-            // seguridad básica (por si algo desincroniza)
-            if (queueIndex === -1) return;
-            state.currentIndex = queueIndex;
 
             // Cargamos el audio
             loadTrack(track);
