@@ -28,6 +28,7 @@ body {
 .container {
     width: 100%;
     max-width: 448px;
+    max-width: 424px;
     margin: auto;
     padding: 1rem;
     border-radius: 1rem;
