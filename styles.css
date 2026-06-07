@@ -221,7 +221,8 @@ body {
 }
 
 .playlist-container::-webkit-scrollbar-track {
-    background-color: rgba(252, 252, 252, 1);
+    /* background-color: rgba(252, 252, 252, 1); */
+    background-color: var(--selected);
     border-radius: 4px;
 }
 
