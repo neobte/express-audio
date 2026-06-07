@@ -175,10 +175,6 @@ body {
     border-radius: 4px;
 }
 
-.slider:focus::-webkit-slider-runnable-track {
-    background-color: var(--accent);
-}
-
 .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     background-color: var(--accent);
@@ -188,9 +184,16 @@ body {
     margin-top: -3px;
 }
 
+.slider:active::-webkit-slider-runnable-track {
+    background-color: var(--accent);
+}
+
+.slider:focus::-webkit-slider-runnable-track {
+    background-color: var(--accent);
+}
+
 .slider:not(:disabled):hover::-webkit-slider-thumb {
     transform: scale(1.3);
-    background-color: var(--accent);
 }
 
 .slider:disabled::-webkit-slider-thumb {
