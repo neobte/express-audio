@@ -126,7 +126,7 @@ const loadPlaylist = response => {
     // state.currentIndex = 0;
 
     // Obtenemos el track en la posición de state.currentIndex por defecto
-    const track = state.playbackQueue[state.currentIndex];
+    const track = getCurrentTrack();
 
     // Cargamos el track en el reproductor, no lo hacemos sonar
     loadTrack(track);
@@ -152,7 +152,6 @@ const renderTracks = () => {
 
     state.playbackQueue.forEach((track, index) => {
         const li = doc.createElement("li");
-        li.dataset.trackIndex = index; // Index original
         li.dataset.trackId = track.id;
 
         li.classList.add("playlist-track");
@@ -413,7 +412,7 @@ function handleVolumeBtn() {
 function enableShuffle() {
 
     // Obtenemos la canción actualmente en reproducción
-    const currentTrack = state.playbackQueue[state.currentIndex];
+    const currentTrack = getCurrentTrack();
 
     // Obtenemos la longitud del arreglo de canciones
     const len = state.playbackQueue.length;
@@ -440,7 +439,7 @@ function enableShuffle() {
 
 function disableShuffle() {
     // Track actualmente en reproducción
-    const currentTrack = state.playbackQueue[state.currentIndex];
+    const currentTrack = getCurrentTrack();
 
     // Devolvemos el orden original al array "playbackQueue"
     state.playbackQueue = [...state.originalPlaylist];
@@ -469,7 +468,7 @@ function prevIndex() {
 }
 
 function loadCurrentTrack() {
-    const track = state.playbackQueue[state.currentIndex];
+    const track = getCurrentTrack();
 
     if (!track) return;
 
