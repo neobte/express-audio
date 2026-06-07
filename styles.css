@@ -190,6 +190,7 @@ body {
 
 .slider:not(:disabled):hover::-webkit-slider-thumb {
     transform: scale(1.3);
+    background-color: var(--accent);
 }
 
 .slider:disabled::-webkit-slider-thumb {
