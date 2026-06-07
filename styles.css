@@ -1,0 +1,333 @@
+:root {
+    /* BACKGROUND */
+    --bg: #121212;
+
+    /* TEXT */
+    --text-primary: #E8E8E8;
+    --text-secondary: #AFAFAF;
+    /* --text-tertiary: rgb(96, 30, 215); */
+    --accent: rgb(139, 92, 246);
+
+    --hover: #202020;
+    --selected: #2C2C2C;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text-primary);
+    padding: 1rem;
+}
+
+.container {
+    width: 100%;
+    max-width: 448px;
+    margin: auto;
+    padding: 1rem;
+    border-radius: 1rem;
+    border: 3px solid #ffffff0d;
+}
+
+.player-track {
+    text-align: center;
+    height: 56px;
+    padding: .5rem;
+}
+
+#player-track-title {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+#player-track-artist {
+    color: var(--text-secondary);
+    font-size: .875rem;
+}
+
+.current-time-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .25rem;
+    height: 48px;
+}
+
+.current-time-container .time {
+    min-width: 48px;
+    font-size: .875rem;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.btn {
+    cursor: pointer;
+    color: var(--text-primary);
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    aspect-ratio: 1/1;
+    border-radius: .25rem;
+    font-size: 1rem;
+
+    outline: none;
+    background: none;
+    border: none;
+
+    transition: all .2s ease;
+}
+
+.btn:hover {
+    background-color: var(--hover);
+}
+
+.btn svg {
+    /* Esto hará que el icono escale en función del font-size del button */
+    width: 1.5em;
+    height: auto;
+}
+
+#play-pause-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 1.25rem;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .25rem;
+}
+
+.volume-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .25rem;
+}
+
+.volume-container #volume-value {
+    min-width: 44px;
+    text-align: center;
+    font-size: .875rem;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+#volume-btn {
+    font-size: .875rem;
+    color: var(--text-secondary);
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    background-color: transparent;
+    cursor: pointer;
+    flex: 1;
+}
+
+/* Mozilla Firefox */
+.slider::-moz-range-track {
+    background-color: var(--selected);
+    height: 4px;
+    border-radius: 4px;
+}
+
+.slider::-moz-range-progress {
+    background-color: var(--accent);
+    height: 4px;
+    border-radius: 4px;
+}
+
+.slider::-moz-range-thumb {
+    border: none;
+    background-color: rgba(139, 92, 246, .5);
+    border-radius: 50%;
+    width: 4px;
+    height: 4px;
+}
+
+.slider:not(:disabled):hover::-moz-range-thumb {
+    background-color: var(--accent);
+    width: 10px;
+    height: 10px;
+    transform: scale(1.3);
+}
+
+/* https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Using_Web_Audio_API */
+/* https://mdn.github.io/webaudio-examples/audio-basics/ */
+
+/* Google Chrome */
+.slider::-webkit-slider-runnable-track {
+    background-color: var(--selected);
+    height: 4px;
+    border-radius: 4px;
+}
+
+.slider:focus::-webkit-slider-runnable-track {
+    background-color: var(--accent);
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    background-color: var(--accent);
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    margin-top: -3px;
+}
+
+.slider:not(:disabled):hover::-webkit-slider-thumb {
+    transform: scale(1.3);
+}
+
+.slider:disabled::-webkit-slider-thumb {
+    height: 0;
+    width: 0;
+}
+
+/* FIN DE ESTILOS DEL SLIDER */
+
+.playlist-container {
+    /* Altura fija teniendo en cuenta font-size de title 14 y font-size de artist 12 */
+    /* 280 para 5 registros */
+    /* 336 para 6 registros */
+    max-height: 280px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.playlist-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.playlist-container::-webkit-scrollbar-track {
+    background-color: rgba(252, 252, 252, 1);
+    border-radius: 4px;
+}
+
+.playlist-container::-webkit-scrollbar-thumb {
+    background-color: rgba(139, 139, 139, 1);
+    border-radius: 4px;
+}
+
+.playlist-container::-webkit-scrollbar-thumb:hover {
+    background-color: #636363;
+}
+
+#playlist {
+    list-style-type: none;
+}
+
+.playlist-track {
+    display: grid;
+    grid-template-columns: 48px auto 48px;
+    padding: .5rem 0;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    border-radius: .25rem;
+}
+
+.playlist-track__title {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.playlist-track__artist {
+    font-size: .875rem;
+    color: var(--text-secondary);
+}
+
+.playlist-track__number,
+.playlist-track__duration {
+    font-size: .875rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.playlist-track:hover {
+    background-color: var(--hover);
+}
+
+.playlist-track.playing {
+    color: var(--accent);
+    background-color: rgba(139, 92, 246, .16);
+}
+
+.playlist-track__info {
+    min-width: 0;
+}
+
+.playlist-track__title,
+.playlist-track__artist,
+#player-track-title,
+#player-track-artist {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.d-none {
+    display: none;
+}
+
+.text-start {
+    text-align: start;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-end {
+    text-align: end;
+}
+
+.fs-14 {
+    font-size: .875rem;
+}
+
+.mb-1 {
+    margin-bottom: 1rem;
+}
+
+.mt-1 {
+    margin-top: 1rem;
+}
+
+#repeat-btn.active,
+#shuffle-btn.active {
+    color: var(--accent);
+}
+
+.track-position-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: .5rem;
+    border: 3px solid #ffffff0d;
+    margin: 1rem 0;
+}
+
+.player-track-position {
+    width: 80px;
+    font-size: .875rem;
+    text-align: center;
+}
+
+.player-track-position>* {
+    font-variant-numeric: tabular-nums;
+}
