@@ -567,8 +567,8 @@
 
         const loadPlaylist = response => {
             // Respuesta del backend
-            state.originalPlaylist = response.tracks.items.slice(0, 5);
-            // state.originalPlaylist = response.tracks.items;
+            // state.originalPlaylist = response.tracks.items.slice(0, 5);
+            state.originalPlaylist = response.tracks.items;
             state.playbackQueue = [...state.originalPlaylist];
 
             // Creamos un Mapper para ubicar los tracks más rapidamente por su ID
