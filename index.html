@@ -643,7 +643,6 @@
 
         // Delegación de eventos para seleccionar un track de la playlist, cuando el usuario hace click en un track
         playlist.addEventListener("click", e => {
-
             const li = e.target.closest(".playlist-track");
 
             if (!li) return;
@@ -656,14 +655,15 @@
             // Asignamos la referencia a la variable currentListItem cuyo valor original es null al principio del todo
             currentListItem = li;
 
-            state.currentIndex = Number(li.dataset.trackIndex);
+            const trackIndex = Number(li.dataset.trackIndex);
+
+            if (!state.isShuffle) state.currentIndex = trackIndex;
 
             // Obtenemos el ID del track
             const trackId = Number(li.dataset.trackId);
 
             // Obtenemos el track buscando en el tracksMap buscando por su ID
             const track = state.tracksMap.get(trackId);
-            // const track = state.playbackQueue[state.currentIndex];
 
             // Cargamos el audio
             loadTrack(track);
@@ -675,8 +675,7 @@
             updateCurrentTrackUI(track);
 
             // Actualizamos la UI, X número de canción de un total de Y canciones
-            playerCurrentTrack.textContent = state.currentIndex + 1;
-
+            playerCurrentTrack.textContent = trackIndex + 1;
         });
 
         // Eventos de controles del reproductor
