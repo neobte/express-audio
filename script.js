@@ -455,8 +455,8 @@ function getCurrentTrack() {
 }
 
 function setAudioTrack(track) {
-    if (!track) return;
     audio.src = BASE_URL + encodeURIComponent(track.name);
+    audio.load();
 }
 
 function nextIndex() {
@@ -480,8 +480,7 @@ function loadCurrentTrack() {
 function loadTrack(track) {
     pauseAudio();
     audio.currentTime = 0;
-    audio.src = BASE_URL + encodeURIComponent(track.name);
-    // audio.dataset.trackId = track.id;
+    setAudioTrack(track);
 }
 
 async function playAudio() {
