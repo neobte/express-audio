@@ -37,6 +37,10 @@ const repeatConfig = {
 
 // Variable para control de list item seleccionado actualmente en la playlist del DOM
 let currentListItem = null;
+let loadToken = 0;
+let isSeeking = false;
+let rafId = null;
+let lastTime = 0;
 
 // URL para petición de los datos de la playlist "salsa" al backend
 const BASE_URL = "https://neobte.github.io/musica/playlists/salsa/";
@@ -95,9 +99,7 @@ const repeat1Icon = doc.getElementById("repeat-1-icon");
 
 
 doc.addEventListener("DOMContentLoaded", () => {
-
     init();
-
 });
 
 const init = () => {
@@ -177,7 +179,6 @@ const renderTracks = () => {
     const nextListItem = playlist.children[state.currentIndex];
     nextListItem.classList.add("playing");
     currentListItem = nextListItem;
-    console.log(currentListItem);
 
     scrollIntoView(nextListItem);
 }
@@ -306,6 +307,8 @@ audio.addEventListener("canplay", () => {/*showLoadingUI(false); */ });
 audio.addEventListener("ended", handleEnded);
 
 function handleLoadedmetadata() {
+    if (audio.dataset.token != loadToken) return;
+
     const duration = audio.duration;
 
     if (!Number.isFinite(duration)) return;
@@ -315,15 +318,34 @@ function handleLoadedmetadata() {
     durationTime.textContent = formatTime(duration);
 }
 
+function renderProgress() {
+    rafId = null;
+
+    const time = lastTime;
+
+    currentTime.textContent = formatTime(time);
+    currentTimeSlider.value = time;
+}
+
 function handleTimeupdate() {
-    const t = audio.currentTime;
+    if (isSeeking) return;
 
-    // Error detectado en el formateo de tiempo, por ejemplo: -5:NaN
-    if (!Number.isFinite(t)) return;
+    lastTime = audio.currentTime;
 
-    currentTimeSlider.value = t;
+    if (!rafId) {
+        rafId = requestAnimationFrame(renderProgress);
+    }
 
-    currentTime.textContent = formatTime(t);
+    // if (isSeeking) return;
+
+    // const t = audio.currentTime;
+
+    // // Error detectado en el formateo de tiempo, por ejemplo: -5:NaN
+    // if (!Number.isFinite(t)) return;
+
+    // currentTimeSlider.value = t;
+
+    // currentTime.textContent = formatTime(t);
 
     // countdown.textContent = `-${formatTime(audio.duration - t)}`;
 }
@@ -361,8 +383,12 @@ const scrollIntoView = listItem => {
 }
 
 volumeSlider.addEventListener("input", handleVolumeSlider);
-currentTimeSlider.addEventListener("input", handleCurrentTimeSlider);
 volumeBtn.addEventListener("click", handleVolumeBtn);
+currentTimeSlider.addEventListener("input", handleCurrentTimeSlider);
+currentTimeSlider.addEventListener("change", () => {
+    audio.currentTime = currentTimeSlider.value;
+    isSeeking = false;
+});
 
 function handleVolumeSlider() {
     if (volumeSlider.value === "0") {
@@ -387,11 +413,6 @@ function handleVolumeSlider() {
     volumeValue.textContent = volumeSlider.value;
 }
 
-function handleCurrentTimeSlider() {
-    if (currentTimeSlider.disabled) return;
-    audio.currentTime = Number(currentTimeSlider.value);
-}
-
 function handleVolumeBtn() {
     if (volumeSlider.value > "0") {
         audio.volume = 0;
@@ -412,6 +433,12 @@ function handleVolumeBtn() {
     }
     // UI
     volumeValue.textContent = volumeSlider.value;
+}
+
+function handleCurrentTimeSlider() {
+    if (currentTimeSlider.disabled) return;
+    isSeeking = true;
+    currentTime.textContent = formatTime(currentTimeSlider.value);
 }
 
 function enableShuffle() {
@@ -460,12 +487,14 @@ function getCurrentTrack() {
 }
 
 function setAudioTrack(track) {
+    const token = ++loadToken;
     audio.src = BASE_URL + encodeURIComponent(track.name);
     // audio.load();
     currentTimeSlider.value = 0;
     currentTimeSlider.max = 0;
     currentTime.textContent = "0:00";
     durationTime.textContent = "0:00";
+    audio.dataset.token = token;
 }
 
 function nextIndex() {
