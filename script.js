@@ -177,6 +177,7 @@ const renderTracks = () => {
     const nextListItem = playlist.children[state.currentIndex];
     nextListItem.classList.add("playing");
     currentListItem = nextListItem;
+    console.log(currentListItem);
 
     scrollIntoView(nextListItem);
 }
@@ -186,6 +187,11 @@ playlist.addEventListener("click", e => {
     const li = e.target.closest(".playlist-track");
 
     if (!li) return;
+
+    if (li.dataset.trackId === currentListItem.dataset.trackId) {
+        state.isPlaying ? pauseAudio() : playAudio();
+        return;
+    }
 
     if (currentListItem) currentListItem.classList.remove("playing");
 
@@ -300,27 +306,26 @@ audio.addEventListener("canplay", () => {/*showLoadingUI(false); */ });
 audio.addEventListener("ended", handleEnded);
 
 function handleLoadedmetadata() {
-    const track = getCurrentTrack();
-    currentTimeSlider.max = track.duration;
-    currentTimeSlider.value = 0; // Inicia en 0
+    const duration = audio.duration;
 
-    // UI
-    currentTime.textContent = "0:00";
-    durationTime.textContent = formatTime(track.duration);
-    // countdown.textContent = `-${formatTime(audio.duration - 0)}`;
-    // if (isFinite(audio.duration) && audio.duration > 0) {
-    // }
+    if (!Number.isFinite(duration)) return;
+
+    currentTimeSlider.max = duration;
+
+    durationTime.textContent = formatTime(duration);
 }
 
 function handleTimeupdate() {
-    // Esta condición evita el error en el formateo de tiempo, por ejemplo: -5:NaN
-    if (isFinite(audio.duration) && audio.duration > 0) {
-        currentTimeSlider.value = audio.currentTime;
+    const t = audio.currentTime;
 
-        // UI
-        currentTime.textContent = formatTime(audio.currentTime);
-        // countdown.textContent = `-${formatTime(audio.duration - audio.currentTime)}`;
-    }
+    // Error detectado en el formateo de tiempo, por ejemplo: -5:NaN
+    if (!Number.isFinite(t)) return;
+
+    currentTimeSlider.value = t;
+
+    currentTime.textContent = formatTime(t);
+
+    // countdown.textContent = `-${formatTime(audio.duration - t)}`;
 }
 
 function handleEnded() {
@@ -456,7 +461,11 @@ function getCurrentTrack() {
 
 function setAudioTrack(track) {
     audio.src = BASE_URL + encodeURIComponent(track.name);
-    audio.load();
+    // audio.load();
+    currentTimeSlider.value = 0;
+    currentTimeSlider.max = 0;
+    currentTime.textContent = "0:00";
+    durationTime.textContent = "0:00";
 }
 
 function nextIndex() {
@@ -633,7 +642,7 @@ const sendFetchHttpRequest = async (url, callback, method = "GET", data = {}) =>
 
 // Format time in hh:mm:ss or mm:ss
 const formatTime = (seconds, format = 0) => {
-    if (!isFinite(seconds) || seconds <= 0) return "0:00";
+    if (!Number.isFinite(seconds) || seconds <= 0) return "0:00";
     // Int mod Int = Int
     const h = Math.floor(seconds / 3600); // hours calculation
     const min = Math.floor(seconds / 60) % 60; // min calculation
