@@ -15,7 +15,7 @@ let state = {
     isShuffle: false,
     isPlaying: false,
     repeatMode: "none" // "none" | "all" | "one"
-};
+}
 
 const repeatConfig = {
     none: {
@@ -33,7 +33,7 @@ const repeatConfig = {
         title: "Desactivar la repetición indefinida",
         active: true
     }
-};
+}
 
 // Variable para control de list item seleccionado actualmente en la playlist del DOM
 let currentListItem = null;
@@ -96,7 +96,6 @@ const repeatBtn = doc.getElementById("repeat-btn");
 const repeatIcon = doc.getElementById("repeat-icon");
 const repeatIndicator = doc.getElementById("repeat-indicator");
 const repeat1Icon = doc.getElementById("repeat-1-icon");
-
 
 doc.addEventListener("DOMContentLoaded", () => {
     init();
@@ -634,7 +633,7 @@ const sendFetchHttpRequest = async (url, callback, method = "GET", data = {}) =>
     const options = {
         method,
         headers: {}
-    };
+    }
 
     if (method === 'GET') {
         const queryString = new URLSearchParams(data).toString();
@@ -689,7 +688,7 @@ const formatTime = (seconds, format = 0) => {
         `${h} h ${min} min ${s} s`
         : // Show min seconds format => 8 min 47 s
         `${min} min ${s} s`;
-};
+}
 
 const getRandomInt = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -703,7 +702,7 @@ const shuffleArray = arr => {
         [arr[i], arr[r]] = [arr[r], arr[i]];
     }
     return arr;
-};
+}
 
 const parseName = name => {
     const dot = name.lastIndexOf(".");
