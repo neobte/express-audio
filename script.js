@@ -47,7 +47,7 @@ const BASE_URL = "https://neobte.github.io/musica/playlists/salsa/";
 
 const PREVIOUS_TRACK_THRESHOLD = 3;
 
-const DEFAULT_AUDIO_VOLUME = .5; // 50%
+const DEFAULT_AUDIO_VOLUME = .33; // 33%
 
 let currentAudioVolume = DEFAULT_AUDIO_VOLUME;
 
@@ -190,6 +190,7 @@ playlist.addEventListener("click", e => {
     if (!li) return;
 
     if (li.dataset.trackId === currentListItem.dataset.trackId) {
+        // Ya sea por pause o play, la UI ya esta actualizada
         state.isPlaying ? pauseAudio() : playAudio();
         return;
     }
