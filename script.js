@@ -300,16 +300,16 @@ audio.addEventListener("canplay", () => {/*showLoadingUI(false); */ });
 audio.addEventListener("ended", handleEnded);
 
 function handleLoadedmetadata() {
-    if (isFinite(audio.duration) && audio.duration > 0) {
-        currentTimeSlider.max = audio.duration;
-        currentTimeSlider.value = 0; // Inicia en 0
+    const track = getCurrentTrack();
+    currentTimeSlider.max = track.duration;
+    currentTimeSlider.value = 0; // Inicia en 0
 
-        // UI
-        currentTime.textContent = "0:00";
-        durationTime.textContent = formatTime(audio.duration);
-        // countdown.textContent = `-${formatTime(audio.duration - 0)}`;
-
-    }
+    // UI
+    currentTime.textContent = "0:00";
+    durationTime.textContent = formatTime(track.duration);
+    // countdown.textContent = `-${formatTime(audio.duration - 0)}`;
+    // if (isFinite(audio.duration) && audio.duration > 0) {
+    // }
 }
 
 function handleTimeupdate() {
