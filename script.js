@@ -1,41 +1,5 @@
 "use strict";
 
-let currentListItem = null;
-
-const playingIcon = document.createElement('img');
-playingIcon.src = 'images/bars.svg';
-playingIcon.width = 14;
-playingIcon.height = 14;
-playingIcon.alt = 'Playing';
-playingIcon.classList.add('playing-icon');
-
-function setPlayingTrack(trackElement) {
-
-    // si ya había uno activo, lo desactivamos
-    if (currentListItem && currentListItem !== trackElement) {
-        currentListItem.classList.remove('is-playing');
-        removeIcon(currentListItem);
-    }
-
-    // activar nuevo
-    currentListItem = trackElement;
-    currentListItem.classList.add('is-playing');
-
-    attachIcon(currentListItem);
-}
-
-function attachIcon(trackElement) {
-    const container = trackElement.querySelector('.playlist-track__number');
-
-    // mover icono (no clonar)
-    container.appendChild(playingIcon);
-}
-
-function removeIcon(trackElement) {
-    const icon = trackElement.querySelector('.playing-icon');
-    if (icon) icon.remove();
-}
-
 const doc = document;
 
 // Objeto audio
@@ -77,6 +41,7 @@ let loadToken = 0;
 let isSeeking = false;
 let rafId = null;
 let lastTime = 0;
+let currentListItem = null;
 
 // URL para petición de los datos de la playlist "salsa" al backend
 const BASE_URL = "https://neobte.github.io/musica/playlists/salsa/";
@@ -133,6 +98,13 @@ const repeatIcon = doc.getElementById("repeat-icon");
 const repeatIndicator = doc.getElementById("repeat-indicator");
 const repeat1Icon = doc.getElementById("repeat-1-icon");
 
+const playingIcon = doc.createElement('img');
+playingIcon.src = 'images/bars.svg';
+playingIcon.width = 14;
+playingIcon.height = 14;
+playingIcon.alt = 'Playing';
+playingIcon.classList.add('playing-icon');
+
 doc.addEventListener("DOMContentLoaded", () => {
     init();
 });
@@ -147,8 +119,8 @@ const init = () => {
 
 const loadPlaylist = response => {
     // Respuesta del backend
-    playerState.originalPlaylist = response.tracks.items.slice(0, 5);
-    // playerState.originalPlaylist = response.tracks.items;
+    // playerState.originalPlaylist = response.tracks.items.slice(0, 5);
+    playerState.originalPlaylist = response.tracks.items;
     playerState.playbackQueue = [...playerState.originalPlaylist];
 
     // Creamos un Mapper para ubicar los tracks más rapidamente por su ID
@@ -603,6 +575,33 @@ function pauseAudio() {
     // console.log(`Status: ${audio.paused}`);
     if (audio.paused) return;
     audio.pause();
+}
+
+function setPlayingTrack(trackElement) {
+
+    // si ya había uno activo, lo desactivamos
+    if (currentListItem && currentListItem !== trackElement) {
+        currentListItem.classList.remove('is-playing');
+        removeIcon(currentListItem);
+    }
+
+    // activar nuevo
+    currentListItem = trackElement;
+    currentListItem.classList.add('is-playing');
+
+    attachIcon(currentListItem);
+}
+
+function attachIcon(trackElement) {
+    const container = trackElement.querySelector('.playlist-track__number');
+
+    // mover icono (no clonar)
+    container.appendChild(playingIcon);
+}
+
+function removeIcon(trackElement) {
+    const icon = trackElement.querySelector('.playing-icon');
+    if (icon) icon.remove();
 }
 
 // Funciones de UI
