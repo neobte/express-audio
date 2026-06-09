@@ -273,11 +273,6 @@ body {
     background-color: var(--hover);
 }
 
-.playlist-track.playing {
-    color: var(--accent);
-    background-color: rgba(139, 92, 246, .16);
-}
-
 .playlist-track__info {
     min-width: 0;
 }
@@ -341,4 +336,32 @@ body {
 
 .player-track-position>* {
     font-variant-numeric: tabular-nums;
+}
+
+.playlist-track.is-selected {
+    color: var(--accent);
+    background-color: rgba(139, 92, 246, .16);
+}
+
+.track-number {
+    transition: opacity 120ms ease;
+}
+
+.playlist-track.is-playing .track-number {
+    opacity: 0;
+}
+
+.playlist-track__number {
+    /* width: 14px;
+    height: 14px; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.playing-icon {
+    width: 14px;
+    height: 14px;
+    position: absolute;
 }

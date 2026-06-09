@@ -1,12 +1,48 @@
 "use strict";
 
+let currentListItem = null;
+
+const playingIcon = document.createElement('img');
+playingIcon.src = 'images/bars.svg';
+playingIcon.width = 14;
+playingIcon.height = 14;
+playingIcon.alt = 'Playing';
+playingIcon.classList.add('playing-icon');
+
+function setPlayingTrack(trackElement) {
+
+    // si ya había uno activo, lo desactivamos
+    if (currentListItem && currentListItem !== trackElement) {
+        currentListItem.classList.remove('is-playing');
+        removeIcon(currentListItem);
+    }
+
+    // activar nuevo
+    currentListItem = trackElement;
+    currentListItem.classList.add('is-playing');
+
+    attachIcon(currentListItem);
+}
+
+function attachIcon(trackElement) {
+    const container = trackElement.querySelector('.playlist-track__number');
+
+    // mover icono (no clonar)
+    container.appendChild(playingIcon);
+}
+
+function removeIcon(trackElement) {
+    const icon = trackElement.querySelector('.playing-icon');
+    if (icon) icon.remove();
+}
+
 const doc = document;
 
 // Objeto audio
 const audio = new Audio();
 
 // Estado del reproductor
-let state = {
+let playerState = {
     originalPlaylist: [],
     playbackQueue: [],
     tracksMap: new Map(),
@@ -36,7 +72,7 @@ const repeatConfig = {
 }
 
 // Variable para control de list item seleccionado actualmente en la playlist del DOM
-let currentListItem = null;
+
 let loadToken = 0;
 let isSeeking = false;
 let rafId = null;
@@ -47,7 +83,7 @@ const BASE_URL = "https://neobte.github.io/musica/playlists/salsa/";
 
 const PREVIOUS_TRACK_THRESHOLD = 3;
 
-const DEFAULT_AUDIO_VOLUME = .33; // 33%
+const DEFAULT_AUDIO_VOLUME = .16; // 33%
 
 let currentAudioVolume = DEFAULT_AUDIO_VOLUME;
 
@@ -111,22 +147,22 @@ const init = () => {
 
 const loadPlaylist = response => {
     // Respuesta del backend
-    // state.originalPlaylist = response.tracks.items.slice(0, 5);
-    state.originalPlaylist = response.tracks.items;
-    state.playbackQueue = [...state.originalPlaylist];
+    playerState.originalPlaylist = response.tracks.items.slice(0, 5);
+    // playerState.originalPlaylist = response.tracks.items;
+    playerState.playbackQueue = [...playerState.originalPlaylist];
 
     // Creamos un Mapper para ubicar los tracks más rapidamente por su ID
-    state.tracksMap = new Map(state.originalPlaylist.map(track => [track.id, track]));
+    playerState.tracksMap = new Map(playerState.originalPlaylist.map(track => [track.id, track]));
 
     // Creamos un Mapper para ubicar el índice del track más rapidamente por su ID
-    state.trackIndexMap = new Map(state.originalPlaylist.map((track, index) => [track.id, index]));
-    // console.log(state.trackIndexMap);
+    playerState.trackIndexMap = new Map(playerState.originalPlaylist.map((track, index) => [track.id, index]));
+    // console.log(playerState.trackIndexMap);
 
     // Obtenemos un currentIndex distinto, cada vez que cargamos la página. No queremos que siempre inicie en 0
-    state.currentIndex = getRandomInt(0, state.playbackQueue.length - 1);
-    // state.currentIndex = 0;
+    playerState.currentIndex = getRandomInt(0, playerState.playbackQueue.length - 1);
+    // playerState.currentIndex = 0;
 
-    // Obtenemos el track en la posición de state.currentIndex por defecto
+    // Obtenemos el track en la posición de playerState.currentIndex por defecto
     const track = getCurrentTrack();
 
     // Cargamos el track en el reproductor, no lo hacemos sonar
@@ -139,10 +175,10 @@ const loadPlaylist = response => {
     updateCurrentTrackUI(track);
 
     // Actualizamos la UI, X número de canción de un total de Y canciones
-    playerCurrentTrack.textContent = state.currentIndex + 1;
+    playerCurrentTrack.textContent = playerState.currentIndex + 1;
 
     // Actulizamos la UI, número total de canciones
-    playerTotalTracks.textContent = state.playbackQueue.length;
+    playerTotalTracks.textContent = playerState.playbackQueue.length;
 }
 
 const renderTracks = () => {
@@ -151,14 +187,14 @@ const renderTracks = () => {
 
     const fragment = doc.createDocumentFragment();
 
-    state.playbackQueue.forEach((track, index) => {
+    playerState.playbackQueue.forEach((track, index) => {
         const li = doc.createElement("li");
         li.dataset.trackId = track.id;
 
         li.classList.add("playlist-track");
         li.innerHTML = `
                     <div class="playlist-track__number">
-                        <span>${index + 1}</span>
+                        <span class="track-number">${index + 1}</span>
                     </div>
                     <div class="playlist-track__info">
                         <h3 class="playlist-track__title">${track.title}</h3>
@@ -174,9 +210,9 @@ const renderTracks = () => {
     // Aquí agregamos los elementos en el DOM, por lo tanto ya existen en el mismo
     playlist.appendChild(fragment);
 
-    // Es aceptable utilizar lo siguiente por ser el render inicial
-    const nextListItem = playlist.children[state.currentIndex];
-    nextListItem.classList.add("playing");
+    // Es aceptable utilizar lo siguiente por ser el render inicial, para resaltar la fila que ha sido seleccionada
+    const nextListItem = playlist.children[playerState.currentIndex];
+    nextListItem.classList.add("is-selected");
     currentListItem = nextListItem;
 
     scrollIntoView(nextListItem);
@@ -188,33 +224,48 @@ playlist.addEventListener("click", e => {
 
     if (!li) return;
 
-    if (li.dataset.trackId === currentListItem.dataset.trackId) {
-        // Ya sea por pause o play, la UI ya esta actualizada
-        state.isPlaying ? pauseAudio() : playAudio();
+    if (li === currentListItem) {
+        // Ya sea por pause o play. Toggle pause/play opcional
+        if (playerState.isPlaying) {
+            pauseAudio();
+            li.classList.remove("is-playing");
+            removeIcon(li);
+        } else {
+            playAudio();
+            li.classList.add("is-playing");
+            attachIcon(li);
+        }
         return;
     }
 
-    if (currentListItem) currentListItem.classList.remove("playing");
-
-    // Actualizamos la UI
-    li.classList.add("playing");
+    // si ya había uno activo, lo desactivamos
+    if (currentListItem && currentListItem !== li) {
+        currentListItem.classList.remove("is-selected");
+        currentListItem.classList.remove("is-playing");
+        removeIcon(currentListItem);
+    }
 
     // Asignamos la referencia a la variable currentListItem cuyo valor original es null al principio del todo
     currentListItem = li;
+
+    // Actualizamos la UI
+    li.classList.add("is-selected");
 
     // Obtenemos el ID del track
     const trackId = Number(li.dataset.trackId);
 
     // Obtenemos el track buscando POR SU ID en el tracksMap
-    const track = state.tracksMap.get(trackId);
+    const track = playerState.tracksMap.get(trackId);
 
-    state.currentIndex = state.playbackQueue.findIndex(track => track.id === trackId);
+    playerState.currentIndex = playerState.playbackQueue.findIndex(track => track.id === trackId);
 
     // Cargamos el audio
     loadTrack(track);
 
     // Reproducimos el audio
     playAudio();
+    li.classList.add("is-playing");
+    attachIcon(li);
 
     // Actualizar UI
     updateCurrentTrackUI(track);
@@ -231,9 +282,9 @@ forwardStepBtn.addEventListener("click", handleForward);
 repeatBtn.addEventListener("click", handleRepeat);
 
 function handleShuffle() {
-    state.isShuffle = !state.isShuffle;
+    playerState.isShuffle = !playerState.isShuffle;
 
-    if (state.isShuffle) {
+    if (playerState.isShuffle) {
         enableShuffle();
     } else {
         disableShuffle();
@@ -251,13 +302,15 @@ function handleBackward() {
         return;
     }
 
-    // 1. Actualizar state.currentIndex
-    state.currentIndex = prevIndex();
+    // 1. Actualizar playerState.currentIndex
+    playerState.currentIndex = prevIndex();
 
     loadCurrentTrack();
 
-    if (state.isPlaying) {
+    if (playerState.isPlaying) {
         playAudio();
+        currentListItem.classList.add("is-playing");
+        attachIcon(currentListItem);
     }
 }
 
@@ -266,40 +319,55 @@ function handlePlayPause() {
     if (!audio.src) return;
 
     // El estado original al inicio de la aplicación es false
-    if (state.isPlaying) {
+    if (playerState.isPlaying) {
         pauseAudio();
+        currentListItem.classList.remove("is-playing");
+        removeIcon(currentListItem);
     } else {
         playAudio();
+        currentListItem.classList.add("is-playing");
+        attachIcon(currentListItem);
     }
 
     updatePlayPauseUI();
 }
 
 function handleForward() {
-    // 1. Actualizar state.currentIndex
-    state.currentIndex = nextIndex();
+    // 1. Actualizar playerState.currentIndex
+    playerState.currentIndex = nextIndex();
 
     loadCurrentTrack();
 
-    if (state.isPlaying) {
+    if (playerState.isPlaying) {
         playAudio()
+        currentListItem.classList.add("is-playing");
+        attachIcon(currentListItem);
     }
 }
 
 function handleRepeat() {
-    // state.repeatMode = "none",  default value
-    state.repeatMode = repeatConfig[state.repeatMode].next; // Aquí state.repeatMode empieza a cambiar de estado
+    // playerState.repeatMode = "none",  default value
+    playerState.repeatMode = repeatConfig[playerState.repeatMode].next; // Aquí playerState.repeatMode empieza a cambiar de estado
     updateRepeatUI();
 }
 
 audio.addEventListener("play", () => {
-    state.isPlaying = true;
+    playerState.isPlaying = true;
     updatePlayPauseUI();
+
+    // if (currentListItem) {
+    //     currentListItem.classList.add('playing');
+    // }
 });
 audio.addEventListener("pause", () => {
-    state.isPlaying = false;
+    playerState.isPlaying = false;
     updatePlayPauseUI();
+
+    // if (currentListItem) {
+    //     currentListItem.classList.remove('playing');
+    // }
 });
+
 audio.addEventListener("loadedmetadata", handleLoadedmetadata);
 audio.addEventListener("timeupdate", handleTimeupdate);
 audio.addEventListener("waiting", () => {/* showLoadingUI(true); */ });
@@ -353,16 +421,16 @@ function handleTimeupdate() {
 function handleEnded() {
 
     // Repeat one -> misma canción
-    if (state.repeatMode === "one") {
+    if (playerState.repeatMode === "one") {
         audio.currentTime = 0; // Aquí si tiene sentido, por que queremos reproducir la canción ya cargada otra vez!!!
         playAudio();
         return;
     }
 
-    const isLastTrack = state.currentIndex === state.playbackQueue.length - 1;
+    const isLastTrack = playerState.currentIndex === playerState.playbackQueue.length - 1;
     // repeat none + última canción → reset sin reproducir
-    if (isLastTrack && state.repeatMode === "none") {
-        state.currentIndex = 0;
+    if (isLastTrack && playerState.repeatMode === "none") {
+        playerState.currentIndex = 0;
         const track = getCurrentTrack();
         setAudioTrack(track);
         syncPlayerUI(track);
@@ -370,11 +438,13 @@ function handleEnded() {
     }
 
     // repeat all o avance normal
-    state.currentIndex = nextIndex();
+    playerState.currentIndex = nextIndex();
     const track = getCurrentTrack();
     setAudioTrack(track);
     syncPlayerUI(track);
     playAudio();
+    currentListItem.classList.add("is-playing");
+    attachIcon(currentListItem);
 
 }
 
@@ -447,7 +517,7 @@ function enableShuffle() {
     const currentTrack = getCurrentTrack();
 
     // Obtenemos la longitud del arreglo de canciones
-    const len = state.playbackQueue.length;
+    const len = playerState.playbackQueue.length;
 
     // Construimos un array con un elemento menos, ej. si hay 5 canciones, entonces new Array tendra lugar para 4 canciones
     let rest = new Array(len - 1);
@@ -455,18 +525,18 @@ function enableShuffle() {
     let k = 0;
     for (let i = 0; i < len; i++) {
         // Llenamos el array, sin la canción actualmente en reproducción
-        if (i === state.currentIndex) continue;
-        rest[k++] = state.playbackQueue[i];
+        if (i === playerState.currentIndex) continue;
+        rest[k++] = playerState.playbackQueue[i];
     }
 
     // Mezclamos el array
     rest = shuffleArray(rest);
 
     // Construimos la nueva cola
-    state.playbackQueue = [currentTrack, ...rest];
+    playerState.playbackQueue = [currentTrack, ...rest];
 
     // Seteamos con 0, ya que la canción actualmente en reproducción esta en la posición 0
-    state.currentIndex = 0;
+    playerState.currentIndex = 0;
 }
 
 function disableShuffle() {
@@ -474,35 +544,20 @@ function disableShuffle() {
     const currentTrack = getCurrentTrack();
 
     // Devolvemos el orden original al array "playbackQueue"
-    state.playbackQueue = [...state.originalPlaylist];
+    playerState.playbackQueue = [...playerState.originalPlaylist];
 
     // Este es un Map creado con los índices originales
-    const originalIndex = state.trackIndexMap.get(currentTrack.id);
+    const originalIndex = playerState.trackIndexMap.get(currentTrack.id);
 
-    state.currentIndex = originalIndex;
-}
-
-function getCurrentTrack() {
-    return state.playbackQueue[state.currentIndex];
-}
-
-function setAudioTrack(track) {
-    const token = ++loadToken;
-    audio.src = BASE_URL + encodeURIComponent(track.name);
-    // audio.load();
-    currentTimeSlider.value = 0;
-    currentTimeSlider.max = 0;
-    currentTime.textContent = "0:00";
-    durationTime.textContent = "0:00";
-    audio.dataset.token = token;
+    playerState.currentIndex = originalIndex;
 }
 
 function nextIndex() {
-    return (state.currentIndex + 1) % state.playbackQueue.length;
+    return (playerState.currentIndex + 1) % playerState.playbackQueue.length;
 }
 
 function prevIndex() {
-    return (state.currentIndex - 1 + state.playbackQueue.length) % state.playbackQueue.length;
+    return (playerState.currentIndex - 1 + playerState.playbackQueue.length) % playerState.playbackQueue.length;
 }
 
 function loadCurrentTrack() {
@@ -521,6 +576,21 @@ function loadTrack(track) {
     setAudioTrack(track);
 }
 
+function getCurrentTrack() {
+    return playerState.playbackQueue[playerState.currentIndex];
+}
+
+function setAudioTrack(track) {
+    const token = ++loadToken;
+    audio.src = BASE_URL + encodeURIComponent(track.name);
+    // audio.load();
+    currentTimeSlider.value = 0;
+    currentTimeSlider.max = 0;
+    currentTime.textContent = "0:00";
+    durationTime.textContent = "0:00";
+    audio.dataset.token = token;
+}
+
 async function playAudio() {
     try {
         await audio.play();
@@ -537,10 +607,10 @@ function pauseAudio() {
 
 // Funciones de UI
 function updateRepeatUI() {
-    // El primer clic en el button repeatBtn, origina que state.repeatMode = all
-    // El segundo clic en el button repeatBtn, origina que state.repeatMode = one
-    // El tercer clic en el button repeatBtn, origina que state.repeatMode = none
-    const mode = state.repeatMode;
+    // El primer clic en el button repeatBtn, origina que playerState.repeatMode = all
+    // El segundo clic en el button repeatBtn, origina que playerState.repeatMode = one
+    // El tercer clic en el button repeatBtn, origina que playerState.repeatMode = none
+    const mode = playerState.repeatMode;
 
     repeatBtn.classList.remove("active");
     // repeatIcon.classList.remove("d-none");
@@ -572,7 +642,7 @@ function updateRepeatUI() {
 }
 
 function updatePlayPauseUI() {
-    const isPlaying = state.isPlaying;
+    const isPlaying = playerState.isPlaying;
 
     playIcon.classList.toggle("d-none", isPlaying);
     pauseIcon.classList.toggle("d-none", !isPlaying);
@@ -589,13 +659,17 @@ function syncPlayerUI(track) {
 
 function updatePlaylistSelectionUI(track) {
 
-    if (currentListItem) currentListItem.classList.remove("playing");
+    if (currentListItem) {
+        currentListItem.classList.remove("is-selected");
+        currentListItem.classList.remove("is-playing");
+        removeIcon(currentListItem);
+    }
 
     const nextListItem = doc.querySelector(`li[data-track-id="${track.id}"]`);
 
     if (!nextListItem) return;
 
-    nextListItem.classList.add("playing");
+    nextListItem.classList.add("is-selected");
     currentListItem = nextListItem;
 
     scrollIntoView(nextListItem);
@@ -609,18 +683,18 @@ function updateCurrentTrackUI(track) {
 
 function updateTrackPositionUI(track) {
     // const currentTrack = track;
-    // const originalIndex = state.originalPlaylist.findIndex(track => track.id === currentTrack.id);
+    // const originalIndex = playerState.originalPlaylist.findIndex(track => track.id === currentTrack.id);
 
     // Este es un Map creado con los índices originales
-    const originalIndex = state.trackIndexMap.get(track.id);
+    const originalIndex = playerState.trackIndexMap.get(track.id);
 
     playerCurrentTrack.textContent = originalIndex + 1;
-    // playerCurrentTrack.textContent = state.originalPlaylist.findIndex(t => t.id === trackId) + 1;
+    // playerCurrentTrack.textContent = playerState.originalPlaylist.findIndex(t => t.id === trackId) + 1;
 }
 
 function updateShuffleButtonUI() {
-    shuffleBtn.classList.toggle("active", state.isShuffle);
-    shuffleBtn.title = state.isShuffle
+    shuffleBtn.classList.toggle("active", playerState.isShuffle);
+    shuffleBtn.title = playerState.isShuffle
         ? "Desactivar reproducción aleatoria"
         : "Activar reproducción aleatoria";
 
