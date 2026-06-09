@@ -577,6 +577,7 @@ function updatePlayPauseUI() {
     playIcon.classList.toggle("d-none", isPlaying);
     pauseIcon.classList.toggle("d-none", !isPlaying);
     playPauseBtn.title = isPlaying ? "Pausar" : "Reproducir";
+
 }
 
 function syncPlayerUI(track) {
