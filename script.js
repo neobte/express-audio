@@ -153,17 +153,27 @@ const loadPlaylist = response => {
     playerTotalTracks.textContent = playerState.playbackQueue.length;
 }
 
+// Solo se renderiza una sola vez!!!
 const renderTracks = () => {
 
+    // Limpiamos todo lo que tiene el elemento playlist anteriormente
     playlist.innerHTML = '';
 
+    // Creamos un fragmento para no esta haciendo appendchild en cada iteración del bucle
     const fragment = doc.createDocumentFragment();
 
+    // Recorremos el array de tracks
     playerState.playbackQueue.forEach((track, index) => {
+        // Creamos un list item por cada track
         const li = doc.createElement("li");
+
+        // Creamos un dataset con el ID de cada track
         li.dataset.trackId = track.id;
 
+        // Agregamos la clase "playlist-track" a cada list item
         li.classList.add("playlist-track");
+
+        // Agregamos todos los elementos hijos del list item
         li.innerHTML = `
                     <div class="playlist-track__number">
                         <span class="track-number">${index + 1}</span>
@@ -176,15 +186,21 @@ const renderTracks = () => {
                         <span>${formatTime(track.duration)}</span>
                     </div>
                 `;
+        // Por cada iteración agregamos un list item al fragmento
         fragment.appendChild(li);
     });
 
-    // Aquí agregamos los elementos en el DOM, por lo tanto ya existen en el mismo
+    // Aquí agregamos todos los list item contenidos en el fragmento al DOM, por lo tanto ahora ya existen
     playlist.appendChild(fragment);
 
-    // Es aceptable utilizar lo siguiente por ser el render inicial, para resaltar la fila que ha sido seleccionada
+    // Obtenemos el list item de la playlist
     const nextListItem = playlist.children[playerState.currentIndex];
+
+    // Agregamos la clase "is-selected"
     nextListItem.classList.add("is-selected");
+
+    // Asignamos una copia a la variabloe currentListItem, por lo tanto en el momento que hagamos 
+    // click en forward o backward, la variable currentListItem contendra una referencia del list item inicial
     currentListItem = nextListItem;
 
     scrollIntoView(nextListItem);
@@ -281,6 +297,8 @@ function handleBackward() {
 
     if (playerState.isPlaying) {
         playAudio();
+
+        // Agregamos la clase is-playing, la clase is-selected fue agregada en el proceso de carga del track
         currentListItem.classList.add("is-playing");
         attachIcon(currentListItem);
     }
@@ -293,11 +311,19 @@ function handlePlayPause() {
     // El estado original al inicio de la aplicación es false
     if (playerState.isPlaying) {
         pauseAudio();
+
+        // Removemos la clase is-playing, si se pulsa el botón pause
         currentListItem.classList.remove("is-playing");
+
+        // Removemos el icon del ecualizador
         removeIcon(currentListItem);
     } else {
         playAudio();
+
+        // Agregamos la clase is-playing, si se pulsa el botón play
         currentListItem.classList.add("is-playing");
+
+        // Agregamos el icono del ecualizador
         attachIcon(currentListItem);
     }
 
@@ -311,7 +337,9 @@ function handleForward() {
     loadCurrentTrack();
 
     if (playerState.isPlaying) {
-        playAudio()
+        playAudio();
+
+        // Agregamos la clase is-playing, la clase is-selected fue agregada en el proceso de carga del track
         currentListItem.classList.add("is-playing");
         attachIcon(currentListItem);
     }
@@ -396,6 +424,7 @@ function handleEnded() {
     if (playerState.repeatMode === "one") {
         audio.currentTime = 0; // Aquí si tiene sentido, por que queremos reproducir la canción ya cargada otra vez!!!
         playAudio();
+        // Aquí no agregamos las clases is-selected y is-playing, porque ya las contiene el elemento
         return;
     }
 
@@ -554,6 +583,7 @@ function getCurrentTrack() {
 
 function setAudioTrack(track) {
     const token = ++loadToken;
+
     audio.src = BASE_URL + encodeURIComponent(track.name);
     // audio.load();
     currentTimeSlider.value = 0;
@@ -668,7 +698,10 @@ function updatePlaylistSelectionUI(track) {
 
     if (!nextListItem) return;
 
+    // Agregamos la clase is-selected, la clase is playing sera agregada cuando se llame a la función playAudio()
     nextListItem.classList.add("is-selected");
+
+    // Volvemos a asignar la referencia a la variable currentListItem
     currentListItem = nextListItem;
 
     scrollIntoView(nextListItem);
