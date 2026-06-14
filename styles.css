@@ -28,7 +28,6 @@ body {
 
 .container {
     width: 100%;
-    max-width: 448px;
     max-width: 424px;
     margin: auto;
     padding: 1rem;
@@ -36,22 +35,146 @@ body {
     border: 3px solid #ffffff0d;
 }
 
-.player-track {
+/* Información del track seleccionado */
+.now-playing {
     text-align: center;
     height: 56px;
     padding: .5rem;
 }
 
-#player-track-title {
+.now-playing #track-title {
     font-size: 1rem;
     font-weight: 500;
 }
 
-#player-track-artist {
+.now-playing #track-artist {
     color: var(--text-secondary);
     font-size: .875rem;
 }
 
+/* Información X de Y */
+.track-progress-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: .5rem;
+    border: 3px solid #ffffff0d;
+    margin: 1rem 0;
+}
+
+.track-progress {
+    width: 100px;
+    text-align: center;
+    font-size: .875rem;
+}
+
+.track-progress span {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Fin track progress */
+
+/* Playlist */
+.playlist-container {
+    max-height: 280px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.playlist-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.playlist-container::-webkit-scrollbar-track {
+    background-color: var(--selected);
+    border-radius: 4px;
+}
+
+.playlist-container::-webkit-scrollbar-thumb {
+    background-color: rgba(139, 139, 139, 1);
+    border-radius: 4px;
+}
+
+.playlist-container::-webkit-scrollbar-thumb:hover {
+    background-color: #636363;
+}
+
+#playlist {
+    width: 100%;
+    list-style-type: none;
+}
+
+/* Fin playlist */
+
+/* Track li */
+.playlist-track {
+    display: grid;
+    grid-template-columns: 48px auto 48px;
+    padding: .5rem 0;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    border-radius: .25rem;
+}
+
+.playlist-track__title {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.playlist-track__artist {
+    font-size: .875rem;
+    color: var(--text-secondary);
+}
+
+.playlist-track__number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.playlist-track__number,
+.playlist-track__duration {
+    font-size: .875rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.playlist-track:hover {
+    background-color: var(--hover);
+}
+
+.playlist-track__info {
+    min-width: 0;
+}
+
+.playlist-track__title,
+.playlist-track__artist,
+#track-title,
+#track-artist {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.playlist-track.is-selected {
+    color: var(--accent);
+    background-color: rgba(139, 92, 246, .16);
+}
+
+.playlist-track.is-playing .track-number {
+    opacity: 0;
+}
+
+.playlist-track .track-number {
+    transition: opacity 120ms ease;
+}
+
+/* Fin de estilos de la playlist */
+
+/* Current time */
 .current-time-container {
     display: flex;
     align-items: center;
@@ -67,43 +190,9 @@ body {
     color: var(--text-secondary);
 }
 
-.btn {
-    cursor: pointer;
-    color: var(--text-primary);
-    width: 44px;
-    height: 44px;
+/* Fin de current time */
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    aspect-ratio: 1/1;
-    border-radius: .25rem;
-    font-size: 1rem;
-
-    outline: none;
-    background: none;
-    border: none;
-
-    transition: all .2s ease;
-}
-
-.btn:hover {
-    background-color: var(--hover);
-}
-
-.btn svg {
-    /* Esto hará que el icono escale en función del font-size del button */
-    width: 1.5em;
-    height: auto;
-}
-
-#play-pause-btn {
-    width: 48px;
-    height: 48px;
-    font-size: 1.25rem;
-}
-
+/* Controles */
 .controls {
     display: flex;
     align-items: center;
@@ -111,6 +200,9 @@ body {
     gap: .25rem;
 }
 
+/* Fin de estilos de controles */
+
+/* Controles de volumen */
 .volume-container {
     display: flex;
     align-items: center;
@@ -126,11 +218,9 @@ body {
     font-variant-numeric: tabular-nums;
 }
 
-#volume-btn {
-    font-size: .875rem;
-    color: var(--text-secondary);
-}
+/* Finde estilos de control de volumen */
 
+/* Slider */
 .slider {
     -webkit-appearance: none;
     width: 100%;
@@ -171,9 +261,6 @@ body {
     transform: scale(1.3);
 }
 
-/* https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Using_Web_Audio_API */
-/* https://mdn.github.io/webaudio-examples/audio-basics/ */
-
 /* Google Chrome */
 .slider::-webkit-slider-runnable-track {
     background-color: var(--selected);
@@ -207,99 +294,68 @@ body {
     width: 0;
 }
 
-/* FIN DE ESTILOS DEL SLIDER */
+/* Fin de estilos del slider */
 
-.playlist-container {
-    /* Altura fija teniendo en cuenta font-size de title 14 y font-size de artist 12 */
-    /* 280 para 5 registros */
-    /* 336 para 6 registros */
-    max-height: 280px;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-.playlist-container::-webkit-scrollbar {
-    width: 8px;
-}
-
-.playlist-container::-webkit-scrollbar-track {
-    /* background-color: rgba(252, 252, 252, 1); */
-    background-color: var(--selected);
-    border-radius: 4px;
-}
-
-.playlist-container::-webkit-scrollbar-thumb {
-    background-color: rgba(139, 139, 139, 1);
-    border-radius: 4px;
-}
-
-.playlist-container::-webkit-scrollbar-thumb:hover {
-    background-color: #636363;
-}
-
-#playlist {
-    list-style-type: none;
-}
-
-.playlist-track {
-    display: grid;
-    grid-template-columns: 48px auto 48px;
-    padding: .5rem 0;
-    align-items: center;
+/* Estilos de botones */
+.btn {
     cursor: pointer;
-    user-select: none;
+    color: var(--text-primary);
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    aspect-ratio: 1/1;
     border-radius: .25rem;
-}
-
-.playlist-track__title {
     font-size: 1rem;
-    font-weight: 500;
+
+    outline: none;
+    background: none;
+    border: none;
+
+    transition: all .2s ease;
 }
 
-.playlist-track__artist {
-    font-size: .875rem;
-    color: var(--text-secondary);
-}
-
-.playlist-track__number,
-.playlist-track__duration {
-    font-size: .875rem;
-    text-align: center;
-    color: var(--text-secondary);
-    font-variant-numeric: tabular-nums;
-}
-
-.playlist-track:hover {
+.btn:hover {
     background-color: var(--hover);
 }
 
-.playlist-track__info {
-    min-width: 0;
+.btn svg {
+    /* Esto hará que el icono escale en función del font-size del button */
+    width: 1.5em;
+    height: auto;
 }
 
-.playlist-track__title,
-.playlist-track__artist,
-#player-track-title,
-#player-track-artist {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+#play-pause-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 1.25rem;
 }
 
+#repeat-btn.active,
+#shuffle-btn.active {
+    color: var(--accent);
+}
+
+#volume-btn {
+    font-size: .875rem;
+    color: var(--text-secondary);
+}
+
+/* Fin estilos de botones */
+
+/*  */
+.playing-icon {
+    width: 14px;
+    height: 14px;
+    position: absolute;
+}
+
+/* Util css */
 .d-none {
     display: none;
-}
-
-.text-start {
-    text-align: start;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.text-end {
-    text-align: end;
 }
 
 .fs-14 {
@@ -314,54 +370,14 @@ body {
     margin-top: 1rem;
 }
 
-#repeat-btn.active,
-#shuffle-btn.active {
-    color: var(--accent);
+.text-start {
+    text-align: start;
 }
 
-.track-position-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: .5rem;
-    border: 3px solid #ffffff0d;
-    margin: 1rem 0;
-}
-
-.player-track-position {
-    width: 80px;
-    font-size: .875rem;
+.text-center {
     text-align: center;
 }
 
-.player-track-position>* {
-    font-variant-numeric: tabular-nums;
-}
-
-.playlist-track.is-selected {
-    color: var(--accent);
-    background-color: rgba(139, 92, 246, .16);
-}
-
-.track-number {
-    transition: opacity 120ms ease;
-}
-
-.playlist-track.is-playing .track-number {
-    opacity: 0;
-}
-
-.playlist-track__number {
-    /* width: 14px;
-    height: 14px; */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-
-.playing-icon {
-    width: 14px;
-    height: 14px;
-    position: absolute;
+.text-end {
+    text-align: end;
 }

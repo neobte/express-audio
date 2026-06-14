@@ -7,42 +7,33 @@
     <meta name="author" content="Julio César">
     <meta name="keywords"
         content="Audio Player, Music Player, Express Audio, Web Player, Music APP, Reproductor de Música, Reproductor de Audio, Reproductor Web de Audio">
+
+    <title>Express Audio</title>
+
     <link rel="shortcut icon" href="images/favicon.png" type="image/png" sizes="16x16 32x32">
     <!-- Preconnect (speed boost) -->
     <link rel="preconnect" href="https://neobte.github.io" crossorigin>
-    <title id="document-title"></title>
     <link rel="stylesheet" href="styles.css">
-
-    <!-- <h1>h1 -> 32px</h1>
-    <h2>h2 -> 24px</h2>
-    <h3>h3 -> 18.72px</h3>
-    <h4>h4 -> 16px</h4>
-    <h5>h5 -> 13.28px</h5>
-    <h6>h6 -> 10.72px</h6> -->
 </head>
 
 <body>
 
-    <header class="">
-    </header>
-
     <main class="container">
 
-        <div class="player-track">
-            <h3 id="player-track-title">Nada esta sonando...</h3>
-            <p id="player-track-artist"></p>
+        <div class="now-playing">
+            <h3 id="track-title">Título</h3>
+            <p id="track-artist">Artista</p>
         </div>
 
-        <div class="track-position-container">
-            <div class="player-track-position">
-                <span id="player-current-track">-</span>
+        <div class="track-progress-container">
+            <div class="track-progress">
+                <span id="track-current-index">-</span>
                 /
-                <span id="player-total-tracks">-</span>
+                <span id="tracks-total">-</span>
             </div>
         </div>
 
         <div class="playlist-container">
-
             <ul id="playlist">
                 <li class="playlist-track">
                     <div class="playlist-track__number">
@@ -81,19 +72,17 @@
                     </div>
                 </li>
             </ul>
-
         </div>
 
         <div class="current-time-container">
-            <span id="current-time" class="time">-:--</span>
-            <input type="range" id="current-time-slider" class="slider" min="0" max="100" value="0" step=".01">
-            <span id="duration-time" class="time">-:--</span>
+            <span id="track-current-time" class="time">-:--</span>
+            <input id="current-time-slider" class="slider" type="range" min="0" value="0" step=".01">
+            <span id="track-duration" class="time">-:--</span>
         </div>
 
         <div class="controls">
-
             <!-- Shuffle btn -->
-            <button id="shuffle-btn" class="btn" title="Activar reproducción aleatoria">
+            <button id="shuffle-btn" class="btn" type="button" title="Activar reproducción aleatoria">
                 <!-- Shuffle icon -->
                 <svg id="shuffle-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
                     <path fill="currentColor"
@@ -102,8 +91,8 @@
                 </svg>
             </button>
 
-            <!-- Backward-step btn -->
-            <button id="backward-step-btn" class="btn" title="Anterior">
+            <!-- Backward btn -->
+            <button id="backward-btn" class="btn" type="button" title="Anterior">
                 <!-- Backward-step icon -->
                 <svg id="backward-step-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
                     <path fill="currentColor"
@@ -112,7 +101,7 @@
             </button>
 
             <!-- Play/pause btn -->
-            <button id="play-pause-btn" class="btn" title="Reproducir">
+            <button id="play-pause-btn" class="btn" type="button" title="Reproducir">
                 <!-- Play icon -->
                 <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
                     <path fill="currentColor"
@@ -125,8 +114,8 @@
                 </svg>
             </button>
 
-            <!-- Forward-step btn -->
-            <button id="forward-step-btn" class="btn" title="Siguiente">
+            <!-- Forward btn -->
+            <button id="forward-btn" class="btn" type="button" title="Siguiente">
                 <!-- Forward-step icon-->
                 <svg id="forward-step-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
                     <path fill="currentColor"
@@ -135,7 +124,7 @@
             </button>
 
             <!-- Repeat btn -->
-            <button id="repeat-btn" class="btn" title="Repetir playlist">
+            <button id="repeat-btn" class="btn" type="button" title="Repetir playlist">
                 <!-- Repeat icon -->
                 <svg id="repeat-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
                     <path fill="currentColor"
@@ -148,7 +137,6 @@
                         d="M534.6 137.4C547.1 149.9 547.1 170.2 534.6 182.7L470.6 246.7C461.4 255.9 447.7 258.6 435.7 253.6C423.7 248.6 416 236.9 416 224L416 192L256 192C185.3 192 128 249.3 128 320C128 337.7 113.7 352 96 352C78.3 352 64 337.7 64 320C64 214 150 128 256 128L416 128L416 96C416 83.1 423.8 71.4 435.8 66.4C447.8 61.4 461.5 64.2 470.7 73.3L534.7 137.3zM105.4 502.6C92.9 490.1 92.9 469.8 105.4 457.3L169.4 393.3C178.6 384.1 192.3 381.4 204.3 386.4C216.3 391.4 224 403.1 224 416L224 448L384 448C454.7 448 512 390.7 512 320C512 302.3 526.3 288 544 288C561.7 288 576 302.3 576 320C576 426 490 512 384 512L224 512L224 544C224 556.9 216.2 568.6 204.2 573.6C192.2 578.6 178.5 575.8 169.3 566.7L105.3 502.7zM352 280L352 360C352 373.3 341.3 384 328 384C314.7 384 304 373.3 304 360L304 312C294 312 284.6 305.6 281.2 295.6C277 283 283.8 269.4 296.4 265.2L320.4 257.2C327.7 254.8 335.8 256 342 260.5C348.2 265 352 272.3 352 280z" />
                 </svg>
             </button>
-
         </div>
 
         <div class="volume-container">
@@ -165,19 +153,18 @@
                         d="M73 39.1C63.6 29.7 48.4 29.7 39.1 39.1C29.8 48.5 29.7 63.7 39 73.1L567 601.1C576.4 610.5 591.6 610.5 600.9 601.1C610.2 591.7 610.3 576.5 600.9 567.2L351.9 318.2L351.9 130.9C351.9 111.7 336.3 96.1 317.1 96.1C308.6 96.1 300.4 99.2 294 104.9L211.8 178L73 39.1zM122.2 224L112 224C85.5 224 64 245.5 64 272L64 368C64 394.5 85.5 416 112 416L160 416L294.1 535.2C300.5 540.9 308.7 544 317.2 544C336.4 544 352 528.4 352 509.2L352 453.8L122.2 224zM471.3 174.4C462.9 184.7 464.5 199.8 474.8 208.2C507.3 234.6 528 274.9 528 320C528 353 516.9 383.4 498.2 407.7L532.4 441.9C559.6 408.8 576 366.3 576 320C576 259.9 548.3 206.2 505.1 171C494.8 162.6 479.7 164.2 471.3 174.5zM428.5 338L463.8 373.3C474 358.1 480 339.7 480 320C480 289.9 466.1 263.1 444.5 245.5C434.2 237.1 419.1 238.7 410.7 249C402.3 259.3 403.9 274.4 414.2 282.8C425.1 291.6 431.9 305 431.9 320.1C431.9 326.5 430.7 332.5 428.4 338.1z" />
                 </svg>
             </button>
-
-            <input type="range" id="volume-slider" class="slider" min="0" max="100" value="50" step="1">
-
-            <span id="volume-value"></span>
+            <input id="volume-slider" class="slider" type="range" min="0" max="100" value="50" step="1">
+            <span id="volume-value">---</span>
         </div>
 
     </main>
-    <!-- DOMException: The fetching process for the media resource was aborted by the user agent at the user's request. -->
+
     <footer class="text-center fs-14 mt-1">
         <p>Copyright ©️ 2025 | Made with ❤️ by Julio</p>
     </footer>
 
-    <script src="script.js"></script>
+    <!-- <script src="data.js"></script> -->
+    <script src="app.js"></script>
 
 </body>
 

@@ -1,123 +1,124 @@
 "use strict";
 
-const doc = document;
+const d = document;
 
-// Objeto audio
-const audio = new Audio();
+/**
+ * Referencias cacheadas
+ */
 
-// Estado del reproductor
-let playerState = {
-    originalPlaylist: [],
-    playbackQueue: [],
-    tracksMap: new Map(),
-    trackIndexMap: new Map(),
-    currentIndex: 0, // Podemos setear a null, si es que no queremos cargar nada por defecto, o -1 nada cargado aún
-    isShuffle: false,
-    isPlaying: false,
-    repeatMode: "none" // "none" | "all" | "one"
-}
+// Información acerca del track
+const trackArtist = d.getElementById("track-artist");
+const trackTitle = d.getElementById("track-title");
 
-const repeatConfig = {
-    none: {
-        next: "all",
-        title: "Repetir playlist",
-        active: false
-    },
-    all: {
-        next: "one",
-        title: "Repetir canción indefinidamente",
-        active: true
-    },
-    one: {
-        next: "none",
-        title: "Desactivar la repetición indefinida",
-        active: true
-    }
-}
+// Información acerca del tiempo del track
+const trackCurrentTime = d.getElementById("track-current-time");
+const currentTimeSlider = d.getElementById("current-time-slider");
+const trackDuration = d.getElementById("track-duration");
 
-// Variable para control de list item seleccionado actualmente en la playlist del DOM
-
-let loadToken = 0;
-let isSeeking = false;
-let rafId = null;
-let lastTime = 0;
-let currentListItem = null;
-
-// URL para petición de los datos de la playlist "salsa" al backend
-const BASE_URL = "https://neobte.github.io/musica/playlists/salsa/";
-
-const PREVIOUS_TRACK_THRESHOLD = 3;
-
-const DEFAULT_AUDIO_VOLUME = .16; // 33%
-
-let currentAudioVolume = DEFAULT_AUDIO_VOLUME;
-
-const DOCUMENT_TITLE = "Neobte - Express Audio";
-
-/*** Referencias Cacheadas ***/
-const documentTitle = doc.getElementById("document-title");
-documentTitle.textContent = DOCUMENT_TITLE;
-// Detalles de Título y Artista, componente superior
-const playerTrackTitle = doc.getElementById("player-track-title");
-const playerTrackArtist = doc.getElementById("player-track-artist");
-
-// Detalles de número de track de total de tracks
-const playerCurrentTrack = doc.getElementById("player-current-track");
-const playerTotalTracks = doc.getElementById("player-total-tracks");
-
-// Cacheamos la playlist para agregar tracks
-const playlist = doc.getElementById("playlist");
-
-// Detalles del tiempo de reproducción
-const currentTime = doc.getElementById("current-time");
-const currentTimeSlider = doc.getElementById("current-time-slider");
-currentTimeSlider.value = 0;
-const durationTime = doc.getElementById("duration-time");
-
-// Detalles de los componentes de volumen
-const volumeBtn = doc.getElementById("volume-btn");
-const volumeIcon = doc.getElementById("volume-icon");
-const volumeSlashIcon = doc.getElementById("volume-slash-icon");
-const volumeSlider = doc.getElementById("volume-slider");
-const volumeValue = doc.getElementById("volume-value");
-
-volumeSlider.value = DEFAULT_AUDIO_VOLUME * 100; // El valor por defecto es "50"
-volumeValue.textContent = volumeSlider.value;
-audio.volume = volumeSlider.value / 100;
-
-// Controles del reproductor
-const shuffleBtn = doc.getElementById("shuffle-btn");
+// Controles
+const shuffleBtn = d.getElementById("shuffle-btn");
 const shuffleIconCircle = shuffleBtn.querySelector("circle");
-const backwardStepBtn = doc.getElementById("backward-step-btn");
-const playPauseBtn = doc.getElementById("play-pause-btn");
-const playIcon = doc.getElementById("play-icon");
-const pauseIcon = doc.getElementById("pause-icon");
-const forwardStepBtn = doc.getElementById("forward-step-btn");
-const repeatBtn = doc.getElementById("repeat-btn");
-const repeatIcon = doc.getElementById("repeat-icon");
-const repeatIndicator = doc.getElementById("repeat-indicator");
-const repeat1Icon = doc.getElementById("repeat-1-icon");
 
-const playingIcon = doc.createElement('img');
+const backwardBtn = d.getElementById("backward-btn");
+
+const playPauseBtn = d.getElementById("play-pause-btn");
+const playIcon = d.getElementById("play-icon");
+const pauseIcon = d.getElementById("pause-icon");
+
+const forwardBtn = d.getElementById("forward-btn");
+
+const repeatBtn = d.getElementById("repeat-btn");
+const repeatIcon = d.getElementById("repeat-icon");
+const repeatIndicator = d.getElementById("repeat-indicator");
+const repeat1Icon = d.getElementById("repeat-1-icon");
+
+// Información de X número de track de Y número total de tracks
+const trackCurrentIndex = d.getElementById("track-current-index");
+const tracksTotal = d.getElementById("tracks-total");
+
+// Información acerca del volumen
+const volumeBtn = d.getElementById("volume-btn");
+const volumeIcon = d.getElementById("volume-icon");
+const volumeSlashIcon = d.getElementById("volume-slash-icon");
+
+const volumeSlider = d.getElementById("volume-slider");
+const volumeValue = d.getElementById("volume-value");
+
+// Playlist de tracks
+const playlist = d.getElementById("playlist");
+
+const playingIcon = d.createElement('img');
 playingIcon.src = 'images/bars.svg';
-playingIcon.width = 14;
-playingIcon.height = 14;
 playingIcon.alt = 'Playing';
 playingIcon.classList.add('playing-icon');
 
-doc.addEventListener("DOMContentLoaded", () => {
+// Objeto audio
+const audioElement = new Audio();
+
+// Umbral de tiempo para repetir un track cuando se hace clic en el botón backward
+const PREVIOUS_TRACK_THRESHOLD = 3;
+
+// Volumen por defecto
+const DEFAULT_VOLUME = 33;
+
+// Volumen por defecto a restaurar cuando el slider sea 0
+const RESTORE_DEFAULT_VOLUME = 50;
+
+// REQUEST URI
+const BASE_URL = "https://neobte.github.io/musica/playlists/salsa/";
+
+// Player state
+const playerState = {
+    selectedTrackIndex: 32,
+    isPlaying: false,
+    isShuffle: false,
+    tracksMap: new Map(),
+    trackIndexMap: new Map(),
+    originalPlaylist: [],
+    playbackQueue: [],
+    previousVolume: DEFAULT_VOLUME,
+    mutedFromSlider: false,
+    repeatMode: "none" // "none" | "all" | "one"
+}
+
+// Modos de repetición
+const repeatModes = {
+    none: {
+        next: "all",
+        title: "Repetir playlist"
+    },
+    all: {
+        next: "one",
+        title: "Repetir canción indefinidamente"
+    },
+    one: {
+        next: "none",
+        title: "Desactivar la repetición indefinida"
+    }
+}
+
+let currentListItem = null;
+
+// Evento que carga el contenido de la página
+d.addEventListener("DOMContentLoaded", () => {
     init();
 });
 
-const init = () => {
+// Función que inicia toda la aplicación
+function init() {
+
+    loadPlaylist();
+}
+
+function loadPlaylist() {
 
     const request_url = BASE_URL + "playlist.json"; // Aquí no hace falta encodeURIComponent()
 
     // Petición de los datos al servidor
-    sendFetchHttpRequest(request_url, loadPlaylist);
+    sendFetchHttpRequest(request_url, handleLoadPlaylist);
 }
 
-const loadPlaylist = response => {
+function handleLoadPlaylist(response) {
     // Respuesta del backend
     // playerState.originalPlaylist = response.tracks.items.slice(0, 5);
     playerState.originalPlaylist = response.tracks.items;
@@ -131,41 +132,307 @@ const loadPlaylist = response => {
     // console.log(playerState.trackIndexMap);
 
     // Obtenemos un currentIndex distinto, cada vez que cargamos la página. No queremos que siempre inicie en 0
-    playerState.currentIndex = getRandomInt(0, playerState.playbackQueue.length - 1);
-    // playerState.currentIndex = 0;
+    playerState.selectedTrackIndex = getRandomInt(0, playerState.playbackQueue.length - 1);
 
-    // Obtenemos el track en la posición de playerState.currentIndex por defecto
-    const track = getCurrentTrack();
+    // Actualiza valores iniciales de tiempo al inicio de la app
+    updateCurrentTimeValues();
 
-    // Cargamos el track en el reproductor, no lo hacemos sonar
-    loadTrack(track);
+    // Actualiza valores iniciales de volumen al inicio de la app
+    initializeVolume();
 
-    // Renderizamos en la UI la playlist de canciones
-    renderTracks();
+    // Renderizamos la playlist
+    renderPlaylist();
 
-    // Actualizamos la UI, con el nombre del título y el artista
-    updateCurrentTrackUI(track);
+    // Delegación de eventos en la playlist
+    bindPlaylistEvents();
 
-    // Actualizamos la UI, X número de canción de un total de Y canciones
-    playerCurrentTrack.textContent = playerState.currentIndex + 1;
-
-    // Actulizamos la UI, número total de canciones
-    playerTotalTracks.textContent = playerState.playbackQueue.length;
+    // Obtenemos el track y lo cargamos
+    loadSelectedTrack();
 }
 
-// Solo se renderiza una sola vez!!!
-const renderTracks = () => {
+/**
+ * Eventos de controles
+ */
 
+// Evento click del botón play/pause
+playPauseBtn.addEventListener("click", () => {
+
+    if (!playerState.isPlaying) {
+        playTrack();
+    } else {
+        pauseTrack();
+    }
+});
+
+// Evento click del botón shuffle
+shuffleBtn.addEventListener("click", () => {
+
+    playerState.isShuffle = !playerState.isShuffle;
+
+    if (playerState.isShuffle) {
+        enableShuffle();
+    } else {
+        disableShuffle();
+    }
+
+    updateShuffleButtonUI();
+});
+
+// Evento click del botón backward
+backwardBtn.addEventListener("click", () => {
+
+    const shouldRestartTrack = audioElement.currentTime > PREVIOUS_TRACK_THRESHOLD;
+
+    if (shouldRestartTrack) {
+        audioElement.currentTime = 0;
+        return;
+    }
+
+    // Seteamos el índice anterior
+    selectPreviousTrack();
+
+    handleTrackChange();
+});
+
+// Evento click del botón forward
+forwardBtn.addEventListener("click", () => {
+
+    // Seteamos el índice siguiente
+    selectNextTrack();
+
+    handleTrackChange();
+});
+
+// Evento click del botón repetir
+repeatBtn.addEventListener("click", () => {
+
+    playerState.repeatMode = repeatModes[playerState.repeatMode].next;
+
+    updateRepeatButtonUI();
+});
+
+/**
+ * Eventos del objeto audio
+ */
+
+audioElement.addEventListener("ended", handleTrackEnded);
+
+// Evento play. playback state
+audioElement.addEventListener("play", () => {
+    playerState.isPlaying = true;
+
+    updatePlayPauseBtnUI();
+
+    currentListItem.classList.add("is-playing");
+    attachIcon(currentListItem);
+});
+
+// Evento pause
+audioElement.addEventListener("pause", () => {
+    playerState.isPlaying = false;
+
+    updatePlayPauseBtnUI();
+
+    currentListItem.classList.remove("is-playing");
+    removeIcon(currentListItem);
+});
+
+// Evento loadedmetadata
+audioElement.addEventListener("loadedmetadata", () => {
+    if (!Number.isFinite(audioElement.duration)) return;
+
+    currentTimeSlider.max = audioElement.duration;
+
+    // UI
+    trackDuration.textContent = formatTime(audioElement.duration);
+});
+
+// Evento timeupdate
+audioElement.addEventListener("timeupdate", () => {
+    if (!Number.isFinite(audioElement.currentTime)) return;
+
+    currentTimeSlider.value = audioElement.currentTime;
+
+    // UI
+    trackCurrentTime.textContent = formatTime(audioElement.currentTime);
+});
+
+// Evento input del Slider de tiempo
+currentTimeSlider.addEventListener("input", () => {
+    audioElement.currentTime = currentTimeSlider.value;
+});
+
+// Evento input del Slider de volumen
+volumeSlider.addEventListener("input", () => {
+
+    const volume = Number(volumeSlider.value);
+
+    setVolume(volume);
+
+    playerState.mutedFromSlider = volume === 0;
+});
+
+//  Evento click del botón de volumen
+volumeBtn.addEventListener("click", () => {
+
+    const currentVolume = Number(volumeSlider.value);
+
+    if (currentVolume > 0) {
+
+        setVolume(0);
+
+    } else {
+
+        const volumeToRestore = playerState.mutedFromSlider ? RESTORE_DEFAULT_VOLUME : playerState.previousVolume;
+
+        setVolume(volumeToRestore);
+    }
+});
+
+/**
+ * 
+ * UI
+ */
+function updateSelectedTrackUI(track) {
+    if (currentListItem) {
+        currentListItem.classList.remove("is-selected", "is-playing");
+    }
+
+    // Obtenemos el list item de la playlist
+    const selectedListItem = d.querySelector(`li[data-track-id="${track.id}"]`);
+
+    // Agregamos la clase "is-selected"
+    selectedListItem.classList.add("is-selected");
+
+    currentListItem = selectedListItem;
+
+    scrollIntoView(selectedListItem);
+}
+
+// UI, botón volumen
+function updateVolumeButtonUI(volume) {
+
+    const isMuted = volume === 0;
+
+    const text = isMuted
+        ? "Activar sonido"
+        : "Silenciar";
+
+    volumeBtn.title = text;
+
+    volumeIcon.classList.toggle("d-none", isMuted);
+    volumeSlashIcon.classList.toggle("d-none", !isMuted);
+}
+
+// UI, Track info
+function updateTrackInfoUI(track) {
+    trackTitle.textContent = track.title;
+    trackArtist.textContent = track.artist;
+}
+
+// UI, X número de track de Y número total de tracks
+function updateTrackCounterUI(track) {
+
+    const originalIndex = playerState.trackIndexMap.get(track.id);
+
+    trackCurrentIndex.textContent = playerState.originalPlaylist.length > 0 ? originalIndex + 1 : 0;
+
+    // La longitud siempre será la misma
+    tracksTotal.textContent = playerState.originalPlaylist.length;
+}
+
+// UI, de valores de tiempo
+function updateCurrentTimeValues() {
+    trackCurrentTime.textContent = "0:00"; // Cambia su valor en el evento timeupdate del objeto audio
+    currentTimeSlider.value = "0"; // Cambia su valor en el evento timeupdate del objeto audio
+    currentTimeSlider.max = "0"; // Cambia su valor en el evento loadedmetadata del objeto audio
+    trackDuration.textContent = "0:00"; // Cambia su valor en el evento loadedmetadata del objeto audio
+}
+
+// UI, de título de la página que mostrará el título y artista del track
+function updateDocumentTitle(track) {
+
+    if (!track) {
+        document.title = "Express Audio";
+        return;
+    }
+
+    document.title = `${track.title} - ${track.artist}`;
+}
+
+// UI, de botón aleatorio
+function updateShuffleButtonUI() {
+
+    shuffleBtn.classList.toggle("active", playerState.isShuffle);
+
+    shuffleBtn.title = playerState.isShuffle
+        ? "Desactivar reproducción aleatoria"
+        : "Activar reproducción aleatoria";
+
+    shuffleIconCircle.classList.toggle("d-none");
+}
+
+// UI, de botón play/pause
+function updatePlayPauseBtnUI() {
+
+    const isPlaying = playerState.isPlaying;
+
+    playIcon.classList.toggle("d-none", isPlaying);
+    pauseIcon.classList.toggle("d-none", !isPlaying);
+    playPauseBtn.classList.toggle("is-playing", isPlaying);
+    playPauseBtn.title = isPlaying ? "Pausar" : "Reproducir";
+    playPauseBtn.setAttribute("aria-label", playPauseBtn.title);
+}
+
+//  UI, de botón repeat
+function updateRepeatButtonUI() {
+
+    const repeatMode = playerState.repeatMode;
+
+    repeatBtn.classList.remove(`active`);
+
+    repeatBtn.title = repeatModes[repeatMode].title;
+
+    switch (repeatMode) {
+
+        case "none":
+            repeat1Icon.classList.add("d-none"); // Ocultamos el icono de repeat-1-icon
+            repeatIcon.classList.remove("d-none"); // Mostramos el icono de repeat icon
+            break;
+
+        case "all":
+            repeatIndicator.classList.remove("d-none"); // Mostramos el circulo dentro del icono svg
+            repeatBtn.classList.add("active");
+            break;
+
+        case "one":
+            repeat1Icon.classList.remove("d-none"); // Mostramos el icono repeat-1-icon
+            repeatBtn.classList.add("active");
+            repeatIndicator.classList.add("d-none"); // Ocultamos el circulo dentro del icono svg
+            repeatIcon.classList.add("d-none"); // Ocultamos el icono de repeat icon
+            break;
+    }
+}
+
+/**
+ * Funciones
+ */
+function renderPlaylist() {
     // Limpiamos todo lo que tiene el elemento playlist anteriormente
     playlist.innerHTML = '';
 
     // Creamos un fragmento para no esta haciendo appendchild en cada iteración del bucle
-    const fragment = doc.createDocumentFragment();
+    const fragment = d.createDocumentFragment();
 
-    // Recorremos el array de tracks
-    playerState.playbackQueue.forEach((track, index) => {
+    const len = playerState.playbackQueue.length;
+
+    for (let i = 0; i < len; i++) {
+
+        // Obtenemos el track
+        const track = playerState.playbackQueue[i];
+
         // Creamos un list item por cada track
-        const li = doc.createElement("li");
+        const li = d.createElement("li");
 
         // Creamos un dataset con el ID de cada track
         li.dataset.trackId = track.id;
@@ -176,7 +443,7 @@ const renderTracks = () => {
         // Agregamos todos los elementos hijos del list item
         li.innerHTML = `
                     <div class="playlist-track__number">
-                        <span class="track-number">${index + 1}</span>
+                        <span class="track-number">${i + 1}</span>
                     </div>
                     <div class="playlist-track__info">
                         <h3 class="playlist-track__title">${track.title}</h3>
@@ -188,345 +455,94 @@ const renderTracks = () => {
                 `;
         // Por cada iteración agregamos un list item al fragmento
         fragment.appendChild(li);
-    });
+    }
 
     // Aquí agregamos todos los list item contenidos en el fragmento al DOM, por lo tanto ahora ya existen
     playlist.appendChild(fragment);
-
-    // Obtenemos el list item de la playlist
-    const nextListItem = playlist.children[playerState.currentIndex];
-
-    // Agregamos la clase "is-selected"
-    nextListItem.classList.add("is-selected");
-
-    // Asignamos una copia a la variabloe currentListItem, por lo tanto en el momento que hagamos 
-    // click en forward o backward, la variable currentListItem contendra una referencia del list item inicial
-    currentListItem = nextListItem;
-
-    scrollIntoView(nextListItem);
 }
 
-// Delegación de eventos para seleccionar un track de la playlist, cuando el usuario hace click en un track
-playlist.addEventListener("click", e => {
-    const li = e.target.closest(".playlist-track");
+// Delegación de eventos, cuando se hace click en una canción
+function bindPlaylistEvents() {
 
-    if (!li) return;
+    playlist.addEventListener("click", (e) => {
+        const li = e.target.closest(".playlist-track");
 
-    if (li === currentListItem) {
-        // Ya sea por pause o play. Toggle pause/play opcional
-        if (playerState.isPlaying) {
-            pauseAudio();
-            li.classList.remove("is-playing");
-            removeIcon(li);
-        } else {
-            playAudio();
-            li.classList.add("is-playing");
-            attachIcon(li);
+        if (!li) return;
+
+        if (li === currentListItem) {
+            // Ya sea por pause o play.
+            playerState.isPlaying ? pauseTrack() : playTrack();
+            return;
         }
-        return;
+
+        // si ya había uno activo, lo desactivamos
+        if (currentListItem && currentListItem !== li) {
+            currentListItem.classList.remove("is-selected", "is-playing");
+            removeIcon(currentListItem);
+        }
+
+        // Asignamos la referencia a la variable currentListItem
+        currentListItem = li;
+
+        // Obtenemos el ID del track seleccionado
+        const trackId = Number(li.dataset.trackId);
+
+        // Obtenemos el track buscando POR SU ID en el tracksMap
+        const track = playerState.tracksMap.get(trackId);
+
+        // Cargamos el audio
+        loadTrack(track);
+
+        // Actualizamos la UI
+        li.classList.add("is-selected");
+
+        // Reproducimos el audio
+        playTrack();
+
+        // Buscamos el índice del track
+        playerState.selectedTrackIndex = playerState.playbackQueue.findIndex(track => track.id === trackId);
+    });
+}
+
+// Función para setear el volumen
+function setVolume(volume) {
+
+    audioElement.volume = volume / 100;
+    // console.log(`Audio element: ${audioElement.volume}`);
+
+    volumeSlider.value = volume;
+    // console.log(`Volume slider: ${volumeSlider.value}`);
+    volumeValue.textContent = volume;
+
+    if (volume > 0) {
+        playerState.previousVolume = volume;
     }
 
-    // si ya había uno activo, lo desactivamos
-    if (currentListItem && currentListItem !== li) {
-        currentListItem.classList.remove("is-selected");
-        currentListItem.classList.remove("is-playing");
-        removeIcon(currentListItem);
-    }
-
-    // Asignamos la referencia a la variable currentListItem cuyo valor original es null al principio del todo
-    currentListItem = li;
-
-    // Actualizamos la UI
-    li.classList.add("is-selected");
-
-    // Obtenemos el ID del track
-    const trackId = Number(li.dataset.trackId);
-
-    // Obtenemos el track buscando POR SU ID en el tracksMap
-    const track = playerState.tracksMap.get(trackId);
-
-    playerState.currentIndex = playerState.playbackQueue.findIndex(track => track.id === trackId);
-
-    // Cargamos el audio
-    loadTrack(track);
-
-    // Reproducimos el audio
-    playAudio();
-    li.classList.add("is-playing");
-    attachIcon(li);
-
-    // Actualizar UI
-    updateCurrentTrackUI(track);
-
-    // Actualizamos la UI, X número de canción de un total de Y canciones
-    updateTrackPositionUI(track);
-});
-
-// Eventos de controles del reproductor
-shuffleBtn.addEventListener("click", handleShuffle);
-backwardStepBtn.addEventListener("click", handleBackward);
-playPauseBtn.addEventListener("click", handlePlayPause);
-forwardStepBtn.addEventListener("click", handleForward);
-repeatBtn.addEventListener("click", handleRepeat);
-
-function handleShuffle() {
-    playerState.isShuffle = !playerState.isShuffle;
-
-    if (playerState.isShuffle) {
-        enableShuffle();
-    } else {
-        disableShuffle();
-    }
-
-    updateShuffleButtonUI();
+    updateVolumeButtonUI(volume);
 }
 
-function handleBackward() {
+// Función para inicializar el volumen
+function initializeVolume() {
 
-    const shouldRestartTrack = audio.currentTime > PREVIOUS_TRACK_THRESHOLD;
-
-    if (shouldRestartTrack) {
-        audio.currentTime = 0;
-        return;
-    }
-
-    // 1. Actualizar playerState.currentIndex
-    playerState.currentIndex = prevIndex();
-
-    loadCurrentTrack();
-
-    if (playerState.isPlaying) {
-        playAudio();
-
-        // Agregamos la clase is-playing, la clase is-selected fue agregada en el proceso de carga del track
-        currentListItem.classList.add("is-playing");
-        attachIcon(currentListItem);
-    }
+    setVolume(DEFAULT_VOLUME)
 }
 
-function handlePlayPause() {
-
-    if (!audio.src) return;
-
-    // El estado original al inicio de la aplicación es false
-    if (playerState.isPlaying) {
-        pauseAudio();
-
-        // Removemos la clase is-playing, si se pulsa el botón pause
-        currentListItem.classList.remove("is-playing");
-
-        // Removemos el icon del ecualizador
-        removeIcon(currentListItem);
-    } else {
-        playAudio();
-
-        // Agregamos la clase is-playing, si se pulsa el botón play
-        currentListItem.classList.add("is-playing");
-
-        // Agregamos el icono del ecualizador
-        attachIcon(currentListItem);
-    }
-
-    updatePlayPauseUI();
-}
-
-function handleForward() {
-    // 1. Actualizar playerState.currentIndex
-    playerState.currentIndex = nextIndex();
-
-    loadCurrentTrack();
-
-    if (playerState.isPlaying) {
-        playAudio();
-
-        // Agregamos la clase is-playing, la clase is-selected fue agregada en el proceso de carga del track
-        currentListItem.classList.add("is-playing");
-        attachIcon(currentListItem);
-    }
-}
-
-function handleRepeat() {
-    // playerState.repeatMode = "none",  default value
-    playerState.repeatMode = repeatConfig[playerState.repeatMode].next; // Aquí playerState.repeatMode empieza a cambiar de estado
-    updateRepeatUI();
-}
-
-audio.addEventListener("play", () => {
-    playerState.isPlaying = true;
-    updatePlayPauseUI();
-
-    // if (currentListItem) {
-    //     currentListItem.classList.add('playing');
-    // }
-});
-audio.addEventListener("pause", () => {
-    playerState.isPlaying = false;
-    updatePlayPauseUI();
-
-    // if (currentListItem) {
-    //     currentListItem.classList.remove('playing');
-    // }
-});
-
-audio.addEventListener("loadedmetadata", handleLoadedmetadata);
-audio.addEventListener("timeupdate", handleTimeupdate);
-audio.addEventListener("waiting", () => {/* showLoadingUI(true); */ });
-audio.addEventListener("canplay", () => {/*showLoadingUI(false); */ });
-audio.addEventListener("ended", handleEnded);
-
-function handleLoadedmetadata() {
-    if (audio.dataset.token != loadToken) return;
-
-    const duration = audio.duration;
-
-    if (!Number.isFinite(duration)) return;
-
-    currentTimeSlider.max = duration;
-
-    durationTime.textContent = formatTime(duration);
-}
-
-function renderProgress() {
-    rafId = null;
-
-    const time = lastTime;
-
-    currentTime.textContent = formatTime(time);
-    currentTimeSlider.value = time;
-}
-
-function handleTimeupdate() {
-    if (isSeeking) return;
-
-    lastTime = audio.currentTime;
-
-    if (!rafId) {
-        rafId = requestAnimationFrame(renderProgress);
-    }
-
-    // if (isSeeking) return;
-
-    // const t = audio.currentTime;
-
-    // // Error detectado en el formateo de tiempo, por ejemplo: -5:NaN
-    // if (!Number.isFinite(t)) return;
-
-    // currentTimeSlider.value = t;
-
-    // currentTime.textContent = formatTime(t);
-
-    // countdown.textContent = `-${formatTime(audio.duration - t)}`;
-}
-
-function handleEnded() {
-
-    // Repeat one -> misma canción
-    if (playerState.repeatMode === "one") {
-        audio.currentTime = 0; // Aquí si tiene sentido, por que queremos reproducir la canción ya cargada otra vez!!!
-        playAudio();
-        // Aquí no agregamos las clases is-selected y is-playing, porque ya las contiene el elemento
-        return;
-    }
-
-    const isLastTrack = playerState.currentIndex === playerState.playbackQueue.length - 1;
-    // repeat none + última canción → reset sin reproducir
-    if (isLastTrack && playerState.repeatMode === "none") {
-        playerState.currentIndex = 0;
-        const track = getCurrentTrack();
-        setAudioTrack(track);
-        syncPlayerUI(track);
-        return;
-    }
-
-    // repeat all o avance normal
-    playerState.currentIndex = nextIndex();
-    const track = getCurrentTrack();
-    setAudioTrack(track);
-    syncPlayerUI(track);
-    playAudio();
-    currentListItem.classList.add("is-playing");
-    attachIcon(currentListItem);
-
-}
-
-const scrollIntoView = listItem => {
-    listItem.scrollIntoView({ behavior: "smooth", block: "center" });
-}
-
-volumeSlider.addEventListener("input", handleVolumeSlider);
-volumeBtn.addEventListener("click", handleVolumeBtn);
-currentTimeSlider.addEventListener("input", handleCurrentTimeSlider);
-currentTimeSlider.addEventListener("change", () => {
-    audio.currentTime = currentTimeSlider.value;
-    isSeeking = false;
-});
-
-function handleVolumeSlider() {
-    if (volumeSlider.value === "0") {
-        audio.volume = 0;
-        currentAudioVolume = 0.5;
-
-        // UI
-        volumeBtn.title = "Activar sonido";
-        volumeIcon.classList.add("d-none");
-        volumeSlashIcon.classList.remove("d-none");
-
-    } else {
-        audio.volume = volumeSlider.value / 100; // 0.x
-        currentAudioVolume = audio.volume;
-
-        // UI
-        volumeBtn.title = "Silenciar";
-        volumeIcon.classList.remove("d-none");
-        volumeSlashIcon.classList.add("d-none");
-    }
-    // UI
-    volumeValue.textContent = volumeSlider.value;
-}
-
-function handleVolumeBtn() {
-    if (volumeSlider.value > "0") {
-        audio.volume = 0;
-        volumeSlider.value = 0;
-
-        // UI
-        volumeBtn.title = "Activar sonido";
-        volumeIcon.classList.add("d-none");
-        volumeSlashIcon.classList.remove("d-none");
-    } else {
-        audio.volume = currentAudioVolume; // Values are  between 0.1 and 1, where 1 = 100 %
-        volumeSlider.value = audio.volume * 100; // Values are between 0 and 100
-
-        // UI
-        volumeBtn.title = "Silenciar";
-        volumeIcon.classList.remove("d-none");
-        volumeSlashIcon.classList.add("d-none");
-    }
-    // UI
-    volumeValue.textContent = volumeSlider.value;
-}
-
-function handleCurrentTimeSlider() {
-    if (currentTimeSlider.disabled) return;
-    isSeeking = true;
-    currentTime.textContent = formatTime(currentTimeSlider.value);
-}
-
+// Función que habilita el modo aleatorio
 function enableShuffle() {
 
-    // Obtenemos la canción actualmente en reproducción
-    const currentTrack = getCurrentTrack();
+    // Obtenemos el track actualmente en reproducción
+    const currentTrack = getSelectedTrack();
 
-    // Obtenemos la longitud del arreglo de canciones
+    // Obtenemos la longitud del arreglo de tracks
     const len = playerState.playbackQueue.length;
 
-    // Construimos un array con un elemento menos, ej. si hay 5 canciones, entonces new Array tendra lugar para 4 canciones
+    // Construimos un array con un elemento menos, ej. si hay 5 tracks, entonces new Array tendra lugar para 4 tracks
     let rest = new Array(len - 1);
 
     let k = 0;
     for (let i = 0; i < len; i++) {
-        // Llenamos el array, sin la canción actualmente en reproducción
-        if (i === playerState.currentIndex) continue;
+        // Llenamos el array, sin el track actualmente en reproducción
+        if (i === playerState.selectedTrackIndex) continue;
         rest[k++] = playerState.playbackQueue[i];
     }
 
@@ -536,13 +552,14 @@ function enableShuffle() {
     // Construimos la nueva cola
     playerState.playbackQueue = [currentTrack, ...rest];
 
-    // Seteamos con 0, ya que la canción actualmente en reproducción esta en la posición 0
-    playerState.currentIndex = 0;
+    // Seteamos con 0, ya que la track actualmente en reproducción esta en la posición 0
+    playerState.selectedTrackIndex = 0;
 }
 
+// Función que deshabilita el modo aleatorio
 function disableShuffle() {
     // Track actualmente en reproducción
-    const currentTrack = getCurrentTrack();
+    const currentTrack = getSelectedTrack();
 
     // Devolvemos el orden original al array "playbackQueue"
     playerState.playbackQueue = [...playerState.originalPlaylist];
@@ -550,187 +567,172 @@ function disableShuffle() {
     // Este es un Map creado con los índices originales
     const originalIndex = playerState.trackIndexMap.get(currentTrack.id);
 
-    playerState.currentIndex = originalIndex;
+    playerState.selectedTrackIndex = originalIndex;
 }
 
-function nextIndex() {
-    return (playerState.currentIndex + 1) % playerState.playbackQueue.length;
-}
+// Función para cargar un track
+function loadTrack(track) {
 
-function prevIndex() {
-    return (playerState.currentIndex - 1 + playerState.playbackQueue.length) % playerState.playbackQueue.length;
-}
-
-function loadCurrentTrack() {
-    const track = getCurrentTrack();
-
+    // Esta función debe verificar que todo este bien antes de llamar a las otras funciones
     if (!track) return;
 
-    loadTrack(track);
+    pauseTrack();
 
-    syncPlayerUI(track);
+    audioElement.currentTime = 0;
+
+    // Construimos el audio source
+    const src = `${BASE_URL}${encodeURIComponent(track.name)}`;
+
+    // Llamamos a la función que se encarga de setear el source
+    setAudioSource(src);
+
+    // UI, actualizamos título y artista
+    updateTrackInfoUI(track);
+
+    // UI, Actualizamos valores de tiempo
+    updateCurrentTimeValues();
+
+    // UI, actualizamos el contador X número de track de Y número de tracks
+    updateTrackCounterUI(track);
+
+    // UI, actualizamos el título del documento con información del track
+    updateDocumentTitle(track);
+
+    // UI, actualizamos en la playlist el track que ha sido seleccionado
+    updateSelectedTrackUI(track);
 }
 
-function loadTrack(track) {
-    pauseAudio();
-    audio.currentTime = 0;
-    setAudioTrack(track);
-}
+// Función para manejar en termino de una canción en el evento ended del objeto audio
+function handleTrackEnded() {
 
-function getCurrentTrack() {
-    return playerState.playbackQueue[playerState.currentIndex];
-}
+    switch (playerState.repeatMode) {
 
-function setAudioTrack(track) {
-    const token = ++loadToken;
+        case "one":
+            audioElement.currentTime = 0;
+            // Reproducimos el track
+            playTrack();
+            break;
 
-    audio.src = BASE_URL + encodeURIComponent(track.name);
-    // audio.load();
-    currentTimeSlider.value = 0;
-    currentTimeSlider.max = 0;
-    currentTime.textContent = "0:00";
-    durationTime.textContent = "0:00";
-    audio.dataset.token = token;
-}
+        case "all":
+            // Incrementamos el índice del siguiente track
+            selectNextTrack();
 
-async function playAudio() {
-    try {
-        await audio.play();
-    } catch (err) {
-        console.error("Error al reproducir audio:", err);
+            playSelectedTrack();
+            break;
+
+        case "none":
+            handleEndedWithoutRepeat();
+            break;
     }
 }
 
-function pauseAudio() {
-    // console.log(`Status: ${audio.paused}`);
-    if (audio.paused) return;
-    audio.pause();
-}
+function handleEndedWithoutRepeat() {
 
-function setPlayingTrack(trackElement) {
+    const isLastTrack = playerState.selectedTrackIndex === playerState.playbackQueue.length - 1;
 
-    // si ya había uno activo, lo desactivamos
-    if (currentListItem && currentListItem !== trackElement) {
-        currentListItem.classList.remove('is-playing');
-        removeIcon(currentListItem);
+    if (isLastTrack) {
+        resetToFirstTrack();
+        return;
     }
 
-    // activar nuevo
-    currentListItem = trackElement;
-    currentListItem.classList.add('is-playing');
-
-    attachIcon(currentListItem);
+    selectNextTrack();
+    playSelectedTrack();
 }
 
-function attachIcon(trackElement) {
-    const container = trackElement.querySelector('.playlist-track__number');
+// Función que adjunta el icono de las barras a la canción en reproducción
+function attachIcon(listItem) {
+
+    const container = listItem.querySelector('.playlist-track__number');
 
     // mover icono (no clonar)
     container.appendChild(playingIcon);
 }
 
-function removeIcon(trackElement) {
-    const icon = trackElement.querySelector('.playing-icon');
-    if (icon) icon.remove();
+// Función que remueve el icoo de las barras a la canción en reproducción
+function removeIcon(listItem) {
+
+    const playingIcon = listItem.querySelector('.playing-icon');
+
+    if (playingIcon) playingIcon.remove();
 }
 
-// Funciones de UI
-function updateRepeatUI() {
-    // El primer clic en el button repeatBtn, origina que playerState.repeatMode = all
-    // El segundo clic en el button repeatBtn, origina que playerState.repeatMode = one
-    // El tercer clic en el button repeatBtn, origina que playerState.repeatMode = none
-    const mode = playerState.repeatMode;
+// Resetea al primer track
+function resetToFirstTrack() {
+    playerState.selectedTrackIndex = 0;
+    loadSelectedTrack();
+    playerState.isPlaying = false;
+}
 
-    repeatBtn.classList.remove("active");
-    // repeatIcon.classList.remove("d-none");
-    // repeat1Icon.classList.add("d-none");
-    // repeatIndicator.classList.add("d-none");
+// Selecciona y reproduce la canción seleccionada
+function playSelectedTrack() {
+    loadSelectedTrack();
+    playTrack();
+}
 
-    if (mode === "none") {
-        repeatBtn.title = repeatConfig[mode].title;
-        repeat1Icon.classList.add("d-none"); // Ocultamos el icono de repeat-1-icon
-        repeatIcon.classList.remove("d-none"); // Mostramos el icono de repeat icon
-        return;
-    }
+// Función para el manejo del cambio de canción
+function handleTrackChange() {
+    loadSelectedTrack();
 
-    if (mode === "all") {
-        repeatIndicator.classList.remove("d-none"); // Mostramos el circulo dentro del icono svg
-        repeatBtn.title = repeatConfig[mode].title;
-        repeatBtn.classList.add("active");
-        return;
-    }
-
-    if (mode === "one") {
-        repeat1Icon.classList.remove("d-none"); // Mostramos el icono repeat-1-icon
-        repeatBtn.title = repeatConfig[mode].title;
-        repeatBtn.classList.add("active");
-        repeatIndicator.classList.add("d-none"); // Ocultamos el circulo dentro del icono svg
-        repeatIcon.classList.add("d-none"); // Ocultamos el icono de repeat icon
-        return;
+    if (playerState.isPlaying) {
+        playTrack();
     }
 }
 
-function updatePlayPauseUI() {
-    const isPlaying = playerState.isPlaying;
-
-    playIcon.classList.toggle("d-none", isPlaying);
-    pauseIcon.classList.toggle("d-none", !isPlaying);
-    playPauseBtn.title = isPlaying ? "Pausar" : "Reproducir";
-
+// Reproducimos el track
+function playTrack() {
+    // No podemos reproducir, si no se ha seteado la fuente de audio
+    if (!audioElement.src) return;
+    playAudio();
 }
 
-function syncPlayerUI(track) {
-    if (!track) return;
-    updateCurrentTrackUI(track);
-    updateTrackPositionUI(track);
-    updatePlaylistSelectionUI(track);
+// Pausamos el track
+function pauseTrack() {
+    // Si el audio ya se encuentra pausado no hacemos nada
+    if (audioElement.paused) return;
+    pauseAudio();
 }
 
-function updatePlaylistSelectionUI(track) {
-
-    if (currentListItem) {
-        currentListItem.classList.remove("is-selected");
-        currentListItem.classList.remove("is-playing");
-        removeIcon(currentListItem);
+// Reproducimos el audio
+async function playAudio() {
+    try {
+        await audioElement.play();
+    } catch (error) {
+        console.error(`Error en el intento de iniciar la reproducción:`, error);
     }
-
-    const nextListItem = doc.querySelector(`li[data-track-id="${track.id}"]`);
-
-    if (!nextListItem) return;
-
-    // Agregamos la clase is-selected, la clase is playing sera agregada cuando se llame a la función playAudio()
-    nextListItem.classList.add("is-selected");
-
-    // Volvemos a asignar la referencia a la variable currentListItem
-    currentListItem = nextListItem;
-
-    scrollIntoView(nextListItem);
 }
 
-function updateCurrentTrackUI(track) {
-    documentTitle.textContent = `${track.title} - ${track.artist}`;
-    playerTrackTitle.textContent = track.title;
-    playerTrackArtist.textContent = track.artist;
+// Pausamos el audio
+function pauseAudio() {
+    audioElement.pause();
 }
 
-function updateTrackPositionUI(track) {
-    // const currentTrack = track;
-    // const originalIndex = playerState.originalPlaylist.findIndex(track => track.id === currentTrack.id);
-
-    // Este es un Map creado con los índices originales
-    const originalIndex = playerState.trackIndexMap.get(track.id);
-
-    playerCurrentTrack.textContent = originalIndex + 1;
-    // playerCurrentTrack.textContent = playerState.originalPlaylist.findIndex(t => t.id === trackId) + 1;
+// Seteamos el audio source
+function setAudioSource(src) {
+    audioElement.src = src;
 }
 
-function updateShuffleButtonUI() {
-    shuffleBtn.classList.toggle("active", playerState.isShuffle);
-    shuffleBtn.title = playerState.isShuffle
-        ? "Desactivar reproducción aleatoria"
-        : "Activar reproducción aleatoria";
+// Obtenemos el track seleccionado
+function getSelectedTrack() {
+    return playerState.playbackQueue[playerState.selectedTrackIndex];
+}
 
-    shuffleIconCircle.classList.toggle("d-none");
+function selectNextTrack() {
+    playerState.selectedTrackIndex = (playerState.selectedTrackIndex + 1) % playerState.playbackQueue.length;
+}
+
+function selectPreviousTrack() {
+    playerState.selectedTrackIndex = (playerState.selectedTrackIndex - 1 + playerState.playbackQueue.length) % playerState.playbackQueue.length;
+}
+
+function loadSelectedTrack() {
+    const track = getSelectedTrack();
+    loadTrack(track);
+}
+
+// Util functions
+
+const scrollIntoView = item => {
+    item.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 // Request to server
@@ -749,14 +751,7 @@ const sendFetchHttpRequest = async (url, callback, method = "GET", data = {}) =>
 
     if (method === 'POST') {
         options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
-        // options.headers['Accept'] = "application/json, text/javascript, */*; q=0.01";
-        // options.headers['Accept-Language'] = "es-AR,es;q=0.9,en-US;q=0.8,en;q=0.7";
-        // options.headers['Sec-Fetch-Mode'] = "cors";
-        // options.headers['Sec-Fetch-Site'] = "same-origin";
         options.body = new URLSearchParams(data).toString();
-        // options.mode = "cors";
-        // options.referrer = "https://www.correoargentino.com.ar/";
-        // options.body = "action=localidades&localidad=none&calle=&altura=&provincia=B"
     }
 
     try {
@@ -776,7 +771,6 @@ const sendFetchHttpRequest = async (url, callback, method = "GET", data = {}) =>
     }
 }
 
-// Format time in hh:mm:ss or mm:ss
 const formatTime = (seconds, format = 0) => {
     if (!Number.isFinite(seconds) || seconds <= 0) return "0:00";
     // Int mod Int = Int
