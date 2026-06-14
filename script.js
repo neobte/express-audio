@@ -101,7 +101,9 @@ let currentListItem = null;
 
 // Evento que carga el contenido de la página
 d.addEventListener("DOMContentLoaded", () => {
+
     init();
+
 });
 
 // Función que inicia toda la aplicación
@@ -206,6 +208,7 @@ forwardBtn.addEventListener("click", () => {
 // Evento click del botón repetir
 repeatBtn.addEventListener("click", () => {
 
+    // Seteamos el modo de repetición
     playerState.repeatMode = repeatModes[playerState.repeatMode].next;
 
     updateRepeatButtonUI();
@@ -219,6 +222,7 @@ audioElement.addEventListener("ended", handleTrackEnded);
 
 // Evento play. playback state
 audioElement.addEventListener("play", () => {
+
     playerState.isPlaying = true;
 
     updatePlayPauseBtnUI();
@@ -229,6 +233,7 @@ audioElement.addEventListener("play", () => {
 
 // Evento pause
 audioElement.addEventListener("pause", () => {
+
     playerState.isPlaying = false;
 
     updatePlayPauseBtnUI();
@@ -239,6 +244,7 @@ audioElement.addEventListener("pause", () => {
 
 // Evento loadedmetadata
 audioElement.addEventListener("loadedmetadata", () => {
+
     if (!Number.isFinite(audioElement.duration)) return;
 
     currentTimeSlider.max = audioElement.duration;
@@ -249,6 +255,7 @@ audioElement.addEventListener("loadedmetadata", () => {
 
 // Evento timeupdate
 audioElement.addEventListener("timeupdate", () => {
+
     if (!Number.isFinite(audioElement.currentTime)) return;
 
     currentTimeSlider.value = audioElement.currentTime;
@@ -259,6 +266,7 @@ audioElement.addEventListener("timeupdate", () => {
 
 // Evento input del Slider de tiempo
 currentTimeSlider.addEventListener("input", () => {
+
     audioElement.currentTime = currentTimeSlider.value;
 });
 
@@ -294,6 +302,7 @@ volumeBtn.addEventListener("click", () => {
  * UI
  */
 function updateSelectedTrackUI(track) {
+
     if (currentListItem) {
         currentListItem.classList.remove("is-selected", "is-playing");
     }
@@ -326,7 +335,9 @@ function updateVolumeButtonUI(volume) {
 
 // UI, Track info
 function updateTrackInfoUI(track) {
+
     trackTitle.textContent = track.title;
+
     trackArtist.textContent = track.artist;
 }
 
@@ -343,9 +354,13 @@ function updateTrackCounterUI(track) {
 
 // UI, de valores de tiempo
 function updateCurrentTimeValues() {
+
     trackCurrentTime.textContent = "0:00"; // Cambia su valor en el evento timeupdate del objeto audio
+
     currentTimeSlider.value = "0"; // Cambia su valor en el evento timeupdate del objeto audio
+
     currentTimeSlider.max = "0"; // Cambia su valor en el evento loadedmetadata del objeto audio
+
     trackDuration.textContent = "0:00"; // Cambia su valor en el evento loadedmetadata del objeto audio
 }
 
@@ -378,9 +393,13 @@ function updatePlayPauseBtnUI() {
     const isPlaying = playerState.isPlaying;
 
     playIcon.classList.toggle("d-none", isPlaying);
+
     pauseIcon.classList.toggle("d-none", !isPlaying);
+
     playPauseBtn.classList.toggle("is-playing", isPlaying);
+
     playPauseBtn.title = isPlaying ? "Pausar" : "Reproducir";
+
     playPauseBtn.setAttribute("aria-label", playPauseBtn.title);
 }
 
@@ -418,6 +437,7 @@ function updateRepeatButtonUI() {
  * Funciones
  */
 function renderPlaylist() {
+
     // Limpiamos todo lo que tiene el elemento playlist anteriormente
     playlist.innerHTML = '';
 
@@ -552,7 +572,7 @@ function enableShuffle() {
     // Construimos la nueva cola
     playerState.playbackQueue = [currentTrack, ...rest];
 
-    // Seteamos con 0, ya que la track actualmente en reproducción esta en la posición 0
+    // Seteamos con 0, ya que el track actualmente en reproducción esta en la posición 0
     playerState.selectedTrackIndex = 0;
 }
 
@@ -658,19 +678,25 @@ function removeIcon(listItem) {
 
 // Resetea al primer track
 function resetToFirstTrack() {
+
     playerState.selectedTrackIndex = 0;
+
     loadSelectedTrack();
+
     playerState.isPlaying = false;
 }
 
 // Selecciona y reproduce la canción seleccionada
 function playSelectedTrack() {
+
     loadSelectedTrack();
+
     playTrack();
 }
 
 // Función para el manejo del cambio de canción
 function handleTrackChange() {
+
     loadSelectedTrack();
 
     if (playerState.isPlaying) {
@@ -682,6 +708,7 @@ function handleTrackChange() {
 function playTrack() {
     // No podemos reproducir, si no se ha seteado la fuente de audio
     if (!audioElement.src) return;
+
     playAudio();
 }
 
@@ -689,54 +716,68 @@ function playTrack() {
 function pauseTrack() {
     // Si el audio ya se encuentra pausado no hacemos nada
     if (audioElement.paused) return;
+
     pauseAudio();
 }
 
 // Reproducimos el audio
 async function playAudio() {
+
     try {
+
         await audioElement.play();
+
     } catch (error) {
+
         console.error(`Error en el intento de iniciar la reproducción:`, error);
     }
 }
 
 // Pausamos el audio
 function pauseAudio() {
+
     audioElement.pause();
 }
 
 // Seteamos el audio source
 function setAudioSource(src) {
+
     audioElement.src = src;
 }
 
 // Obtenemos el track seleccionado
 function getSelectedTrack() {
+
     return playerState.playbackQueue[playerState.selectedTrackIndex];
 }
 
 function selectNextTrack() {
+
     playerState.selectedTrackIndex = (playerState.selectedTrackIndex + 1) % playerState.playbackQueue.length;
 }
 
 function selectPreviousTrack() {
+
     playerState.selectedTrackIndex = (playerState.selectedTrackIndex - 1 + playerState.playbackQueue.length) % playerState.playbackQueue.length;
 }
 
 function loadSelectedTrack() {
+
     const track = getSelectedTrack();
+
     loadTrack(track);
 }
 
 // Util functions
 
 const scrollIntoView = item => {
+
     item.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 // Request to server
 const sendFetchHttpRequest = async (url, callback, method = "GET", data = {}) => {
+
     method = method.toUpperCase();
 
     const options = {
@@ -772,10 +813,14 @@ const sendFetchHttpRequest = async (url, callback, method = "GET", data = {}) =>
 }
 
 const formatTime = (seconds, format = 0) => {
+
     if (!Number.isFinite(seconds) || seconds <= 0) return "0:00";
+
     // Int mod Int = Int
     const h = Math.floor(seconds / 3600); // hours calculation
+
     const min = Math.floor(seconds / 60) % 60; // min calculation
+
     const s = Math.floor(seconds) % 60; // Whole seconds
 
     if (format === 0) {
@@ -792,22 +837,31 @@ const formatTime = (seconds, format = 0) => {
 }
 
 const getRandomInt = (min, max) => {
+
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 // https://introcs.cs.princeton.edu/java/14array/Deck.java.html
 const shuffleArray = arr => {
+
     const n = arr.length;
+
     for (let i = 0; i < n; i++) {
+
         const r = i + Math.floor(Math.random() * (n - i));
+
         [arr[i], arr[r]] = [arr[r], arr[i]];
     }
+
     return arr;
 }
 
 const parseName = name => {
+
     const dot = name.lastIndexOf(".");
+
     const sep = name.indexOf(" - ");
+
     return {
         artist: name.slice(0, sep),
         title: name.slice(sep + 3, dot)
