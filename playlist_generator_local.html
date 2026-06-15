@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Audio Metadata JSON Generator</title>
+</head>
+
+<body>
+
+    <h2>Generador de Metadata (1000 archivos)</h2>
+
+    <input type="file" id="input" webkitdirectory multiple accept="audio/*">
+    <button id="export">Generar JSON</button>
+
+    <p id="status"></p>
+
+    <script>
+
+        const input = document.getElementById("input");
+        const exportBtn = document.getElementById("export");
+        const status = document.getElementById("status");
+
+        let filesCache = [];
+        let playlistName;
+
+        /* ---------------------------------------
+           1. CAPTURA DE ARCHIVOS (SIN PROCESAR)
+        ----------------------------------------*/
+        input.addEventListener("change", (e) => {
+            const firstFile = e.target.files[0];
+            playlistName = firstFile.webkitRelativePath.split('/')[0];
+            filesCache = Array.from(e.target.files);
+            status.textContent = `Archivos cargados listos para procesar: ${filesCache.length}`;
+        });
+
+        /* ---------------------------------------
+           2. CONCURRENCY LIMIT (CLAVE PARA 1000)
+        ----------------------------------------*/
+        async function processQueue(files, limit = 5) {
+            let index = 0;
+            const len = files.length;
+            const results = new Array(len);
+
+            const workers = Array.from({ length: limit }).map(async () => {
+                while (true) {
+                    const current = index++;
+                    if (current >= len) break;
+
+                    const file = files[current];
+                    const data = await getMetadata(file, current);
+
+                    results[current] = data;
+
+                    status.textContent = `Procesando ${current + 1}/${len}`;
+                }
+            });
+
+            await Promise.all(workers);
+
+            return results;
+        }
+
+        /* ---------------------------------------
+           3. EXTRACCIÓN DE METADATA (ULTRA LIVIANA)
+        ----------------------------------------*/
+        function getMetadata(file, index) {
+            return new Promise((resolve) => {
+                const url = URL.createObjectURL(file);
+                const audio = new Audio();
+
+                audio.preload = "metadata";
+                audio.src = url;
+
+                audio.addEventListener("loadedmetadata", () => {
+                    const result = {
+                        trackId: index + 1,
+                        artist: getArtist(file.name),
+                        title: getTitle(file.name),
+                        name: encodeURIComponent(file.name),
+                        size: file.size,
+                        type: file.type,
+                        duration: audio.duration
+                    };
+
+                    URL.revokeObjectURL(url);
+                    resolve(result);
+                });
+
+                audio.addEventListener("error", () => {
+                    URL.revokeObjectURL(url);
+                    resolve({
+                        trackId: index + 1,
+                        name: encodeURIComponent(file.name),
+                        error: true
+                    });
+                });
+            });
+        }
+
+        /* ---------------------------------------
+           4. EXPORTACIÓN JSON
+        ----------------------------------------*/
+        exportBtn.addEventListener("click", async () => {
+            if (!filesCache.length) {
+                status.textContent = "No hay archivos seleccionados";
+                return;
+            }
+
+            status.textContent = "Procesando...";
+
+            const tracks = await processQueue(filesCache, 5);
+
+            const json = JSON.stringify({
+                playlistId: 1,
+                playlistName: playlistName,
+                createdAt: new Date().toISOString(),
+                total: tracks.length,
+                tracks
+            }, null, 2);
+
+            const blob = new Blob([json], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "playlist.json";
+            a.click();
+
+            a.remove();
+            URL.revokeObjectURL(url);
+
+            status.textContent = "JSON generado ✔";
+        });
+
+        // Utils
+        function getTitle(name) {
+            return name.slice(name.indexOf(" - ") + 3, name.lastIndexOf("."))
+        }
+
+        function getArtist(name) {
+            return name.slice(0, name.indexOf(" - "));
+        }
+
+        // Request to server
+        const sendFetchHttpRequest = async (url, callback, method = "GET", data = {}) => {
+
+            method = method.toUpperCase();
+
+            const options = {
+                method,
+                headers: {}
+            }
+
+            if (method === 'GET') {
+                const queryString = new URLSearchParams(data).toString();
+                url += queryString ? `?${queryString}` : '';
+            }
+
+            if (method === 'POST') {
+                options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+                options.body = new URLSearchParams(data).toString();
+            }
+
+            try {
+                const response = await fetch(url + (/\?/.test(url) ? "&" : "?") + new Date().getTime(), options);
+                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+
+                const contentType = response.headers.get("content-type");
+                // console.log(contentType); // application/json; charset=utf-8
+                if (contentType &&
+                    contentType.toLowerCase().indexOf("application/json") >= 0) {
+                    // Content-Type: text/html; charset=UTF-8
+                    callback(await response.json()); // Esto asignaría la referencia a la variable "songs"
+                    // callback(await response.text()); // Para parsear el string con JSON.parse y asignar a la variable
+                }
+            } catch (error) {
+                console.log(error.message);
+            }
+        }
+    </script>
+
+</body>
+
+</html>
