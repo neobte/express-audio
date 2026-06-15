@@ -1,0 +1,912 @@
+{
+  "playlistId": 1,
+  "playlistName": "salsa",
+  "createdAt": "2026-06-15T18:36:59.107Z",
+  "total": 113,
+  "tracks": [
+    {
+      "trackId": 1,
+      "artist": "3-2 Get Funky",
+      "title": "Si Ya No Estás",
+      "name": "3-2%20Get%20Funky%20-%20Si%20Ya%20No%20Est%C3%A1s.m4a",
+      "size": 4347893,
+      "duration": 268.608435
+    },
+    {
+      "trackId": 2,
+      "artist": "Amilcar Boscan",
+      "title": "Faltaba Una Razón",
+      "name": "Amilcar%20Boscan%20-%20Faltaba%20Una%20Raz%C3%B3n.m4a",
+      "size": 4342545,
+      "duration": 268.283356
+    },
+    {
+      "trackId": 3,
+      "artist": "Antonio Cartagena",
+      "title": "Necesito Un Amor",
+      "name": "Antonio%20Cartagena%20-%20Necesito%20Un%20Amor.m4a",
+      "size": 3975522,
+      "duration": 245.59746
+    },
+    {
+      "trackId": 4,
+      "artist": "Antonio Cartagena",
+      "title": "Si Tú No Estás",
+      "name": "Antonio%20Cartagena%20-%20Si%20T%C3%BA%20No%20Est%C3%A1s.m4a",
+      "size": 4760239,
+      "duration": 293.98204
+    },
+    {
+      "trackId": 5,
+      "artist": "Antonio Cartagena",
+      "title": "Sin Ti",
+      "name": "Antonio%20Cartagena%20-%20Sin%20Ti.m4a",
+      "size": 5261124,
+      "duration": 325.032925
+    },
+    {
+      "trackId": 6,
+      "artist": "Bobby Valentín",
+      "title": "La Boda De Ella",
+      "name": "Bobby%20Valent%C3%ADn%20-%20La%20Boda%20De%20Ella.m4a",
+      "size": 5285409,
+      "duration": 326.4
+    },
+    {
+      "trackId": 7,
+      "artist": "Conjunto Clásico",
+      "title": "Señora Ley",
+      "name": "Conjunto%20Cl%C3%A1sico%20-%20Se%C3%B1ora%20Ley.m4a",
+      "size": 4081743,
+      "duration": 252.066666
+    },
+    {
+      "trackId": 8,
+      "artist": "Dan Den",
+      "title": "Torbellino De Amor",
+      "name": "Dan%20Den%20-%20Torbellino%20De%20Amor.m4a",
+      "size": 4927606,
+      "duration": 307.959375
+    },
+    {
+      "trackId": 9,
+      "artist": "David Pabón",
+      "title": "Aquel Viejo Motel",
+      "name": "David%20Pab%C3%B3n%20-%20Aquel%20Viejo%20Motel.m4a",
+      "size": 5001907,
+      "duration": 308.866666
+    },
+    {
+      "trackId": 10,
+      "artist": "Dimensión Latina",
+      "title": "Por Tu Proceder",
+      "name": "Dimensi%C3%B3n%20Latina%20-%20Por%20Tu%20Proceder.m4a",
+      "size": 4498922,
+      "duration": 277.791927
+    },
+    {
+      "trackId": 11,
+      "artist": "Eddie Santiago",
+      "title": "Antídoto Y Veneno",
+      "name": "Eddie%20Santiago%20-%20Ant%C3%ADdoto%20Y%20Veneno.m4a",
+      "size": 5156953,
+      "duration": 318.453333
+    },
+    {
+      "trackId": 12,
+      "artist": "El Gran Combo",
+      "title": "Amame",
+      "name": "El%20Gran%20Combo%20-%20Amame.m4a",
+      "size": 5230206,
+      "duration": 323.036009
+    },
+    {
+      "trackId": 13,
+      "artist": "El Gran Combo",
+      "title": "Regresa Ya",
+      "name": "El%20Gran%20Combo%20-%20Regresa%20Ya.m4a",
+      "size": 4159424,
+      "duration": 256.835918
+    },
+    {
+      "trackId": 14,
+      "artist": "El Gran Combo",
+      "title": "Trampolín",
+      "name": "El%20Gran%20Combo%20-%20Trampol%C3%ADn.m4a",
+      "size": 4240555,
+      "duration": 261.893333
+    },
+    {
+      "trackId": 15,
+      "artist": "El Gran Combo",
+      "title": "Y No Hago Más Na",
+      "name": "El%20Gran%20Combo%20-%20Y%20No%20Hago%20M%C3%A1s%20Na.m4a",
+      "size": 4836811,
+      "duration": 298.68
+    },
+    {
+      "trackId": 16,
+      "artist": "Fania All Stars",
+      "title": "Quitate Tú",
+      "name": "Fania%20All%20Stars%20-%20Quitate%20T%C3%BA.m4a",
+      "size": 16243540,
+      "duration": 1003.636099
+    },
+    {
+      "trackId": 17,
+      "artist": "Frankie Ruiz",
+      "title": "Quiero Llenarte",
+      "name": "Frankie%20Ruiz%20-%20Quiero%20Llenarte.m4a",
+      "size": 4421500,
+      "duration": 273.066666
+    },
+    {
+      "trackId": 18,
+      "artist": "Frankie Ruiz",
+      "title": "Si Te Entregas A Mi",
+      "name": "Frankie%20Ruiz%20-%20Si%20Te%20Entregas%20A%20Mi.m4a",
+      "size": 4833373,
+      "duration": 298.44
+    },
+    {
+      "trackId": 19,
+      "artist": "Frankie Ruiz",
+      "title": "Tú Con El",
+      "name": "Frankie%20Ruiz%20-%20T%C3%BA%20Con%20El.m4a",
+      "size": 4914147,
+      "duration": 303.508027
+    },
+    {
+      "trackId": 20,
+      "artist": "Frankie Ruiz",
+      "title": "Y No Puedo",
+      "name": "Frankie%20Ruiz%20-%20Y%20No%20Puedo.m4a",
+      "size": 4425879,
+      "duration": 273.32
+    },
+    {
+      "trackId": 21,
+      "artist": "Fruko Y Sus Tesos",
+      "title": "El Preso",
+      "name": "Fruko%20Y%20Sus%20Tesos%20-%20El%20Preso.m4a",
+      "size": 4720318,
+      "duration": 291.535646
+    },
+    {
+      "trackId": 22,
+      "artist": "Giro López",
+      "title": "Amor Lunático",
+      "name": "Giro%20L%C3%B3pez%20-%20Amor%20Lun%C3%A1tico.m4a",
+      "size": 3903047,
+      "duration": 241.116009
+    },
+    {
+      "trackId": 23,
+      "artist": "Grupo Niche",
+      "title": "Ana Milé",
+      "name": "Grupo%20Niche%20-%20Ana%20Mil%C3%A9.m4a",
+      "size": 5479373,
+      "duration": 338.373333
+    },
+    {
+      "trackId": 24,
+      "artist": "Grupo Niche",
+      "title": "Entrega",
+      "name": "Grupo%20Niche%20-%20Entrega.m4a",
+      "size": 5455361,
+      "duration": 337.037641
+    },
+    {
+      "trackId": 25,
+      "artist": "Grupo Niche",
+      "title": "Me Sabe A Perú",
+      "name": "Grupo%20Niche%20-%20Me%20Sabe%20A%20Per%C3%BA.m4a",
+      "size": 4200198,
+      "duration": 259.482993
+    },
+    {
+      "trackId": 26,
+      "artist": "Grupo Niche",
+      "title": "Mecánico",
+      "name": "Grupo%20Niche%20-%20Mec%C3%A1nico.m4a",
+      "size": 5014725,
+      "duration": 309.746666
+    },
+    {
+      "trackId": 27,
+      "artist": "Grupo Niche",
+      "title": "Mujer De Novela",
+      "name": "Grupo%20Niche%20-%20Mujer%20De%20Novela.m4a",
+      "size": 5110364,
+      "duration": 315.6
+    },
+    {
+      "trackId": 28,
+      "artist": "Grupo Niche",
+      "title": "Nuestro Sueño",
+      "name": "Grupo%20Niche%20-%20Nuestro%20Sue%C3%B1o.m4a",
+      "size": 5817124,
+      "duration": 359.226666
+    },
+    {
+      "trackId": 29,
+      "artist": "Grupo Niche",
+      "title": "Se Pareció Tanto A Ti",
+      "name": "Grupo%20Niche%20-%20Se%20Pareci%C3%B3%20Tanto%20A%20Ti.m4a",
+      "size": 5317358,
+      "duration": 328.492698
+    },
+    {
+      "trackId": 30,
+      "artist": "Grupo Niche",
+      "title": "Te Enseñare A Olvidar",
+      "name": "Grupo%20Niche%20-%20Te%20Ense%C3%B1are%20A%20Olvidar.m4a",
+      "size": 5472544,
+      "duration": 338.105759
+    },
+    {
+      "trackId": 31,
+      "artist": "Hansel Camacho",
+      "title": "Tú Fidelidad",
+      "name": "Hansel%20Camacho%20-%20T%C3%BA%20Fidelidad.m4a",
+      "size": 4939509,
+      "duration": 305.133424
+    },
+    {
+      "trackId": 32,
+      "artist": "Héctor Lavoe",
+      "title": "Ausencia",
+      "name": "H%C3%A9ctor%20Lavoe%20-%20Ausencia.m4a",
+      "size": 4964118,
+      "duration": 306.68916
+    },
+    {
+      "trackId": 33,
+      "artist": "Héctor Lavoe",
+      "title": "Che Che Colé",
+      "name": "H%C3%A9ctor%20Lavoe%20-%20Che%20Che%20Col%C3%A9.m4a",
+      "size": 3457566,
+      "duration": 213.495941
+    },
+    {
+      "trackId": 34,
+      "artist": "Héctor Lavoe",
+      "title": "De Que Tamaño Es Tu Amor",
+      "name": "H%C3%A9ctor%20Lavoe%20-%20De%20Que%20Taman%CC%83o%20Es%20Tu%20Amor.m4a",
+      "size": 3454989,
+      "duration": 213.437823
+    },
+    {
+      "trackId": 35,
+      "artist": "Héctor Lavoe",
+      "title": "Dejala Que Siga",
+      "name": "H%C3%A9ctor%20Lavoe%20-%20Dejala%20Que%20Siga.m4a",
+      "size": 6274482,
+      "duration": 387.657142
+    },
+    {
+      "trackId": 36,
+      "artist": "Héctor Lavoe",
+      "title": "El Cantante",
+      "name": "H%C3%A9ctor%20Lavoe%20-%20El%20Cantante.m4a",
+      "size": 10146992,
+      "duration": 626.938775
+    },
+    {
+      "trackId": 37,
+      "artist": "Héctor Lavoe",
+      "title": "El Todo Poderoso",
+      "name": "H%C3%A9ctor%20Lavoe%20-%20El%20Todo%20Poderoso.m4a",
+      "size": 4253666,
+      "duration": 262.68
+    },
+    {
+      "trackId": 38,
+      "artist": "Héctor Lavoe",
+      "title": "Ella Mintió",
+      "name": "H%C3%A9ctor%20Lavoe%20-%20Ella%20Minti%C3%B3.m4a",
+      "size": 4631552,
+      "duration": 286
+    },
+    {
+      "trackId": 39,
+      "artist": "Héctor Lavoe",
+      "title": "Periodico De Ayer",
+      "name": "H%C3%A9ctor%20Lavoe%20-%20Periodico%20De%20Ayer.m4a",
+      "size": 6622069,
+      "duration": 409.1356
+    },
+    {
+      "trackId": 40,
+      "artist": "Héctor Lavoe",
+      "title": "Rompe Saraguey",
+      "name": "H%C3%A9ctor%20Lavoe%20-%20Rompe%20Saraguey.m4a",
+      "size": 6323040,
+      "duration": 390.652517
+    },
+    {
+      "trackId": 41,
+      "artist": "Héctor Lavoe",
+      "title": "Siento",
+      "name": "H%C3%A9ctor%20Lavoe%20-%20Siento.m4a",
+      "size": 6322776,
+      "duration": 390.629297
+    },
+    {
+      "trackId": 42,
+      "artist": "Héctor Lavoe",
+      "title": "Soñando Despierto",
+      "name": "H%C3%A9ctor%20Lavoe%20-%20So%C3%B1ando%20Despierto.m4a",
+      "size": 3934950,
+      "duration": 243
+    },
+    {
+      "trackId": 43,
+      "artist": "Héctor Lavoe",
+      "title": "Sóngoro Cosongo",
+      "name": "H%C3%A9ctor%20Lavoe%20-%20S%C3%B3ngoro%20Cosongo.m4a",
+      "size": 7612374,
+      "duration": 470.320181
+    },
+    {
+      "trackId": 44,
+      "artist": "Héctor Lavoe Y Willie Colón",
+      "title": "Calle Luna, Calle Sol",
+      "name": "H%C3%A9ctor%20Lavoe%20Y%20Willie%20Col%C3%B3n%20-%20Calle%20Luna%2C%20Calle%20Sol.mp3",
+      "size": 3607232,
+      "duration": 225.452
+    },
+    {
+      "trackId": 45,
+      "artist": "Ismael Miranda",
+      "title": "Abran Paso",
+      "name": "Ismael%20Miranda%20-%20Abran%20Paso.m4a",
+      "size": 3415531,
+      "duration": 210.92
+    },
+    {
+      "trackId": 46,
+      "artist": "Ismael Miranda",
+      "title": "Así Se Compone Un Son",
+      "name": "Ismael%20Miranda%20-%20As%C3%AD%20Se%20Compone%20Un%20Son.m4a",
+      "size": 5448343,
+      "duration": 336.48
+    },
+    {
+      "trackId": 47,
+      "artist": "Ismael Miranda",
+      "title": "Galera Tres",
+      "name": "Ismael%20Miranda%20-%20Galera%20Tres.m4a",
+      "size": 5900002,
+      "duration": 364.413333
+    },
+    {
+      "trackId": 48,
+      "artist": "Ismael Rivera",
+      "title": "Incomprendido",
+      "name": "Ismael%20Rivera%20-%20Incomprendido.m4a",
+      "size": 2865579,
+      "duration": 176.88
+    },
+    {
+      "trackId": 49,
+      "artist": "Johnny Rivera",
+      "title": "Necesito Una Amiga",
+      "name": "Johnny%20Rivera%20-%20Necesito%20Una%20Amiga.m4a",
+      "size": 5078483,
+      "duration": 313.748027
+    },
+    {
+      "trackId": 50,
+      "artist": "Johnny Rivera",
+      "title": "Por Eso Está Conmigo",
+      "name": "Johnny%20Rivera%20-%20Por%20Eso%20Est%C3%A1%20Conmigo.m4a",
+      "size": 4510465,
+      "duration": 278.639455
+    },
+    {
+      "trackId": 51,
+      "artist": "Johnny Rojas",
+      "title": "Adicto A Ti",
+      "name": "Johnny%20Rojas%20-%20Adicto%20A%20Ti.m4a",
+      "size": 4102476,
+      "duration": 326.00814
+    },
+    {
+      "trackId": 52,
+      "artist": "Jose Alberto El Canario",
+      "title": "Que Muera El Amor",
+      "name": "Jose%20Alberto%20El%20Canario%20-%20Que%20Muera%20El%20Amor.m4a",
+      "size": 5076786,
+      "duration": 313.608707
+    },
+    {
+      "trackId": 53,
+      "artist": "Justo Betancourt",
+      "title": "Pa' Bravo Yo",
+      "name": "Justo%20Betancourt%20-%20Pa'%20Bravo%20Yo.m4a",
+      "size": 3641259,
+      "duration": 224.826666
+    },
+    {
+      "trackId": 54,
+      "artist": "La Misma Gente",
+      "title": "Llegaste Tú",
+      "name": "La%20Misma%20Gente%20-%20Llegaste%20T%C3%BA.m4a",
+      "size": 4318315,
+      "duration": 266.631836
+    },
+    {
+      "trackId": 55,
+      "artist": "La Misma Gente",
+      "title": "Llégo El Final",
+      "name": "La%20Misma%20Gente%20-%20Ll%C3%A9go%20El%20Final.m4a",
+      "size": 5562791,
+      "duration": 343.562448
+    },
+    {
+      "trackId": 56,
+      "artist": "La Misma Gente",
+      "title": "Tú Y Yo",
+      "name": "La%20Misma%20Gente%20-%20T%C3%BA%20Y%20Yo.m4a",
+      "size": 4636602,
+      "duration": 286.32
+    },
+    {
+      "trackId": 57,
+      "artist": "Lalo Rodriguez",
+      "title": "Ven Devórame Otra Vez",
+      "name": "Lalo%20Rodriguez%20-%20Ven%20Dev%C3%B3rame%20Otra%20Vez.m4a",
+      "size": 4981798,
+      "duration": 307.617959
+    },
+    {
+      "trackId": 58,
+      "artist": "Larry Harlow",
+      "title": "La Cartera",
+      "name": "Larry%20Harlow%20-%20La%20Cartera.m4a",
+      "size": 6263410,
+      "duration": 386.853333
+    },
+    {
+      "trackId": 59,
+      "artist": "Los Hermanos Moreno",
+      "title": "No Hay Motivo",
+      "name": "Los%20Hermanos%20Moreno%20-%20No%20Hay%20Motivo.m4a",
+      "size": 4937677,
+      "duration": 304.953469
+    },
+    {
+      "trackId": 60,
+      "artist": "Los Hermanos Moreno",
+      "title": "Por Alguien Como Tú",
+      "name": "Los%20Hermanos%20Moreno%20-%20Por%20Alguien%20Como%20T%C3%BA.m4a",
+      "size": 2732119,
+      "duration": 214.94712
+    },
+    {
+      "trackId": 61,
+      "artist": "Los Hermanos Moreno",
+      "title": "Un Hombre Busca Una Mujer",
+      "name": "Los%20Hermanos%20Moreno%20-%20Un%20Hombre%20Busca%20Una%20Mujer.m4a",
+      "size": 4838800,
+      "duration": 298.788571
+    },
+    {
+      "trackId": 62,
+      "artist": "Los Titanes",
+      "title": "Compárame",
+      "name": "Los%20Titanes%20-%20Comp%C3%A1rame.m4a",
+      "size": 4265552,
+      "duration": 263.399999
+    },
+    {
+      "trackId": 63,
+      "artist": "Los Titanes",
+      "title": "Diré Que Te Amo",
+      "name": "Los%20Titanes%20-%20Dir%C3%A9%20Que%20Te%20Amo.m4a",
+      "size": 4310766,
+      "duration": 266.183129
+    },
+    {
+      "trackId": 64,
+      "artist": "Los Titanes",
+      "title": "Sobredosis",
+      "name": "Los%20Titanes%20-%20Sobredosis.m4a",
+      "size": 4045568,
+      "duration": 249.878639
+    },
+    {
+      "trackId": 65,
+      "artist": "Luis Enrique",
+      "title": "Lo Que Pasó Entre Tú Y Yo Pasó",
+      "name": "Luis%20Enrique%20-%20Lo%20Que%20Pas%C3%B3%20Entre%20T%C3%BA%20Y%20Yo%20Pas%C3%B3.m4a",
+      "size": 4541802,
+      "duration": 280.589931
+    },
+    {
+      "trackId": 66,
+      "artist": "Luis Enrique",
+      "title": "Mi Mundo",
+      "name": "Luis%20Enrique%20-%20Mi%20Mundo.m4a",
+      "size": 4594375,
+      "duration": 283.733333
+    },
+    {
+      "trackId": 67,
+      "artist": "Luis Enrique",
+      "title": "Tú No Le Amas Le Temes",
+      "name": "Luis%20Enrique%20-%20T%C3%BA%20No%20Le%20Amas%20Le%20Temes.m4a",
+      "size": 4365943,
+      "duration": 269.722993
+    },
+    {
+      "trackId": 68,
+      "artist": "Luis Enrique, Hansel Y Raúl",
+      "title": "Ella",
+      "name": "Luis%20Enrique%2C%20Hansel%20Y%20Ra%C3%BAl%20-%20Ella.m4a",
+      "size": 5645088,
+      "duration": 348.6
+    },
+    {
+      "trackId": 69,
+      "artist": "Luisito Carrión",
+      "title": "La Fuga",
+      "name": "Luisito%20Carri%C3%B3n%20-%20La%20Fuga.m4a",
+      "size": 4443042,
+      "duration": 274.390204
+    },
+    {
+      "trackId": 70,
+      "artist": "Mickey Taveras",
+      "title": "A Pesar Del Tiempo",
+      "name": "Mickey%20Taveras%20-%20A%20Pesar%20Del%20Tiempo.m4a",
+      "size": 4787185,
+      "duration": 295.626666
+    },
+    {
+      "trackId": 71,
+      "artist": "Nino Segarra",
+      "title": "Como Amigos Si, Como Amantes No",
+      "name": "Nino%20Segarra%20-%20Como%20Amigos%20Si%2C%20Como%20Amantes%20No.m4a",
+      "size": 4748288,
+      "duration": 293.24
+    },
+    {
+      "trackId": 72,
+      "artist": "Nino Segarra",
+      "title": "Entre La Espada Y La Pared",
+      "name": "Nino%20Segarra%20-%20Entre%20La%20Espada%20Y%20La%20Pared.m4a",
+      "size": 5575998,
+      "duration": 344.373333
+    },
+    {
+      "trackId": 73,
+      "artist": "Nino Segarra",
+      "title": "Porque Te Amo",
+      "name": "Nino%20Segarra%20-%20Porque%20Te%20Amo.m4a",
+      "size": 4971016,
+      "duration": 306.96
+    },
+    {
+      "trackId": 74,
+      "artist": "Orquesta Harlow",
+      "title": "El Paso De Encarnación",
+      "name": "Orquesta%20Harlow%20-%20El%20Paso%20De%20Encarnaci%C3%B3n.m4a",
+      "size": 5099646,
+      "duration": 314.96
+    },
+    {
+      "trackId": 75,
+      "artist": "Orquesta Inmensidad",
+      "title": "Ay Que Amor",
+      "name": "Orquesta%20Inmensidad%20-%20Ay%20Que%20Amor.m4a",
+      "size": 3790233,
+      "duration": 234.053333
+    },
+    {
+      "trackId": 76,
+      "artist": "Orquesta Octava Dimensión",
+      "title": "Nunca Cambies",
+      "name": "Orquesta%20Octava%20Dimensi%C3%B3n%20-%20Nunca%20Cambies.m4a",
+      "size": 4388322,
+      "duration": 271.020975
+    },
+    {
+      "trackId": 77,
+      "artist": "Orquesta Sabrosura",
+      "title": "Cuando Aparezca El Amor",
+      "name": "Orquesta%20Sabrosura%20-%20Cuando%20Aparezca%20El%20Amor.m4a",
+      "size": 4591818,
+      "duration": 283.575986
+    },
+    {
+      "trackId": 78,
+      "artist": "Orquesta Sociedad 76",
+      "title": "La Solución De La Salsa",
+      "name": "Orquesta%20Sociedad%2076%20-%20La%20Soluci%C3%B3n%20De%20La%20Salsa.m4a",
+      "size": 3651885,
+      "duration": 225.48
+    },
+    {
+      "trackId": 79,
+      "artist": "Paquito Guzmán",
+      "title": "Qué Voy A Hacer Sin Ti",
+      "name": "Paquito%20Guzm%C3%A1n%20-%20Qu%C3%A9%20Voy%20A%20Hacer%20Sin%20Ti.m4a",
+      "size": 5385723,
+      "duration": 332.644331
+    },
+    {
+      "trackId": 80,
+      "artist": "Pedro Conga",
+      "title": "Me Niegas Tanto Amor",
+      "name": "Pedro%20Conga%20-%20Me%20Niegas%20Tanto%20Amor.m4a",
+      "size": 4540256,
+      "duration": 283.75
+    },
+    {
+      "trackId": 81,
+      "artist": "Polo Montañez",
+      "title": "Un Montón De Estrellas",
+      "name": "Polo%20Monta%C3%B1ez%20-%20Un%20Mont%C3%B3n%20De%20Estrellas.m4a",
+      "size": 5902750,
+      "duration": 364.573333
+    },
+    {
+      "trackId": 82,
+      "artist": "Puerto Rican Power",
+      "title": "Solo Con Un Beso",
+      "name": "Puerto%20Rican%20Power%20-%20Solo%20Con%20Un%20Beso.m4a",
+      "size": 4804731,
+      "duration": 296.693333
+    },
+    {
+      "trackId": 83,
+      "artist": "Ray Sepúlveda",
+      "title": "No Vale La Pena Enamorarse",
+      "name": "Ray%20Sep%C3%BAlveda%20-%20No%20Vale%20La%20Pena%20Enamorarse.m4a",
+      "size": 5721460,
+      "duration": 353.477369
+    },
+    {
+      "trackId": 84,
+      "artist": "Ray Sepúlveda",
+      "title": "Una Mujer Como Tú",
+      "name": "Ray%20Sep%C3%BAlveda%20-%20Una%20Mujer%20Como%20T%C3%BA.m4a",
+      "size": 4682338,
+      "duration": 289.274195
+    },
+    {
+      "trackId": 85,
+      "artist": "Rey Ruiz",
+      "title": "Mi Media Mitad",
+      "name": "Rey%20Ruiz%20-%20Mi%20Media%20Mitad.m4a",
+      "size": 4750798,
+      "duration": 293.500226
+    },
+    {
+      "trackId": 86,
+      "artist": "Rubby Haddock And Orchesta",
+      "title": "Todo Me Huele A Ti",
+      "name": "Rubby%20Haddock%20And%20Orchesta%20-%20Todo%20Me%20Huele%20A%20Ti.m4a",
+      "size": 5232303,
+      "duration": 323.16
+    },
+    {
+      "trackId": 87,
+      "artist": "Salsa Kids",
+      "title": "Siempre",
+      "name": "Salsa%20Kids%20-%20Siempre.m4a",
+      "size": 5889781,
+      "duration": 299.389387
+    },
+    {
+      "trackId": 88,
+      "artist": "Son Habana",
+      "title": "Te Dejo Libre",
+      "name": "Son%20Habana%20-%20Te%20Dejo%20Libre.m4a",
+      "size": 5729811,
+      "duration": 353.867006
+    },
+    {
+      "trackId": 89,
+      "artist": "Sonora Ponceña",
+      "title": "Boranda",
+      "name": "Sonora%20Ponce%C3%B1a%20-%20Boranda.m4a",
+      "size": 7042133,
+      "duration": 434.973333
+    },
+    {
+      "trackId": 90,
+      "artist": "Sonora Ponceña",
+      "title": "Sola Vaya",
+      "name": "Sonora%20Ponce%C3%B1a%20-%20Sola%20Vaya.m4a",
+      "size": 6107877,
+      "duration": 377.213424
+    },
+    {
+      "trackId": 91,
+      "artist": "Sonora Ponceña",
+      "title": "Yambeque",
+      "name": "Sonora%20Ponce%C3%B1a%20-%20Yambeque.m4a",
+      "size": 6180693,
+      "duration": 381.852154
+    },
+    {
+      "trackId": 92,
+      "artist": "Sonora Ponceña",
+      "title": "Yaré",
+      "name": "Sonora%20Ponce%C3%B1a%20-%20Yar%C3%A9.m4a",
+      "size": 5691612,
+      "duration": 351.546666
+    },
+    {
+      "trackId": 93,
+      "artist": "The Latin Brothers",
+      "title": "Buscándote",
+      "name": "The%20Latin%20Brothers%20-%20Busc%C3%A1ndote.m4a",
+      "size": 4496517,
+      "duration": 277.636009
+    },
+    {
+      "trackId": 94,
+      "artist": "The Latin Brothers",
+      "title": "Patrona De Los Reclusos",
+      "name": "The%20Latin%20Brothers%20-%20Patrona%20De%20Los%20Reclusos.m4a",
+      "size": 6074965,
+      "duration": 375.2
+    },
+    {
+      "trackId": 95,
+      "artist": "The New York Band",
+      "title": "Nadie Como Tú",
+      "name": "The%20New%20York%20Band%20-%20Nadie%20Como%20T%C3%BA.m4a",
+      "size": 4651545,
+      "duration": 287.370158
+    },
+    {
+      "trackId": 96,
+      "artist": "Tito Allen",
+      "title": "Como Tú",
+      "name": "Tito%20Allen%20-%20Como%20T%C3%BA.m4a",
+      "size": 5774791,
+      "duration": 356.64
+    },
+    {
+      "trackId": 97,
+      "artist": "Tito Nieves",
+      "title": "De Mi Enamorate",
+      "name": "Tito%20Nieves%20-%20De%20Mi%20Enamorate.m4a",
+      "size": 4950016,
+      "duration": 309.323875
+    },
+    {
+      "trackId": 98,
+      "artist": "Tito Rojas",
+      "title": "Siempre Seré",
+      "name": "Tito%20Rojas%20-%20Siempre%20Ser%C3%A9.m4a",
+      "size": 5221477,
+      "duration": 322.50195
+    },
+    {
+      "trackId": 99,
+      "artist": "Viti Ruiz",
+      "title": "Caricias Prohibidas",
+      "name": "Viti%20Ruiz%20-%20Caricias%20Prohibidas.m4a",
+      "size": 5164092,
+      "duration": 319.018956
+    },
+    {
+      "trackId": 100,
+      "artist": "Willie Colón",
+      "title": "Oh Qué Será",
+      "name": "Willie%20Col%C3%B3n%20-%20Oh%20Qu%C3%A9%20Ser%C3%A1.m4a",
+      "size": 6422045,
+      "duration": 396.759365
+    },
+    {
+      "trackId": 101,
+      "artist": "Willie Colón",
+      "title": "Sin Poderte Hablar",
+      "name": "Willie%20Col%C3%B3n%20-%20Sin%20Poderte%20Hablar.m4a",
+      "size": 5201271,
+      "duration": 321.261746
+    },
+    {
+      "trackId": 102,
+      "artist": "Willie Colón Y Héctor Lavoe",
+      "title": "Aguanile",
+      "name": "Willie%20Col%C3%B3n%20Y%20H%C3%A9ctor%20Lavoe%20-%20Aguanile.m4a",
+      "size": 6425648,
+      "duration": 396.991564
+    },
+    {
+      "trackId": 103,
+      "artist": "Willie Colón Y Héctor Lavoe",
+      "title": "El Día De Mi Suerte",
+      "name": "Willie%20Col%C3%B3n%20Y%20H%C3%A9ctor%20Lavoe%20-%20El%20D%C3%ADa%20De%20Mi%20Suerte.m4a",
+      "size": 5719958,
+      "duration": 353.384489
+    },
+    {
+      "trackId": 104,
+      "artist": "Willie González",
+      "title": "Hazme Olvidarla",
+      "name": "Willie%20Gonz%C3%A1lez%20-%20Hazme%20Olvidarla.m4a",
+      "size": 5460093,
+      "duration": 337.173333
+    },
+    {
+      "trackId": 105,
+      "artist": "Willie González",
+      "title": "No Podrás Escapar De Mi",
+      "name": "Willie%20Gonz%C3%A1lez%20-%20No%20Podr%C3%A1s%20Escapar%20De%20Mi.m4a",
+      "size": 5383825,
+      "duration": 332.533333
+    },
+    {
+      "trackId": 106,
+      "artist": "Willie González",
+      "title": "Quiero Morir En Tu Piel",
+      "name": "Willie%20Gonz%C3%A1lez%20-%20Quiero%20Morir%20En%20Tu%20Piel.m4a",
+      "size": 6107031,
+      "duration": 377.16
+    },
+    {
+      "trackId": 107,
+      "artist": "Willie González",
+      "title": "Si Tú Fueras Mia",
+      "name": "Willie%20Gonz%C3%A1lez%20-%20Si%20T%C3%BA%20Fueras%20Mia.m4a",
+      "size": 4973443,
+      "duration": 307.133333
+    },
+    {
+      "trackId": 108,
+      "artist": "Willie González",
+      "title": "Tanto Amor",
+      "name": "Willie%20Gonz%C3%A1lez%20-%20Tanto%20Amor.m4a",
+      "size": 4258176,
+      "duration": 265.863999
+    },
+    {
+      "trackId": 109,
+      "artist": "Willie Rosario",
+      "title": "Anuncio Clasificado",
+      "name": "Willie%20Rosario%20-%20Anuncio%20Clasificado.m4a",
+      "size": 4873629,
+      "duration": 301.010521
+    },
+    {
+      "trackId": 110,
+      "artist": "Willie Rosario",
+      "title": "El Timbal De Carlitos",
+      "name": "Willie%20Rosario%20-%20El%20Timbal%20De%20Carlitos.m4a",
+      "size": 5334120,
+      "duration": 331.2065
+    },
+    {
+      "trackId": 111,
+      "artist": "Willie Rosario",
+      "title": "La Mitad",
+      "name": "Willie%20Rosario%20-%20La%20Mitad.m4a",
+      "size": 5357638,
+      "duration": 330.933333
+    },
+    {
+      "trackId": 112,
+      "artist": "Willie Rosario",
+      "title": "Tormenta",
+      "name": "Willie%20Rosario%20-%20Tormenta.m4a",
+      "size": 6422528,
+      "duration": 401.222688
+    },
+    {
+      "trackId": 113,
+      "artist": "Wilmer Cartagena",
+      "title": "Un Amor Como El Tuyo",
+      "name": "Wilmer%20Cartagena%20-%20Un%20Amor%20Como%20El%20Tuyo.m4a",
+      "size": 4727940,
+      "duration": 291.990929
+    }
+  ]
+}
