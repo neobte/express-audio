@@ -114,7 +114,7 @@ function init() {
 
 function loadPlaylist() {
 
-    const request_url = BASE_URL + "playlist.json"; // Aquí no hace falta encodeURIComponent()
+    const request_url = "playlist_api_github.json";
 
     // Petición de los datos al servidor
     sendFetchHttpRequest(request_url, handleLoadPlaylist);
@@ -123,17 +123,17 @@ function loadPlaylist() {
 function handleLoadPlaylist(response) {
     // Respuesta del backend
     // playerState.originalPlaylist = response.tracks.items.slice(0, 5);
-    playerState.originalPlaylist = response.tracks.items;
+    playerState.originalPlaylist = response.tracks;
     playerState.playbackQueue = [...playerState.originalPlaylist];
 
     // Creamos un Mapper para ubicar los tracks más rapidamente por su ID
-    playerState.tracksMap = new Map(playerState.originalPlaylist.map(track => [track.id, track]));
+    playerState.tracksMap = new Map(playerState.originalPlaylist.map(track => [track.trackId, track]));
 
     // Creamos un Mapper para ubicar el índice del track más rapidamente por su ID
-    playerState.trackIndexMap = new Map(playerState.originalPlaylist.map((track, index) => [track.id, index]));
+    playerState.trackIndexMap = new Map(playerState.originalPlaylist.map((track, index) => [track.trackId, index]));
     // console.log(playerState.trackIndexMap);
 
-    // Obtenemos un currentIndex distinto, cada vez que cargamos la página. No queremos que siempre inicie en 0
+    // Obtenemos un selectedTrackIndex distinto, cada vez que cargamos la página. No queremos que siempre inicie en 0
     playerState.selectedTrackIndex = getRandomInt(0, playerState.playbackQueue.length - 1);
 
     // Actualiza valores iniciales de tiempo al inicio de la app
@@ -267,7 +267,7 @@ audioElement.addEventListener("timeupdate", () => {
 // Evento input del Slider de tiempo
 currentTimeSlider.addEventListener("input", () => {
 
-    audioElement.currentTime = currentTimeSlider.value;
+    audioElement.currentTime = Number(currentTimeSlider.value);
 });
 
 // Evento input del Slider de volumen
@@ -308,7 +308,7 @@ function updateSelectedTrackUI(track) {
     }
 
     // Obtenemos el list item de la playlist
-    const selectedListItem = d.querySelector(`li[data-track-id="${track.id}"]`);
+    const selectedListItem = d.querySelector(`li[data-track-id="${track.trackId}"]`);
 
     // Agregamos la clase "is-selected"
     selectedListItem.classList.add("is-selected");
@@ -344,7 +344,7 @@ function updateTrackInfoUI(track) {
 // UI, X número de track de Y número total de tracks
 function updateTrackCounterUI(track) {
 
-    const originalIndex = playerState.trackIndexMap.get(track.id);
+    const originalIndex = playerState.trackIndexMap.get(track.trackId);
 
     trackCurrentIndex.textContent = playerState.originalPlaylist.length > 0 ? originalIndex + 1 : 0;
 
@@ -455,7 +455,7 @@ function renderPlaylist() {
         const li = d.createElement("li");
 
         // Creamos un dataset con el ID de cada track
-        li.dataset.trackId = track.id;
+        li.dataset.trackId = track.trackId;
 
         // Agregamos la clase "playlist-track" a cada list item
         li.classList.add("playlist-track");
@@ -520,7 +520,7 @@ function bindPlaylistEvents() {
         playTrack();
 
         // Buscamos el índice del track
-        playerState.selectedTrackIndex = playerState.playbackQueue.findIndex(track => track.id === trackId);
+        playerState.selectedTrackIndex = playerState.playbackQueue.findIndex(track => track.trackId === trackId);
     });
 }
 
@@ -585,7 +585,7 @@ function disableShuffle() {
     playerState.playbackQueue = [...playerState.originalPlaylist];
 
     // Este es un Map creado con los índices originales
-    const originalIndex = playerState.trackIndexMap.get(currentTrack.id);
+    const originalIndex = playerState.trackIndexMap.get(currentTrack.trackId);
 
     playerState.selectedTrackIndex = originalIndex;
 }
@@ -601,7 +601,7 @@ function loadTrack(track) {
     audioElement.currentTime = 0;
 
     // Construimos el audio source
-    const src = `${BASE_URL}${encodeURIComponent(track.name)}`;
+    const src = `${BASE_URL}$track.name}`;
 
     // Llamamos a la función que se encarga de setear el source
     setAudioSource(src);
