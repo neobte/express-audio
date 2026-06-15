@@ -601,7 +601,7 @@ function loadTrack(track) {
     audioElement.currentTime = 0;
 
     // Construimos el audio source
-    const src = `${BASE_URL}$track.name}`;
+    const src = `${BASE_URL}${track.name}`;
 
     // Llamamos a la función que se encarga de setear el source
     setAudioSource(src);
