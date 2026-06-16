@@ -145,6 +145,9 @@ function handleLoadPlaylist(response) {
     // Renderizamos la playlist
     renderPlaylist();
 
+    // Mostramos en consola la duración de la playlist
+    getPlaylistDuration();
+
     // Delegación de eventos en la playlist
     bindPlaylistEvents();
 
@@ -868,3 +871,18 @@ const parseName = name => {
     }
 }
 
+function getPlaylistDuration() {
+    // return getTotalDuration(playerState.playbackQueue);
+    const totalDuration = getTotalDuration(playerState.playbackQueue);
+    console.log(`Tiempo de duración de la playlist: ${formatTime(totalDuration, 1)}`)
+}
+
+function getTotalDuration(tracks) {
+    let total = 0;
+    const len = tracks.length;
+    for (let i = 0; i < len; i++) {
+        total += tracks[i].duration;
+    }
+
+    return total;
+}
