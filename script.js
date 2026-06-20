@@ -65,7 +65,7 @@ const DEFAULT_VOLUME = 33;
 const RESTORE_DEFAULT_VOLUME = 50;
 
 // REQUEST URI
-const BASE_URL = "https://neobte.github.io/musica/playlists/salsa/";
+const BASE_URL = "https://neobte.github.io/audio-repo/playlists/salsa/";
 
 // Player state
 const playerState = {
@@ -114,27 +114,15 @@ function init() {
 
 function loadPlaylist() {
 
-    const request_url = "playlist_api_github.json";
+    const filename = "playlist.json";
 
     // Petición de los datos al servidor
-    sendFetchHttpRequest(request_url, handleLoadPlaylist);
+    sendFetchHttpRequest(filename, handleLoadPlaylist);
 }
 
 function handleLoadPlaylist(response) {
-    // Respuesta del backend
-    // playerState.originalPlaylist = response.tracks.items.slice(0, 5);
-    playerState.originalPlaylist = response.tracks;
-    playerState.playbackQueue = [...playerState.originalPlaylist];
 
-    // Creamos un Mapper para ubicar los tracks más rapidamente por su ID
-    playerState.tracksMap = new Map(playerState.originalPlaylist.map(track => [track.trackId, track]));
-
-    // Creamos un Mapper para ubicar el índice del track más rapidamente por su ID
-    playerState.trackIndexMap = new Map(playerState.originalPlaylist.map((track, index) => [track.trackId, index]));
-    // console.log(playerState.trackIndexMap);
-
-    // Obtenemos un selectedTrackIndex distinto, cada vez que cargamos la página. No queremos que siempre inicie en 0
-    playerState.selectedTrackIndex = getRandomInt(0, playerState.playbackQueue.length - 1);
+    setPlaylistState(response);
 
     // Actualiza valores iniciales de tiempo al inicio de la app
     updateCurrentTimeValues();
@@ -153,6 +141,23 @@ function handleLoadPlaylist(response) {
 
     // Obtenemos el track y lo cargamos
     loadSelectedTrack();
+}
+
+function setPlaylistState(response) {
+
+    // playerState.originalPlaylist = response.tracks.items.slice(0, 5);
+    playerState.originalPlaylist = response.tracks;
+
+    playerState.playbackQueue = [...playerState.originalPlaylist];
+
+    // Creamos un Mapper para ubicar los tracks más rapidamente por su ID
+    playerState.tracksMap = new Map(playerState.originalPlaylist.map(track => [track.trackId, track]));
+
+    // Creamos un Mapper para ubicar el índice del track más rapidamente por su ID
+    playerState.trackIndexMap = new Map(playerState.originalPlaylist.map((track, index) => [track.trackId, index]));
+
+    // Obtenemos un selectedTrackIndex distinto, cada vez que cargamos la página. No queremos que siempre inicie en 0
+    playerState.selectedTrackIndex = getRandomInt(0, playerState.playbackQueue.length - 1);
 }
 
 /**
