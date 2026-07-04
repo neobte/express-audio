@@ -52,6 +52,8 @@ playingIcon.src = 'images/bars.svg';
 playingIcon.alt = 'Playing';
 playingIcon.classList.add('playing-icon');
 
+const playlistOptions = d.getElementById("playlist-options");
+
 // Objeto audio
 const audioElement = new Audio();
 
@@ -65,7 +67,7 @@ const DEFAULT_VOLUME = 33;
 const RESTORE_DEFAULT_VOLUME = 50;
 
 // REQUEST URI
-const BASE_URL = "https://neobte.github.io/audio-repo/playlists/salsa_romantica/";
+const BASE_URL = "https://neobte.github.io/audio-repo/playlists/";
 
 // Player state
 const playerState = {
@@ -98,6 +100,8 @@ const repeatModes = {
 }
 
 let currentListItem = null;
+let playlistName = null;
+let currentPlaylist = null;
 
 // Evento que carga el contenido de la página
 d.addEventListener("DOMContentLoaded", () => {
@@ -106,18 +110,39 @@ d.addEventListener("DOMContentLoaded", () => {
 
 });
 
+
 // Función que inicia toda la aplicación
 function init() {
 
-    loadPlaylist();
+    // Delegación de eventos en la lista de playlists para seleccionar una playlist
+    bindPlaylistOptionsEvents();
+
+    // Delegación de eventos en la playlist para seleccionar un track
+    bindPlaylistEvents();
 }
 
-function loadPlaylist() {
+function bindPlaylistOptionsEvents() {
 
-    const filename = "playlist.json";
+    playlistOptions.addEventListener("click", (e) => {
 
-    // Petición de los datos al servidor
-    sendFetchHttpRequest(filename, handleLoadPlaylist);
+        const li = e.target.closest("li");
+        if (!li) return;
+
+        if (li === currentPlaylist) {
+            return;
+        }
+
+        // Asignamos la referencia a la variable currentPlaylist
+        currentPlaylist = li;
+
+        playlistName = li.dataset.playlist;
+
+        const request_url = BASE_URL + playlistName + "/playlist.json";
+
+        // Petición de los datos al servidor
+        sendFetchHttpRequest(request_url, handleLoadPlaylist);
+
+    });
 }
 
 function handleLoadPlaylist(response) {
@@ -133,14 +158,19 @@ function handleLoadPlaylist(response) {
     // Renderizamos la playlist
     renderPlaylist();
 
+    // Despues de renderizar la playlist verificamos el shuffle
+    if (playerState.isShuffle) {
+        enableShuffle();
+    }
+
     // Mostramos en consola la duración de la playlist
     getPlaylistDuration();
 
-    // Delegación de eventos en la playlist
-    bindPlaylistEvents();
-
     // Obtenemos el track y lo cargamos
     loadSelectedTrack();
+
+    // Ponemos a sonar el track
+    playTrack();
 }
 
 function setPlaylistState(response) {
@@ -148,16 +178,17 @@ function setPlaylistState(response) {
     // playerState.originalPlaylist = response.tracks.items.slice(0, 5);
     playerState.originalPlaylist = response.tracks;
 
-    playerState.playbackQueue = [...playerState.originalPlaylist];
-
     // Creamos un Mapper para ubicar los tracks más rapidamente por su ID
     playerState.tracksMap = new Map(playerState.originalPlaylist.map(track => [track.trackId, track]));
 
     // Creamos un Mapper para ubicar el índice del track más rapidamente por su ID
     playerState.trackIndexMap = new Map(playerState.originalPlaylist.map((track, index) => [track.trackId, index]));
 
+    playerState.playbackQueue = [...playerState.originalPlaylist];
+
     // Obtenemos un selectedTrackIndex distinto, cada vez que cargamos la página. No queremos que siempre inicie en 0
     playerState.selectedTrackIndex = getRandomInt(0, playerState.playbackQueue.length - 1);
+
 }
 
 /**
@@ -499,7 +530,11 @@ function bindPlaylistEvents() {
 
         if (li === currentListItem) {
             // Ya sea por pause o play.
-            playerState.isPlaying ? pauseTrack() : playTrack();
+            if (playerState.isPlaying) {
+                pauseTrack();
+            } else {
+                playTrack();
+            }
             return;
         }
 
@@ -568,6 +603,7 @@ function enableShuffle() {
     let rest = new Array(len - 1);
 
     let k = 0;
+
     for (let i = 0; i < len; i++) {
         // Llenamos el array, sin el track actualmente en reproducción
         if (i === playerState.selectedTrackIndex) continue;
@@ -609,7 +645,7 @@ function loadTrack(track) {
     audioElement.currentTime = 0;
 
     // Construimos el audio source
-    const src = `${BASE_URL}${track.name}`;
+    const src = `${BASE_URL}${playlistName}/${track.name}`;
 
     // Llamamos a la función que se encarga de setear el source
     setAudioSource(src);
@@ -737,7 +773,7 @@ async function playAudio() {
 
     } catch (error) {
 
-        console.error(`Error en el intento de iniciar la reproducción:`, error);
+        console.error(`Error en el intento de iniciar la reproducción:`, error.message);
     }
 }
 

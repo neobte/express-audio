@@ -76,7 +76,7 @@ body {
 
 /* Playlist */
 .playlist-container {
-    max-height: 280px;
+    height: 280px;
     overflow-y: auto;
     overflow-x: hidden;
 }
