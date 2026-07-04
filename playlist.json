@@ -1,8 +1,8 @@
 {
   "playlistId": 1,
   "playlistName": "salsa_romantica",
-  "createdAt": "2026-07-04T07:23:38.078Z",
-  "total": 35,
+  "createdAt": "2026-07-04T07:29:45.906Z",
+  "total": 34,
   "tracks": [
     {
       "trackId": 1,
@@ -240,11 +240,6 @@
     },
     {
       "trackId": 27,
-      "name": "playlist.json",
-      "error": true
-    },
-    {
-      "trackId": 28,
       "artist": "Rubby Haddock and Orchestra",
       "title": "Todo Me Huele A Ti",
       "name": "Rubby%20Haddock%20and%20Orchestra%20-%20Todo%20Me%20Huele%20A%20Ti.m4a",
@@ -253,7 +248,7 @@
       "duration": 323.16
     },
     {
-      "trackId": 29,
+      "trackId": 28,
       "artist": "The New York Band",
       "title": "Nadie Como Tú",
       "name": "The%20New%20York%20Band%20-%20Nadie%20Como%20T%C3%BA.m4a",
@@ -262,7 +257,7 @@
       "duration": 287.370158
     },
     {
-      "trackId": 30,
+      "trackId": 29,
       "artist": "Viti Ruiz",
       "title": "Caricias Prohibidas",
       "name": "Viti%20Ruiz%20-%20Caricias%20Prohibidas.m4a",
@@ -271,7 +266,7 @@
       "duration": 319.018956
     },
     {
-      "trackId": 31,
+      "trackId": 30,
       "artist": "Willie González",
       "title": "Hazme Olvidarla",
       "name": "Willie%20Gonz%C3%A1lez%20-%20Hazme%20Olvidarla.m4a",
@@ -280,7 +275,7 @@
       "duration": 337.173333
     },
     {
-      "trackId": 32,
+      "trackId": 31,
       "artist": "Willie González",
       "title": "No Podrás Escapar De Mi",
       "name": "Willie%20Gonz%C3%A1lez%20-%20No%20Podr%C3%A1s%20Escapar%20De%20Mi.m4a",
@@ -289,7 +284,7 @@
       "duration": 331.306666
     },
     {
-      "trackId": 33,
+      "trackId": 32,
       "artist": "Willie González",
       "title": "Pequeñas Cosas",
       "name": "Willie%20Gonz%C3%A1lez%20-%20Peque%C3%B1as%20Cosas.m4a",
@@ -298,7 +293,7 @@
       "duration": 289.297414
     },
     {
-      "trackId": 34,
+      "trackId": 33,
       "artist": "Willie González",
       "title": "Quiero Morir En Tu Piel",
       "name": "Willie%20Gonz%C3%A1lez%20-%20Quiero%20Morir%20En%20Tu%20Piel.m4a",
@@ -307,7 +302,7 @@
       "duration": 377.16
     },
     {
-      "trackId": 35,
+      "trackId": 34,
       "artist": "Willie González",
       "title": "Tanto Amor",
       "name": "Willie%20Gonz%C3%A1lez%20-%20Tanto%20Amor.m4a",
