@@ -381,3 +381,25 @@ body {
 .text-end {
     text-align: end;
 }
+
+/*  */
+
+.player {
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+/* Sin playlist */
+.player.is-idle {
+    opacity: 0.5;
+    filter: grayscale(1);
+}
+
+/* Con playlist */
+.player.is-ready {
+    opacity: 1;
+    filter: none;
+}
+
+.player.is-idle button {
+    cursor: not-allowed;
+}

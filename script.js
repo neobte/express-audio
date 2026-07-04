@@ -69,6 +69,13 @@ const RESTORE_DEFAULT_VOLUME = 50;
 // REQUEST URI
 const BASE_URL = "https://neobte.github.io/audio-repo/playlists/";
 
+const PLAYER_STATE = {
+    IDLE: "idle",
+    READY: "ready",
+    PLAYING: "playing",
+    PAUSED: "paused"
+};
+
 // Player state
 const playerState = {
     selectedTrackIndex: 32,
@@ -80,7 +87,8 @@ const playerState = {
     playbackQueue: [],
     previousVolume: DEFAULT_VOLUME,
     mutedFromSlider: false,
-    repeatMode: "none" // "none" | "all" | "one"
+    repeatMode: "none", // "none" | "all" | "one"
+    status: PLAYER_STATE.IDLE,
 }
 
 // Modos de repetición
@@ -114,11 +122,34 @@ d.addEventListener("DOMContentLoaded", () => {
 // Función que inicia toda la aplicación
 function init() {
 
+    // Actualiza valores iniciales de volumen al inicio de la app
+    initializeVolume();
+
+    playerState.status = PLAYER_STATE.IDLE;
+
+    syncPlayerUI();
+
     // Delegación de eventos en la lista de playlists para seleccionar una playlist
     bindPlaylistOptionsEvents();
 
     // Delegación de eventos en la playlist para seleccionar un track
     bindPlaylistEvents();
+}
+
+function syncPlayerUI() {
+
+    const player = d.querySelector(".player");
+
+    const isReady = playerState.status !== PLAYER_STATE.IDLE;
+
+    player.classList.toggle("is-idle", !isReady);
+    player.classList.toggle("is-ready", isReady);
+
+    d.querySelectorAll(".controls .btn").forEach(btn => {
+        btn.disabled = !isReady;
+    });
+
+    currentTimeSlider.disabled = !isReady;
 }
 
 function bindPlaylistOptionsEvents() {
@@ -151,9 +182,6 @@ function handleLoadPlaylist(response) {
 
     // Actualiza valores iniciales de tiempo al inicio de la app
     updateCurrentTimeValues();
-
-    // Actualiza valores iniciales de volumen al inicio de la app
-    initializeVolume();
 
     // Renderizamos la playlist
     renderPlaylist();
@@ -189,6 +217,10 @@ function setPlaylistState(response) {
     // Obtenemos un selectedTrackIndex distinto, cada vez que cargamos la página. No queremos que siempre inicie en 0
     playerState.selectedTrackIndex = getRandomInt(0, playerState.playbackQueue.length - 1);
 
+    playerState.status = PLAYER_STATE.READY;
+
+    syncPlayerUI();
+
 }
 
 /**
@@ -217,6 +249,8 @@ shuffleBtn.addEventListener("click", () => {
     }
 
     updateShuffleButtonUI();
+
+    syncPlayerUI();
 });
 
 // Evento click del botón backward
@@ -767,9 +801,15 @@ function pauseTrack() {
 // Reproducimos el audio
 async function playAudio() {
 
+    if (playerState.status === PLAYER_STATE.IDLE) return;
+
     try {
+        const track = playerState.playbackQueue[playerState.selectedTrackIndex];
+        if (!track) return;
 
         await audioElement.play();
+        playerState.status = PLAYER_STATE.PLAYING;
+        syncPlayerUI();
 
     } catch (error) {
 
@@ -780,7 +820,13 @@ async function playAudio() {
 // Pausamos el audio
 function pauseAudio() {
 
+    if (playerState.status !== PLAYER_STATE.PLAYING) return;
+
     audioElement.pause();
+
+    playerState.status = PLAYER_STATE.PAUSED;
+
+    syncPlayerUI();
 }
 
 // Seteamos el audio source
