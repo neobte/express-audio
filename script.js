@@ -65,7 +65,7 @@ const DEFAULT_VOLUME = 33;
 const RESTORE_DEFAULT_VOLUME = 50;
 
 // REQUEST URI
-const BASE_URL = "https://neobte.github.io/audio-repo/playlists/salsa/";
+const BASE_URL = "https://neobte.github.io/audio-repo/playlists/salsa_romantica/";
 
 // Player state
 const playerState = {
