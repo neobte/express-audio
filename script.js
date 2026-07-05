@@ -150,6 +150,7 @@ function syncPlayerUI() {
     });
 
     currentTimeSlider.disabled = !isReady;
+
 }
 
 function bindPlaylistOptionsEvents() {
@@ -157,6 +158,7 @@ function bindPlaylistOptionsEvents() {
     playlistOptions.addEventListener("click", (e) => {
 
         const li = e.target.closest("li");
+
         if (!li) return;
 
         if (li === currentPlaylist) {
@@ -180,6 +182,8 @@ function handleLoadPlaylist(response) {
 
     setPlaylistState(response);
 
+    updatePlayPauseBtnUI();
+
     // Actualiza valores iniciales de tiempo al inicio de la app
     updateCurrentTimeValues();
 
@@ -196,9 +200,6 @@ function handleLoadPlaylist(response) {
 
     // Obtenemos el track y lo cargamos
     loadSelectedTrack();
-
-    // Ponemos a sonar el track
-    playTrack();
 }
 
 function setPlaylistState(response) {
@@ -218,6 +219,8 @@ function setPlaylistState(response) {
     playerState.selectedTrackIndex = getRandomInt(0, playerState.playbackQueue.length - 1);
 
     playerState.status = PLAYER_STATE.READY;
+
+    playerState.isPlaying = false;
 
     syncPlayerUI();
 
@@ -239,6 +242,10 @@ playPauseBtn.addEventListener("click", () => {
 
 // Evento click del botón shuffle
 shuffleBtn.addEventListener("click", () => {
+
+    if (!Array.isArray(playerState.playbackQueue) || !playerState.playbackQueue.length) {
+        return;
+    }
 
     playerState.isShuffle = !playerState.isShuffle;
 
@@ -263,8 +270,8 @@ backwardBtn.addEventListener("click", () => {
         return;
     }
 
-    // Seteamos el índice anterior
-    selectPreviousTrack();
+    // Seteamos el índice del track anterior
+    setPreviousTrackIndex();
 
     handleTrackChange();
 });
@@ -272,8 +279,8 @@ backwardBtn.addEventListener("click", () => {
 // Evento click del botón forward
 forwardBtn.addEventListener("click", () => {
 
-    // Seteamos el índice siguiente
-    selectNextTrack();
+    // Seteamos el índice del siguiente track
+    setNextTrackIndex();
 
     handleTrackChange();
 });
@@ -564,11 +571,8 @@ function bindPlaylistEvents() {
 
         if (li === currentListItem) {
             // Ya sea por pause o play.
-            if (playerState.isPlaying) {
-                pauseTrack();
-            } else {
-                playTrack();
-            }
+            playerState.isPlaying ? pauseTrack() : playTrack();
+
             return;
         }
 
@@ -713,7 +717,7 @@ function handleTrackEnded() {
 
         case "all":
             // Incrementamos el índice del siguiente track
-            selectNextTrack();
+            setNextTrackIndex();
 
             playSelectedTrack();
             break;
@@ -733,7 +737,7 @@ function handleEndedWithoutRepeat() {
         return;
     }
 
-    selectNextTrack();
+    setNextTrackIndex();
     playSelectedTrack();
 }
 
@@ -841,12 +845,12 @@ function getSelectedTrack() {
     return playerState.playbackQueue[playerState.selectedTrackIndex];
 }
 
-function selectNextTrack() {
+function setNextTrackIndex() {
 
     playerState.selectedTrackIndex = (playerState.selectedTrackIndex + 1) % playerState.playbackQueue.length;
 }
 
-function selectPreviousTrack() {
+function setPreviousTrackIndex() {
 
     playerState.selectedTrackIndex = (playerState.selectedTrackIndex - 1 + playerState.playbackQueue.length) % playerState.playbackQueue.length;
 }
