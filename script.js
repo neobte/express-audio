@@ -208,10 +208,10 @@ function setPlaylistState(response) {
     playerState.originalPlaylist = response.tracks;
 
     // Creamos un Mapper para ubicar los tracks más rapidamente por su ID
-    playerState.tracksMap = new Map(playerState.originalPlaylist.map(track => [track.trackId, track]));
+    playerState.tracksMap = new Map(playerState.originalPlaylist.map(track => [track.id, track]));
 
     // Creamos un Mapper para ubicar el índice del track más rapidamente por su ID
-    playerState.trackIndexMap = new Map(playerState.originalPlaylist.map((track, index) => [track.trackId, index]));
+    playerState.trackIndexMap = new Map(playerState.originalPlaylist.map((track, index) => [track.id, index]));
 
     playerState.playbackQueue = [...playerState.originalPlaylist];
 
@@ -388,7 +388,7 @@ function updateSelectedTrackUI(track) {
     }
 
     // Obtenemos el list item de la playlist
-    const selectedListItem = d.querySelector(`li[data-track-id="${track.trackId}"]`);
+    const selectedListItem = d.querySelector(`li[data-track-id="${track.id}"]`);
 
     // Agregamos la clase "is-selected"
     selectedListItem.classList.add("is-selected");
@@ -424,7 +424,7 @@ function updateTrackInfoUI(track) {
 // UI, X número de track de Y número total de tracks
 function updateTrackCounterUI(track) {
 
-    const originalIndex = playerState.trackIndexMap.get(track.trackId);
+    const originalIndex = playerState.trackIndexMap.get(track.id);
 
     trackCurrentIndex.textContent = playerState.originalPlaylist.length > 0 ? originalIndex + 1 : 0;
 
@@ -535,7 +535,7 @@ function renderPlaylist() {
         const li = d.createElement("li");
 
         // Creamos un dataset con el ID de cada track
-        li.dataset.trackId = track.trackId;
+        li.dataset.trackId = track.id;
 
         // Agregamos la clase "playlist-track" a cada list item
         li.classList.add("playlist-track");
@@ -570,8 +570,12 @@ function bindPlaylistEvents() {
         if (!li) return;
 
         if (li === currentListItem) {
-            // Ya sea por pause o play.
-            playerState.isPlaying ? pauseTrack() : playTrack();
+
+            if (playerState.isPlaying) {
+                pauseTrack();
+            } else {
+                playTrack();
+            }
 
             return;
         }
@@ -601,7 +605,7 @@ function bindPlaylistEvents() {
         playTrack();
 
         // Buscamos el índice del track
-        playerState.selectedTrackIndex = playerState.playbackQueue.findIndex(track => track.trackId === trackId);
+        playerState.selectedTrackIndex = playerState.playbackQueue.findIndex(track => track.id === trackId);
     });
 }
 
@@ -667,7 +671,7 @@ function disableShuffle() {
     playerState.playbackQueue = [...playerState.originalPlaylist];
 
     // Este es un Map creado con los índices originales
-    const originalIndex = playerState.trackIndexMap.get(currentTrack.trackId);
+    const originalIndex = playerState.trackIndexMap.get(currentTrack.id);
 
     playerState.selectedTrackIndex = originalIndex;
 }

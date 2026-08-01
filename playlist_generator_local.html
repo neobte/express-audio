@@ -74,7 +74,7 @@
 
                 audio.addEventListener("loadedmetadata", () => {
                     const result = {
-                        trackId: index + 1,
+                        id: index + 1,
                         artist: getArtist(file.name),
                         title: getTitle(file.name),
                         name: encodeURIComponent(file.name),
@@ -90,7 +90,7 @@
                 audio.addEventListener("error", () => {
                     URL.revokeObjectURL(url);
                     resolve({
-                        trackId: index + 1,
+                        id: index + 1,
                         name: encodeURIComponent(file.name),
                         error: true
                     });
