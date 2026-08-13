@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obtener duración de archivos de audio</title>
+</head>
+
+<body>
+
+    <div>
+        <label for="input-file">Seleccione archivos</label>
+        <input type="file" id="input-file" accept="aac,.flac,.mp3,.m4a,.mp4,.ogg,.wav,.webm" multiple>
+    </div>
+
+    <pre id="status"></pre>
+
+    <script>
+
+        'use strict';
+
+        const inputFile = document.getElementById("input-file");
+        const status = document.getElementById("status");
+
+        const audio = new Audio();
+        audio.preload = "metadata";
+
+        inputFile.addEventListener("change", async () => {
+            const numFiles = inputFile.files.length;
+            if (numFiles === 0) return;
+            inputFile.disabled = true;
+
+            status.textContent = "Procesando...";
+
+            const start = performance.now();
+            const fileList = inputFile.files;
+            const tracks = new Array(numFiles);
+
+            try {
+
+                for (let index = 0; index < numFiles; index++) {
+                    const file = fileList[index];
+                    const objectURL = URL.createObjectURL(file);
+                    try {
+                        tracks[index] = {
+                            id: index + 1,
+                            artist: getArtist(file.name),
+                            title: getTitle(file.name),
+                            name: encodeURIComponent(file.name),
+                            size: file.size,
+                            type: file.type,
+                            duration: await new Promise(resolve => {
+                                const onLoadedMetadata = () => { audio.removeEventListener("error", onError); resolve(Number.isFinite(audio.duration) ? audio.duration : null); };
+                                const onError = () => { audio.removeEventListener("loadedmetadata", onLoadedMetadata); resolve(null); };
+
+                                audio.addEventListener("loadedmetadata", onLoadedMetadata, { once: true });
+                                audio.addEventListener("error", onError, { once: true });
+                                audio.src = objectURL;
+                            })
+                        };
+                    } finally {
+                        audio.removeAttribute("src");
+                        audio.load();
+                        URL.revokeObjectURL(objectURL);
+                    }
+
+                    status.textContent = `Procesando ${index + 1}/${numFiles}`;
+                }
+
+                const jsonString = JSON.stringify({
+                    playlistId: 1,
+                    createdAt: new Date().toISOString(),
+                    total: tracks.length,
+                    tracks
+                }, null, 2);
+
+                const blob = new Blob([jsonString], { type: "application/json" });
+                const blobUrl = URL.createObjectURL(blob);
+
+                const a = document.createElement("a");
+                a.href = blobUrl;
+                a.download = "playlist.json";
+                a.click();
+
+                a.remove();
+                URL.revokeObjectURL(blobUrl);
+
+                const elapsed = (performance.now() - start) / 1000;
+                status.textContent = `JSON generado ✔\r\nTiempo total: ${elapsed.toFixed(2)} segundos`;
+
+            } finally {
+                inputFile.disabled = false;
+                inputFile.value = "";
+            }
+
+        });
+
+        // Utils
+        function getTitle(name) {
+            return name.slice(name.indexOf(" - ") + 3, name.lastIndexOf("."))
+        }
+
+        function getArtist(name) {
+            return name.slice(0, name.indexOf(" - "));
+        }
+
+    </script>
+</body>
+
+</html>

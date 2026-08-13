@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obtener duración de archivos de audio</title>
+</head>
+
+<body>
+
+    <div>
+        <label for="input-file">Seleccione archivos</label>
+        <input type="file" id="input-file" accept="aac,.flac,.mp3,.m4a,.mp4,.ogg,.wav,.webm" multiple>
+    </div>
+
+    <pre id="status"></pre>
+
+    <script>
+        "use strict";
+
+        /*
+         * ============================================================
+         * CONSTANTES
+         * ============================================================
+         */
+
+        const CONCURRENCY = 4;
+
+        /*
+         * ============================================================
+         * HANDLERS COMPARTIDOS
+         * ============================================================
+         *
+         * Estas funciones existen UNA SOLA VEZ.
+         *
+         * Todos los elementos Audio del pool reutilizan estas mismas
+         * referencias.
+         */
+
+        function handleLoadedMetadata(event) {
+            const audio = event.currentTarget;
+            const operation = operations.get(audio);
+
+            if (!operation) {
+                return;
+            }
+
+            const duration = audio.duration;
+
+            operation.resolve(Number.isFinite(duration) ? duration : null);
+        }
+
+        function handleError(event) {
+            const audio = event.currentTarget;
+            const operation = operations.get(audio);
+
+            if (!operation) {
+                return;
+            }
+
+            operation.resolve(null);
+        }
+
+        /*
+         * ============================================================
+         * POOL
+         * ============================================================
+         */
+
+        const operations = new WeakMap();
+
+        function createAudioPool(size) {
+            if (!Number.isInteger(size) || size <= 0) {
+                throw new RangeError("El tamaño del pool debe ser un entero mayor que cero.");
+            }
+
+            const available = new Array(size);
+            const owned = new WeakSet();
+            const inUse = new WeakSet();
+
+
+            /*
+             * --------------------------------------------------------
+             * Crear los Audio una sola vez
+             * --------------------------------------------------------
+             */
+
+            for (let index = 0; index < size; index++) {
+                const audio = new Audio();
+
+                audio.preload = "metadata";
+
+                audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+
+                audio.addEventListener("error", handleError);
+
+                owned.add(audio);
+
+                available[index] = audio;
+            }
+
+            /*
+             * --------------------------------------------------------
+             * acquire()
+             * --------------------------------------------------------
+             */
+
+            function acquire() {
+                const audio = available.pop();
+
+                if (audio === undefined) {
+                    return undefined;
+                }
+
+                inUse.add(audio);
+
+                return audio;
+            }
+
+            /*
+             * --------------------------------------------------------
+             * getMetadata()
+             * --------------------------------------------------------
+             */
+
+            function getMetadata(audio, file) {
+                return new Promise((resolve) => {
+                    const objectURL = URL.createObjectURL(file);
+
+                    operations.set(audio, { resolve, objectURL });
+
+                    audio.src = objectURL;
+                });
+            }
+
+            /*
+             * --------------------------------------------------------
+             * release()
+             * --------------------------------------------------------
+             */
+
+            function release(audio) {
+                if (!owned.has(audio)) {
+                    throw new TypeError("El Audio no pertenece a este pool.");
+                }
+
+                if (!inUse.has(audio)) {
+                    throw new Error("El Audio no está actualmente adquirido.");
+                }
+
+                const operation = operations.get(audio);
+
+                if (operation) {
+                    URL.revokeObjectURL(operation.objectURL);
+                    operations.delete(audio);
+                }
+
+                audio.removeAttribute("src");
+                audio.load();
+
+                inUse.delete(audio);
+                available.push(audio);
+            }
+
+            /*
+             * --------------------------------------------------------
+             * API pública del pool
+             * --------------------------------------------------------
+             */
+
+            return {
+                acquire,
+                getMetadata,
+                release
+            };
+        }
+
+        /*
+         * ============================================================
+         * PROCESAMIENTO
+         * ============================================================
+         */
+
+        async function processFiles(files, concurrency) {
+            const total = files.length;
+
+            if (total === 0) {
+                return [];
+            }
+
+            const workerCount = Math.min(concurrency, total);
+
+            const pool = createAudioPool(workerCount);
+
+            const results = new Array(total);
+
+            let nextIndex = 0;
+
+            /*
+             * --------------------------------------------------------
+             * Un único worker reutilizado.
+             *
+             * Lo invocamos varias veces, pero la función solamente
+             * se declara/crea una vez.
+             * --------------------------------------------------------
+             */
+
+            async function worker() {
+                while (true) {
+                    const index = nextIndex++;
+
+                    if (index >= total) {
+                        return;
+                    }
+
+                    const file = files[index];
+                    const audio = pool.acquire();
+
+                    if (audio === undefined) {
+                        throw new Error("El pool se quedó sin recursos disponibles.");
+                    }
+
+                    try {
+                        const duration = await pool.getMetadata(audio, file);
+
+                        results[index] = {
+                            id: index + 1,
+                            artist: getArtist(file.name),
+                            title: getTitle(file.name),
+                            name: encodeURIComponent(file.name),
+                            size: file.size,
+                            type: file.type,
+                            duration
+                        };
+
+                        // Debido a la concurrencia el contador puede no mostrar la cantidad real
+                        status.textContent = `Procesando ${index + 1}/${total}`;
+
+                    } finally {
+                        pool.release(audio);
+                    }
+                }
+            }
+
+            /*
+             * --------------------------------------------------------
+             * Ejecutar los workers concurrentemente.
+             * --------------------------------------------------------
+             */
+
+            const workers = new Array(workerCount);
+
+            for (let index = 0; index < workerCount; index++) {
+                workers[index] = worker();
+            }
+
+            await Promise.all(workers);
+
+            return results;
+        }
+
+        /*
+         * ============================================================
+         * UI
+         * ============================================================
+         */
+
+        const inputFile = document.getElementById("input-file");
+
+        const status = document.getElementById("status");
+
+        let processing = false;
+
+        inputFile.addEventListener("change", async () => {
+            if (processing) {
+                return;
+            }
+
+            const files = inputFile.files;
+
+            if (files.length === 0) {
+                return;
+            }
+
+            status.textContent = "Procesando...";
+
+            processing = true;
+            inputFile.disabled = true;
+
+            const start = performance.now();
+
+            try {
+                const tracks = await processFiles(files, CONCURRENCY);
+
+                const jsonString = JSON.stringify({
+                    playlistId: 1,
+                    createdAt: new Date().toISOString(),
+                    total: tracks.length,
+                    tracks
+                }, null, 2);
+
+                const blob = new Blob([jsonString], { type: "application/json" });
+                const blobUrl = URL.createObjectURL(blob);
+
+                const a = document.createElement("a");
+                a.href = blobUrl;
+                a.download = "playlist.json";
+                a.click();
+
+                a.remove();
+                URL.revokeObjectURL(blobUrl);
+
+                const elapsed = (performance.now() - start) / 1000;
+
+                status.textContent = `JSON generado ✔\r\nTiempo total: ${elapsed.toFixed(2)} segundos`;
+
+            } catch (error) {
+
+                status.textContent = `Error: ${error.message}`;
+
+            } finally {
+                processing = false;
+                inputFile.disabled = false;
+                inputFile.value = "";
+            }
+        });
+
+        // Utils
+        function getTitle(name) {
+            return name.slice(name.indexOf(" - ") + 3, name.lastIndexOf("."))
+        }
+
+        function getArtist(name) {
+            return name.slice(0, name.indexOf(" - "));
+        }
+
+    </script>
+
+</body>
+
+</html>
