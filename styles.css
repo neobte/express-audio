@@ -143,7 +143,7 @@ body {
 }
 
 .playlist-track:hover {
-    background-color: var(--hover);
+    /* background-color: var(--hover); */
 }
 
 .playlist-track__info {

@@ -868,9 +868,9 @@ function loadSelectedTrack() {
 
 // Util functions
 
-const scrollIntoView = item => {
+const scrollIntoView = element => {
 
-    item.scrollIntoView({ behavior: "smooth", block: "center" });
+    element.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
 }
 
 // Request to server

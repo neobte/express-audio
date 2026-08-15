@@ -25,7 +25,7 @@
          * ============================================================
          */
 
-        const CONCURRENCY = 4;
+        const CONCURRENCY = 16;
 
         /*
          * ============================================================
@@ -333,6 +333,17 @@
 
         function getArtist(name) {
             return name.slice(0, name.indexOf(" - "));
+        }
+
+        function localDateTime() {
+            const d = new Date();
+            const z = n => (n < 10 ? '0' : '') + n;
+            return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}:${z(d.getSeconds())}`;
+        }
+
+        function getLocalDateTime(isoDate) {
+            const d = new Date(isoDate);
+            return `${d.getFullYear()}-${(d.getMonth() + 1) < 10 ? "0" + (d.getMonth() + 1) : (d.getMonth() + 1)}-${d.getDate() < 10 ? "0" + d.getDate() : d.getDate()} ${d.getHours() < 10 ? "0" + d.getHours() : d.getHours()}:${d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes()}:${d.getSeconds() < 10 ? "0" + d.getSeconds() : d.getSeconds()}`;
         }
 
     </script>
