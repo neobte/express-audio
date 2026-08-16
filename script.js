@@ -967,17 +967,57 @@ const parseName = name => {
 }
 
 function getPlaylistDuration() {
-    // return getTotalDuration(playerState.playbackQueue);
-    const totalDuration = getTotalDuration(playerState.playbackQueue);
-    console.log(`Tiempo de duración de la playlist: ${formatTime(totalDuration, 1)}`)
+
+    const infoPlaylist = getInfoPlaylist(playerState.playbackQueue);
+    console.log(`Tiempo de duración de la playlist: ${formatTime(infoPlaylist.totalDuration, 1)}`);
+    console.log("Número de canciones: " + infoPlaylist.tracks);
+    console.log("Tamaños de la playlist: " + JSON.stringify(getSizeInUnits(infoPlaylist.totalSize), null, 2));
 }
 
-function getTotalDuration(tracks) {
-    let total = 0;
+function getInfoPlaylist(tracks) {
+    let totalDuration = 0;
+    let totalSize = 0;
     const len = tracks.length;
     for (let i = 0; i < len; i++) {
-        total += tracks[i].duration;
+        totalDuration += tracks[i].duration;
+        totalSize += tracks[i].size;
     }
 
-    return total;
+    return { totalDuration, totalSize, tracks: len };
+}
+
+function getSizeInUnits(bytes) {
+    /**
+     * https://www.bipm.org/en/measurement-units/si-prefixes
+     * 
+     * 10^0  = 1 B
+     * 10^3  = 1000 B
+     * 10^6  = 1000000 B
+     * 10^9  = 1000000000 B
+     * 10^10 = 10000000000 B
+     * ...
+     * 10^30 = ... B
+     * 
+     * 10³=1000 => base = 10; exponente = 3; potencia 1000
+     * log 10 (1000) = 3
+     */
+
+    // const units = ["B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "RB", "QB"];
+    const units = ["B", "kB", "MB", "GB", "TB"];
+
+    const result = {};
+
+    const exponent = Math.min(Math.floor(Math.log10(bytes) / 3), units.length - 1);
+    console.log("Unidad apropiada para mostrar resultado: " + units[exponent]);
+
+    let value = bytes;
+
+    for (let i = 0; i < units.length; i++) {
+
+        // result[units[i]] = bytes / (10 ** (3 * i));
+        result[units[i]] = value;
+        value /= 1000;
+    }
+
+    return result;
 }
