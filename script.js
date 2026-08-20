@@ -870,7 +870,7 @@ function loadSelectedTrack() {
 
 const scrollIntoView = element => {
 
-    element.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+    element.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 // Request to server
@@ -991,10 +991,10 @@ function getSizeInUnits(bytes) {
      * https://www.bipm.org/en/measurement-units/si-prefixes
      * 
      * 10^0  = 1 B
-     * 10^3  = 1000 B
-     * 10^6  = 1000000 B
-     * 10^9  = 1000000000 B
-     * 10^10 = 10000000000 B
+     * 10^3  = 1_000 B
+     * 10^6  = 1_000_000 B
+     * 10^9  = 1_000_000_000 B
+     * 10^12 = 1_000_000_000_000 B
      * ...
      * 10^30 = ... B
      * 
