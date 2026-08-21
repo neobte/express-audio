@@ -165,8 +165,14 @@ function bindPlaylistOptionsEvents() {
             return;
         }
 
+        if (currentPlaylist && currentPlaylist !== li) {
+            currentPlaylist.classList.remove("active");
+        }
+
         // Asignamos la referencia a la variable currentPlaylist
         currentPlaylist = li;
+
+        li.classList.add("active");
 
         playlistName = li.dataset.playlist;
 

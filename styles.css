@@ -74,6 +74,46 @@ body {
 
 /* Fin track progress */
 
+/*  */
+.playlist-select-container {
+    user-select: none;
+}
+
+#playlist-options {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 0;
+    margin: 0;
+}
+
+#playlist-options li {
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+}
+
+/* Separador */
+#playlist-options li:not(:last-child)::after {
+    content: "·";
+    margin: 0 12px;
+    color: var(--accent);
+}
+
+/* Al pasar el mouse */
+/* #playlist-options li:hover {
+    color: var(--accent);
+} */
+
+/* Playlist seleccionada */
+#playlist-options li.active {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/*  */
+
 /* Playlist */
 .playlist-container {
     height: 280px;
