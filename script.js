@@ -876,7 +876,7 @@ function loadSelectedTrack() {
 
 const scrollIntoView = element => {
 
-    element.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    element.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 // Request to server

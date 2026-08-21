@@ -110,7 +110,6 @@ body {
 /* Playlist seleccionada */
 #playlist-options li.active {
     color: var(--accent);
-    font-weight: 600;
 }
 
 /*  */
