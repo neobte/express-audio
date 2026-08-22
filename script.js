@@ -874,9 +874,22 @@ function loadSelectedTrack() {
 
 // Util functions
 
-const scrollIntoView = element => {
+const playlistContainer = d.querySelector(".playlist-container");
+const containerRect = playlistContainer.getBoundingClientRect();
+const containerCenter = containerRect.top + containerRect.height / 2;
 
-    element.scrollIntoView({ behavior: "smooth", block: "center" });
+const scrollIntoView = item => {
+
+    const itemRect = item.getBoundingClientRect();
+
+    const itemCenter = itemRect.top + itemRect.height / 2;
+
+    playlistContainer.scrollTo({
+        top: playlistContainer.scrollTop + (itemCenter - containerCenter),
+        behavior: 'smooth'
+    });
+
+    // element.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 // Request to server
