@@ -96,16 +96,16 @@ body {
 
 /* Separador */
 #playlist-options li:not(:last-child)::after {
-    content: "·";
+    content: "•";
     margin: 0 12px;
     color: var(--text-secondary);
     font-weight: 600;
 }
 
 /* Al pasar el mouse */
-/* #playlist-options li:hover {
-    color: var(--accent);
-} */
+#playlist-options li:hover {
+    color: var(--text-secondary);
+}
 
 /* Playlist seleccionada */
 #playlist-options li.active {
