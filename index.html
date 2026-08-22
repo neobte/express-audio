@@ -24,17 +24,17 @@
             flex-wrap: wrap;
             align-items: center;
             justify-content: center;
-            gap: .5rem;
+            gap: .25rem;
         }
 
         .playlist-btn {
             appearance: none;
             display: inline-flex;
             align-items: center;
-            gap: .5rem;
+            gap: .25rem;
 
             min-height: 2.5rem;
-            padding: 0.5rem 0.75rem;
+            padding: .5rem;
 
             border: 0;
             border-radius: 0.25rem;
@@ -43,7 +43,8 @@
             color: var(--text-primary);
 
             font: inherit;
-            font-weight: 600;
+            /* font-weight: 600; */
+            font-size: 1rem;
             line-height: 1.2;
 
             cursor: pointer;
@@ -66,15 +67,15 @@
 
         <div class="playlists" role="group" aria-label="Seleccionar playlist">
 
-            <button class="playlist-btn" type="button" aria-pressed="false" data-playlist="my_playlist">
+            <button class="playlist-btn" type="button" data-playlist="my_playlist">
                 <span aria-hidden="true">🤷‍♂️</span>
                 <span>Julify</span>
             </button>
-            <button class="playlist-btn" type="button" aria-pressed="false" data-playlist="rock">
+            <button class="playlist-btn" type="button" data-playlist="rock">
                 <span aria-hidden="true">🎸</span>
                 <span>Rock</span>
             </button>
-            <button class="playlist-btn" type="button" aria-pressed="false" data-playlist="salsa_romantica">
+            <button class="playlist-btn" type="button" data-playlist="salsa_romantica">
                 <span aria-hidden="true">🕺</span>
                 <span>Salsa romántica</span>
             </button>

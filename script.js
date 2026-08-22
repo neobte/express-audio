@@ -166,14 +166,14 @@ function bindPlaylistOptionsEvents() {
         }
 
         if (currentPlaylist && currentPlaylist !== playlist) {
-            currentPlaylist.setAttribute("aria-pressed", "false");
+            // currentPlaylist.setAttribute("aria-pressed", "false");
             currentPlaylist.classList.remove("active");
         }
 
         // Asignamos la referencia a la variable currentPlaylist
         currentPlaylist = playlist;
 
-        playlist.setAttribute("aria-pressed", "true");
+        // playlist.setAttribute("aria-pressed", "true");
         playlist.classList.add("active");
 
         playlistName = playlist.dataset.playlist;
