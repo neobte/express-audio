@@ -52,7 +52,7 @@ playingIcon.src = 'images/bars.svg';
 playingIcon.alt = 'Playing';
 playingIcon.classList.add('playing-icon');
 
-const playlistOptions = d.getElementById("playlist-options");
+const playlists = d.querySelector(".playlists");
 
 // Objeto audio
 const audioElement = new Audio();
@@ -155,26 +155,28 @@ function syncPlayerUI() {
 
 function bindPlaylistOptionsEvents() {
 
-    playlistOptions.addEventListener("click", (e) => {
+    playlists.addEventListener("click", (e) => {
 
-        const li = e.target.closest("li");
+        const playlist = e.target.closest(".playlist-btn");
 
-        if (!li) return;
+        if (!playlist) return;
 
-        if (li === currentPlaylist) {
+        if (playlist === currentPlaylist) {
             return;
         }
 
-        if (currentPlaylist && currentPlaylist !== li) {
+        if (currentPlaylist && currentPlaylist !== playlist) {
+            currentPlaylist.setAttribute("aria-pressed", "false");
             currentPlaylist.classList.remove("active");
         }
 
         // Asignamos la referencia a la variable currentPlaylist
-        currentPlaylist = li;
+        currentPlaylist = playlist;
 
-        li.classList.add("active");
+        playlist.setAttribute("aria-pressed", "true");
+        playlist.classList.add("active");
 
-        playlistName = li.dataset.playlist;
+        playlistName = playlist.dataset.playlist;
 
         const request_url = BASE_URL + playlistName + "/playlist.json";
 

@@ -18,12 +18,69 @@
 
 <body>
 
-    <div class="playlist-select-container">
-        <ul id="playlist-options">
-            <li data-playlist="my_playlist">🤷‍♂️ Julify</li>
-            <li data-playlist="rock">🎸 Rock</li>
-            <li data-playlist="salsa_romantica">🕺 Salsa Romántica</li>
-        </ul>
+    <style>
+        .playlists {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+        }
+
+        .playlist-btn {
+            appearance: none;
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+
+            min-height: 2.5rem;
+            padding: 0.5rem 0.75rem;
+
+            border: 0;
+            border-radius: 0.25rem;
+
+            background: transparent;
+            color: var(--text-primary);
+
+            font: inherit;
+            font-weight: 600;
+            line-height: 1.2;
+
+            cursor: pointer;
+            user-select: none;
+
+            transition: background-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+        }
+
+        .playlist-btn:hover {
+            background-color: var(--hover);
+        }
+
+        .playlist-btn.active {
+            background-color: rgba(139, 92, 246, .16);
+            /* color: var(--accent); */
+        }
+    </style>
+
+    <div class="container" style="border: none;">
+
+        <div class="playlists" role="group" aria-label="Seleccionar playlist">
+
+            <button class="playlist-btn" type="button" aria-pressed="false" data-playlist="my_playlist">
+                <span aria-hidden="true">🤷‍♂️</span>
+                <span>Julify</span>
+            </button>
+            <button class="playlist-btn" type="button" aria-pressed="false" data-playlist="rock">
+                <span aria-hidden="true">🎸</span>
+                <span>Rock</span>
+            </button>
+            <button class="playlist-btn" type="button" aria-pressed="false" data-playlist="salsa_romantica">
+                <span aria-hidden="true">🕺</span>
+                <span>Salsa romántica</span>
+            </button>
+
+        </div>
+
     </div>
 
     <main class="container">
