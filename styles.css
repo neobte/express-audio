@@ -75,10 +75,52 @@ body {
 
 /* Fin track progress */
 
-/*  */
+/* Playlist options */
+.playlists {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: 1rem 0;
+}
 
+.playlist-btn {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
 
-/*  */
+    min-height: 2.5rem;
+    padding: .5rem .75rem;
+
+    border: 0;
+    border-radius: .25rem;
+
+    background: transparent;
+    color: var(--text-primary);
+
+    font: inherit;
+    /* font-weight: 600; */
+    font-size: 1rem;
+    line-height: 1.2;
+
+    cursor: pointer;
+    user-select: none;
+
+    transition: all .2s ease;
+}
+
+.playlist-btn:hover {
+    background-color: var(--hover);
+}
+
+.playlist-btn.active {
+    /* background-color: rgba(139, 92, 246, .16); */
+    background-color: var(--surface);
+    /* color: var(--text-tertiary); */
+}
+
+/* Fin playlists options */
 
 /* Playlist */
 .playlist-container {
