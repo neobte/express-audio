@@ -166,7 +166,9 @@ body {
 
 .playlist-track.is-selected {
     color: var(--accent);
-    background-color: rgba(139, 92, 246, .16);
+    /* background-color: rgba(139, 92, 246, .16); */
+    /* background-color: #180e30; */
+    background-color: #281d44;
 }
 
 .playlist-track.is-playing .track-number {
