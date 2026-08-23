@@ -5,10 +5,10 @@
     /* TEXT */
     --text-primary: #E8E8E8;
     --text-secondary: #AFAFAF;
-    --text-tertiary: rgb(40, 29, 68);
-    /* --accent: rgb(139, 92, 246); */
-    --accent: rgb(255, 128, 144);
-    --slider: rgba(139, 92, 246, 1);
+    --text-tertiary: rgba(139, 92, 246, 1);
+    --surface: rgb(40, 29, 68);
+    /* --test: rgb(255, 128, 144); */
+    --slider: var(--text-tertiary);
 
     --hover: #202020;
     --selected: #2C2C2C;
@@ -166,9 +166,9 @@ body {
 }
 
 .playlist-track.is-selected {
-    color: var(--accent);
     /* background-color: rgba(139, 92, 246, .16); */
-    background-color: var(--text-tertiary);
+    color: var(--text-tertiary);
+    background-color: var(--surface);
 }
 
 .playlist-track.is-playing .track-number {
@@ -343,8 +343,7 @@ body {
 
 #repeat-btn.active,
 #shuffle-btn.active {
-    color: var(--accent);
-    color: var(--slider);
+    color: var(--text-tertiary);
 }
 
 #volume-btn {
