@@ -25,6 +25,7 @@
             align-items: center;
             justify-content: center;
             gap: .5rem;
+            padding: .5rem;
         }
 
         .playlist-btn {
@@ -62,24 +63,20 @@
         }
     </style>
 
-    <div class="container" style="border: none;">
+    <div class="playlists" role="group" aria-label="Seleccionar playlist">
 
-        <div class="playlists" role="group" aria-label="Seleccionar playlist">
-
-            <button class="playlist-btn" type="button" data-playlist="my_playlist">
-                <!-- <span aria-hidden="true">🤷‍♂️</span> -->
-                <span>Julify</span>
-            </button>
-            <button class="playlist-btn" type="button" data-playlist="rock">
-                <!-- <span aria-hidden="true">🎸</span> -->
-                <span>Rock</span>
-            </button>
-            <button class="playlist-btn" type="button" data-playlist="salsa_romantica">
-                <!-- <span aria-hidden="true">🕺</span> -->
-                <span>Salsa romántica</span>
-            </button>
-
-        </div>
+        <button class="playlist-btn" type="button" data-playlist="my_playlist">
+            <!-- <span aria-hidden="true">🤷‍♂️</span> -->
+            <span>Julify</span>
+        </button>
+        <button class="playlist-btn" type="button" data-playlist="rock">
+            <!-- <span aria-hidden="true">🎸</span> -->
+            <span>Rock</span>
+        </button>
+        <button class="playlist-btn" type="button" data-playlist="salsa_romantica">
+            <!-- <span aria-hidden="true">🕺</span> -->
+            <span>Salsa romántica</span>
+        </button>
 
     </div>
 
