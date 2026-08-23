@@ -344,6 +344,7 @@ body {
 #repeat-btn.active,
 #shuffle-btn.active {
     color: var(--accent);
+    color: var(--slider);
 }
 
 #volume-btn {
