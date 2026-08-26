@@ -379,14 +379,22 @@ body {
     transition: all .2s ease;
 }
 
-.btn:hover {
-    background-color: var(--hover);
+@media (hover:hover) and (pointer: fine) {
+    .btn:hover {
+        background-color: var(--hover);
+    }
+}
+
+.btn:active {
+    background-color: rgb(56, 56, 56);
 }
 
 .btn svg {
     /* Esto hará que el icono escale en función del font-size del button */
     width: 1.5em;
     height: auto;
+    /* Hereda los estilos del padre */
+    fill: currentColor;
 }
 
 #play-pause-btn {
