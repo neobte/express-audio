@@ -149,7 +149,9 @@ body {
 
 #playlist {
     width: 100%;
-    list-style-type: none;
+    list-style: none;
+    padding-left: 0;
+    user-select: none;
 }
 
 /* Fin playlist */
@@ -161,8 +163,8 @@ body {
     padding: .5rem 0;
     align-items: center;
     cursor: pointer;
-    user-select: none;
     border-radius: .25rem;
+    /* transition: background-color 0.2s ease, color 0.2s ease; */
 }
 
 .playlist-track__title {
@@ -191,7 +193,13 @@ body {
 }
 
 .playlist-track:hover {
+    /* No utilizamos el estado hover por el desplazamiento del scroll */
     /* background-color: var(--hover); */
+}
+
+.playlist-track:active {
+    /* Si tiene hover, podemos utilizar el estado active */
+    /* background-color: rgb(56, 56, 56); */
 }
 
 .playlist-track__info {
@@ -211,6 +219,10 @@ body {
     /* background-color: rgba(139, 92, 246, .16); */
     color: var(--text-tertiary);
     background-color: var(--surface);
+}
+
+.playlist-track.is-selected:active {
+    background-color: rgb(64, 43, 92);
 }
 
 .playlist-track.is-playing .track-number {
