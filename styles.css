@@ -222,8 +222,7 @@ body {
 }
 
 .playlist-track.is-selected:hover {
-    color: var(--text-tertiary);
-    background-color: hsl(257, 40%, 23%);
+    /* background-color: hsl(257, 40%, 23%); */
 }
 
 .playlist-track.is-selected:active {
