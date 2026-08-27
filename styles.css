@@ -1,16 +1,21 @@
 :root {
     /* TEXT */
-    --text-primary: hsl(0, 0%, 91%);
+    /* --text-primary: hsl(0, 0%, 91%); */
+    --text-primary: hsl(259, 100%, 76%);
     --text-secondary: hsl(0, 0%, 69%);
     --text-tertiary: hsl(258, 90%, 66%);
+
+    --bg: hsl(253, 31%, 6%);
 
     --surface: hsl(257, 40%, 19%);
     --slider: var(--text-tertiary);
 
-    --body-bg: hsl(0, 0%, 7%);
+    /* --body-bg: hsl(0, 0%, 7%); */
+    --body-bg: var(--bg);
     --body-color: var(--text-primary);
 
-    --hover: hsl(0, 0%, 13%);
+    /* --hover: hsl(0, 0%, 13%); */
+    --hover: var(--surface);
     --selected: hsl(0, 0%, 17%);
 }
 
@@ -25,6 +30,8 @@ body {
     background: var(--body-bg);
     color: var(--body-color);
     padding: 1rem;
+
+    font-size: 120%;
 }
 
 .container {
@@ -45,7 +52,7 @@ body {
 
 .now-playing #track-title {
     font-size: 1rem;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .now-playing #track-artist {
@@ -210,11 +217,6 @@ body {
     /* background-color: var(--hover); */
 }
 
-.playlist-track:active {
-    /* Si tiene hover, podemos utilizar el estado active */
-    /* background-color: rgb(56, 56, 56); */
-}
-
 .playlist-track.is-selected {
     color: var(--text-tertiary);
     /* surface = hsl(257, 40%, 19%) */
@@ -225,7 +227,8 @@ body {
     /* background-color: hsl(257, 40%, 23%); */
 }
 
-.playlist-track.is-selected:active {
+.playlist-track.is-selected:active,
+.playlist-track:active {
     background-color: hsl(257, 40%, 27%);
 }
 
@@ -252,7 +255,7 @@ body {
     min-width: 48px;
     font-size: .875rem;
     text-align: center;
-    color: var(--text-secondary);
+    /* color: var(--text-secondary); */
 }
 
 /* Fin de current time */
@@ -279,7 +282,7 @@ body {
     min-width: 44px;
     text-align: center;
     font-size: .875rem;
-    color: var(--text-secondary);
+    /* color: var(--text-secondary); */
     font-variant-numeric: tabular-nums;
 }
 
@@ -390,7 +393,8 @@ body {
 }
 
 .btn:active {
-    background-color: hsl(0, 3%, 25%);
+    /* background-color: hsl(0, 3%, 25%); */
+    background-color: hsl(257, 40%, 27%);
 }
 
 .btn svg {
@@ -414,7 +418,7 @@ body {
 
 #volume-btn {
     font-size: .875rem;
-    color: var(--text-secondary);
+    /* color: var(--text-secondary); */
 }
 
 /* Fin estilos de botones */
