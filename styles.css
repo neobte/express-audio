@@ -223,11 +223,11 @@ body {
 
 .playlist-track.is-selected:hover {
     color: var(--text-tertiary);
-    background-color: hsl(257, 38%, 10%);
+    background-color: hsl(257, 40%, 23%);
 }
 
 .playlist-track.is-selected:active {
-    background-color: hsl(257, 33%, 22%);
+    background-color: hsl(257, 40%, 27%);
 }
 
 .playlist-track.is-playing .track-number {
