@@ -1,9 +1,9 @@
 :root {
     /* TEXT */
     --text-primary: hsl(0, 0%, 91%);
-    /* --text-primary: hsl(259, 100%, 76%); */
     --text-secondary: hsl(0, 0%, 69%);
-    --text-tertiary: hsl(258, 90%, 66%);
+    /* --text-tertiary: hsl(258, 90%, 66%); */
+    --text-tertiary: hsl(259, 100%, 76%);
 
     --bg: hsl(253, 31%, 6%);
 
@@ -219,6 +219,7 @@ body {
 
 .playlist-track.is-selected {
     color: var(--text-tertiary);
+    font-weight: 600;
     /* surface = hsl(257, 40%, 19%) */
     background-color: var(--surface);
 }
