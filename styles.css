@@ -1,17 +1,17 @@
 :root {
-    /* BACKGROUND */
-    --bg: #121212;
-
     /* TEXT */
-    --text-primary: #E8E8E8;
-    --text-secondary: #AFAFAF;
-    --text-tertiary: rgba(139, 92, 246, 1);
-    --surface: rgb(40, 29, 68);
-    /* --test: rgb(255, 128, 144); */
+    --text-primary: hsl(0, 0%, 91%);
+    --text-secondary: hsl(0, 0%, 69%);
+    --text-tertiary: hsl(258, 90%, 66%);
+
+    --surface: hsl(257, 40%, 19%);
     --slider: var(--text-tertiary);
 
-    --hover: #202020;
-    --selected: #2C2C2C;
+    --body-bg: hsl(0, 0%, 7%);
+    --body-color: var(--text-primary);
+
+    --hover: hsl(0, 0%, 13%);
+    --selected: hsl(0, 0%, 17%);
 }
 
 * {
@@ -22,8 +22,8 @@
 }
 
 body {
-    background: var(--bg);
-    color: var(--text-primary);
+    background: var(--body-bg);
+    color: var(--body-color);
     padding: 1rem;
 }
 
@@ -192,16 +192,6 @@ body {
     font-variant-numeric: tabular-nums;
 }
 
-.playlist-track:hover {
-    /* No utilizamos el estado hover por el desplazamiento del scroll */
-    /* background-color: var(--hover); */
-}
-
-.playlist-track:active {
-    /* Si tiene hover, podemos utilizar el estado active */
-    /* background-color: rgb(56, 56, 56); */
-}
-
 .playlist-track__info {
     min-width: 0;
 }
@@ -215,14 +205,29 @@ body {
     text-overflow: ellipsis;
 }
 
+.playlist-track:hover {
+    /* No utilizamos el estado hover por el desplazamiento del scroll */
+    /* background-color: var(--hover); */
+}
+
+.playlist-track:active {
+    /* Si tiene hover, podemos utilizar el estado active */
+    /* background-color: rgb(56, 56, 56); */
+}
+
 .playlist-track.is-selected {
-    /* background-color: rgba(139, 92, 246, .16); */
     color: var(--text-tertiary);
+    /* surface = hsl(257, 40%, 19%) */
     background-color: var(--surface);
 }
 
+.playlist-track.is-selected:hover {
+    color: var(--text-tertiary);
+    background-color: hsl(257, 38%, 10%);
+}
+
 .playlist-track.is-selected:active {
-    background-color: rgb(64, 43, 92);
+    background-color: hsl(257, 33%, 22%);
 }
 
 .playlist-track.is-playing .track-number {
@@ -386,7 +391,7 @@ body {
 }
 
 .btn:active {
-    background-color: rgb(56, 56, 56);
+    background-color: hsl(0, 3%, 25%);
 }
 
 .btn svg {
