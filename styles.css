@@ -30,8 +30,6 @@ body {
     background: var(--body-bg);
     color: var(--body-color);
     padding: 1rem;
-
-    font-size: 120%;
 }
 
 .container {
@@ -214,8 +212,9 @@ body {
 
 .playlist-track:hover {
     /* No utilizamos el estado hover por el desplazamiento del scroll */
-    /* background-color: var(--hover); */
 }
+
+.playlist-track:active {}
 
 .playlist-track.is-selected {
     color: var(--text-tertiary);
@@ -227,8 +226,7 @@ body {
     /* background-color: hsl(257, 40%, 23%); */
 }
 
-.playlist-track.is-selected:active,
-.playlist-track:active {
+.playlist-track.is-selected:active {
     background-color: hsl(257, 40%, 27%);
 }
 
