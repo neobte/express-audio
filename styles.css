@@ -219,7 +219,6 @@ body {
 
 .playlist-track.is-selected {
     color: var(--text-tertiary);
-    font-weight: 600;
     /* surface = hsl(257, 40%, 19%) */
     background-color: var(--surface);
 }
