@@ -527,7 +527,7 @@ function updateRepeatButtonUI() {
 function renderPlaylist() {
 
     // Limpiamos todo lo que tiene el elemento playlist anteriormente
-    playlist.innerHTML = '';
+    playlist.replaceChildren();
 
     // Creamos un fragmento para no esta haciendo appendchild en cada iteración del bucle
     const fragment = d.createDocumentFragment();

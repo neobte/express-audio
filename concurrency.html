@@ -225,13 +225,14 @@
                         const duration = await pool.getMetadata(audio, file);
 
                         results[index] = {
-                            id: index + 1,
+                            id: `track_${String(index + 1).padStart(3, '0')}`,
                             artist: getArtist(file.name),
                             title: getTitle(file.name),
-                            name: encodeURIComponent(file.name),
-                            size: file.size,
-                            type: file.type,
-                            duration
+                            album: "",
+                            audioUrl: encodeURIComponent(file.name),
+                            sizeBytes: file.size,
+                            mimeType: file.type,
+                            durationSeconds: duration
                         };
 
                         // Debido a la concurrencia el contador puede no mostrar la cantidad real
@@ -294,9 +295,13 @@
                 const tracks = await processFiles(files, CONCURRENCY);
 
                 const jsonString = JSON.stringify({
-                    playlistId: 1,
+                    id: "playlist_001",
+                    title: "En espera...",
+                    description: "En espera...",
+                    coverUrl: "./assets/covers/night-drive.jpg",
                     createdAt: new Date().toISOString(),
-                    total: tracks.length,
+                    // updatedAt: new Date().toISOString(),
+                    totalTracks: tracks.length,
                     tracks
                 }, null, 2);
 
