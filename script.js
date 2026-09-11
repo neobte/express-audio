@@ -61,7 +61,7 @@ const audioElement = new Audio();
 const PREVIOUS_TRACK_THRESHOLD = 3;
 
 // Volumen por defecto
-const DEFAULT_VOLUME = 33;
+const DEFAULT_VOLUME = 67;
 
 // Volumen por defecto a restaurar cuando el slider sea 0
 const RESTORE_DEFAULT_VOLUME = 50;
@@ -558,7 +558,7 @@ function renderPlaylist() {
                         <p class="playlist-track__artist">${track.artist}</p>
                     </div>
                     <div class="playlist-track__duration">
-                        <span>${formatDuration(track.duration)}</span>
+                        <span>${formatDuration(track.durationSeconds)}</span>
                     </div>
                 `;
         // Por cada iteración agregamos un list item al fragmento
@@ -694,8 +694,10 @@ function loadTrack(track) {
 
     audioElement.currentTime = 0;
 
+    console.log(track);
+
     // Construimos el audio source
-    const src = `${BASE_URL}${playlistName}/${track.name}`;
+    const src = `${BASE_URL}${playlistName}/${track.audioUrl}`;
 
     // Llamamos a la función que se encarga de setear el source
     setAudioSource(src);
@@ -1011,7 +1013,7 @@ function getPlaylistTotalDuration(tracks) {
     let totalDuration = 0;
     const len = tracks.length;
     for (let i = 0; i < len; i++) {
-        totalDuration += tracks[i].duration;
+        totalDuration += tracks[i].durationSeconds;
     }
     return totalDuration;
 }
@@ -1021,7 +1023,7 @@ function getPlaylistTotalSize(tracks) {
     let totalSize = 0;
     const len = tracks.length;
     for (let i = 0; i < len; i++) {
-        totalSize += tracks[i].size;
+        totalSize += tracks[i].sizeBytes;
     }
     return totalSize;
 }
@@ -1062,7 +1064,9 @@ function getSizeInUnits(bytes) {
 
         // result[units[i]] = bytes / (10 ** (3 * i));
         result[units[i]] = value;
-        value /= 1000; // Puede diferir con el almacenamiento que muestra Windows. Windows utiliza 1024
+        // Puede diferir con el tamaño que muestra Windows. Windows utiliza la base 2. 2^10 = 1024. Aquí estamos
+        // utilizando la base 10. 10^3 = 1000.
+        value /= 1000;
     }
 
     return result;
