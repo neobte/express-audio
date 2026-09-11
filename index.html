@@ -38,16 +38,14 @@
     <main class="container">
 
         <div class="now-playing">
-            <h3 id="track-title">Nada esta sonando...</h3>
+            <h3 id="track-title">Nada esta sonando</h3>
             <p id="track-artist"></p>
         </div>
 
-        <div class="track-progress-container">
-            <div class="track-progress">
-                <span id="track-current-index">-</span>
-                /
-                <span id="tracks-total">-</span>
-            </div>
+        <div class="track-progress" aria-live="polite">
+            <span id="track-current-index">-</span>
+            <span aria-hidden="true">&nbsp;/&nbsp;</span>
+            <span id="tracks-total">-</span>
         </div>
 
         <div class="playlist-container">

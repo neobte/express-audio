@@ -203,8 +203,8 @@ function handleLoadPlaylist(response) {
         enableShuffle();
     }
 
-    // Mostramos en consola la duración de la playlist
-    getPlaylistDuration();
+    // Mostramos en consola información de la playlist
+    getPlaylistStats(playerState.playbackQueue);
 
     // Obtenemos el track y lo cargamos
     loadSelectedTrack();
@@ -338,7 +338,7 @@ audioElement.addEventListener("loadedmetadata", () => {
     currentTimeSlider.max = audioElement.duration;
 
     // UI
-    trackDuration.textContent = formatTime(audioElement.duration);
+    trackDuration.textContent = formatDuration(audioElement.duration);
 });
 
 // Evento timeupdate
@@ -349,7 +349,7 @@ audioElement.addEventListener("timeupdate", () => {
     currentTimeSlider.value = audioElement.currentTime;
 
     // UI
-    trackCurrentTime.textContent = formatTime(audioElement.currentTime);
+    trackCurrentTime.textContent = formatDuration(audioElement.currentTime);
 });
 
 // Evento input del Slider de tiempo
@@ -558,7 +558,7 @@ function renderPlaylist() {
                         <p class="playlist-track__artist">${track.artist}</p>
                     </div>
                     <div class="playlist-track__duration">
-                        <span>${formatTime(track.duration)}</span>
+                        <span>${formatDuration(track.duration)}</span>
                     </div>
                 `;
         // Por cada iteración agregamos un list item al fragmento
@@ -931,28 +931,47 @@ const sendFetchHttpRequest = async (url, callback, method = "GET", data = {}) =>
     }
 }
 
-const formatTime = (seconds, format = 0) => {
-
-    if (!Number.isFinite(seconds) || seconds <= 0) return "0:00";
-
-    // Int mod Int = Int
-    const h = Math.floor(seconds / 3600); // hours calculation
-
-    const min = Math.floor(seconds / 60) % 60; // min calculation
-
-    const s = Math.floor(seconds) % 60; // Whole seconds
-
-    if (format === 0) {
-        return h > 0
-            ? `${/*h < 10 ? "0" + h : */h}:${min < 10 ? "0" + min : min}:${s < 10 ? "0" + s : s}`
-            : `${/*min < 10 ? "0" + min : */min}:${s < 10 ? "0" + s : s}`;
+function getDurationParts(totalSeconds) {
+    if (!Number.isFinite(totalSeconds) || totalSeconds < 0) {
+        throw new TypeError("Total seconds must be a non-negative finite number");
     }
+    // Int mod Int = Int
+    const h = Math.floor(totalSeconds / 3600);
+    const min = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60; // Segundos, conservando la parte fraccionaria
+
+    return { h, min, s };
+}
+
+function formatDuration(totalSeconds) {
+
+    const { h, min, s } = getDurationParts(totalSeconds);
+
+    const paddedSeconds = String(Math.floor(s)).padStart(2, "0");
 
     return h > 0
-        ? // Show hours min seconds format => 10 h 8 min 47 s
-        `${h} h ${min} min ${s} s`
-        : // Show min seconds format => 8 min 47 s
-        `${min} min ${s} s`;
+        ? `${h}:${String(min).padStart(2, "0")}:${paddedSeconds}`
+        : `${min}:${paddedSeconds}`;
+}
+
+function formatDurationLong(totalSeconds) {
+    const { h, min, s } = getDurationParts(totalSeconds);
+
+    const parts = [];
+
+    if (h > 0) {
+        parts.push(`${h} h`);
+    }
+
+    if (min > 0) {
+        parts.push(`${min} min`);
+    }
+
+    if (s > 0) {
+        parts.push(`${Math.floor(s)} s`);
+    }
+
+    return parts.length > 0 ? parts.join(" ") : "0 s";
 }
 
 const getRandomInt = (min, max) => {
@@ -987,24 +1006,30 @@ const parseName = name => {
     }
 }
 
-function getPlaylistDuration() {
-
-    const infoPlaylist = getInfoPlaylist(playerState.playbackQueue);
-    console.log(`Tiempo de duración de la playlist: ${formatTime(infoPlaylist.totalDuration, 1)}`);
-    console.log("Número de canciones: " + infoPlaylist.tracks);
-    console.log("Tamaños de la playlist: " + JSON.stringify(getSizeInUnits(infoPlaylist.totalSize), null, 2));
-}
-
-function getInfoPlaylist(tracks) {
+// Return duración total de la playlist en segundos
+function getPlaylistTotalDuration(tracks) {
     let totalDuration = 0;
-    let totalSize = 0;
     const len = tracks.length;
     for (let i = 0; i < len; i++) {
         totalDuration += tracks[i].duration;
+    }
+    return totalDuration;
+}
+
+// Return tamaño total de la playlist en bytes
+function getPlaylistTotalSize(tracks) {
+    let totalSize = 0;
+    const len = tracks.length;
+    for (let i = 0; i < len; i++) {
         totalSize += tracks[i].size;
     }
+    return totalSize;
+}
 
-    return { totalDuration, totalSize, tracks: len };
+function getPlaylistStats(tracks) {
+    console.log("Número de canciones: " + tracks.length);
+    console.log(`Tiempo de duración de la playlist: ${formatDurationLong(getPlaylistTotalDuration(tracks))}`);
+    console.log("Tamaño de la playlist: " + JSON.stringify(getSizeInUnits(getPlaylistTotalSize(tracks)), null, 2));
 }
 
 function getSizeInUnits(bytes) {
@@ -1037,7 +1062,7 @@ function getSizeInUnits(bytes) {
 
         // result[units[i]] = bytes / (10 ** (3 * i));
         result[units[i]] = value;
-        value /= 1000;
+        value /= 1000; // Puede diferir con el almacenamiento que muestra Windows. Windows utiliza 1024
     }
 
     return result;

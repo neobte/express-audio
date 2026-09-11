@@ -60,7 +60,7 @@ body {
 }
 
 /* Información X de Y */
-.track-progress-container {
+.track-progress {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -68,15 +68,7 @@ body {
     /* border: 1px solid #ffffff0d; */
     border: 1px solid hsl(253 20% 14%);
     margin: 1rem 0;
-}
-
-.track-progress {
-    width: 100px;
-    text-align: center;
     font-size: .875rem;
-}
-
-.track-progress span {
     font-variant-numeric: tabular-nums;
 }
 
@@ -291,11 +283,13 @@ body {
 
 /* Slider */
 .slider {
+    appearance: none;
     -webkit-appearance: none;
     width: 100%;
     background-color: transparent;
     cursor: pointer;
     flex: 1;
+    height: 24px;
 }
 
 .slider:focus {
@@ -343,6 +337,7 @@ body {
     height: 10px;
     width: 10px;
     border-radius: 50%;
+    /* (track-height - thumb-height) / 2 */
     margin-top: -3px;
 }
 
