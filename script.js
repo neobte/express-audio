@@ -7,8 +7,13 @@ const d = document;
  */
 
 // Información acerca del track
-const trackArtist = d.getElementById("track-artist");
-const trackTitle = d.getElementById("track-title");
+// const trackTitle = d.getElementById("track-title");
+// const trackArtist = d.getElementById("track-artist");
+// Nuevo nombre de variables
+const nowPlayingHeading = d.querySelector(".now-playing-heading");
+nowPlayingHeading.textContent = "Nada esta sonando";
+const nowPlayingTitle = d.querySelector(".now-playing-title");
+const nowPlayingArtist = d.querySelector(".now-playing-artist");
 
 // Información acerca del tiempo del track
 const trackCurrentTime = d.getElementById("track-current-time");
@@ -33,8 +38,8 @@ const repeatIndicator = d.getElementById("repeat-indicator");
 const repeat1Icon = d.getElementById("repeat-1-icon");
 
 // Información de X número de track de Y número total de tracks
-const trackCurrentIndex = d.getElementById("track-current-index");
-const tracksTotal = d.getElementById("tracks-total");
+const currentTrackNumber = d.getElementById("current-track-number");
+const totalTrackCount = d.getElementById("total-track-count");
 
 // Información acerca del volumen
 const volumeBtn = d.getElementById("volume-btn");
@@ -317,6 +322,8 @@ audioElement.addEventListener("play", () => {
 
     currentListItem.classList.add("is-playing");
     attachIcon(currentListItem);
+
+    nowPlayingHeading.textContent = "Ahora sonando";
 });
 
 // Evento pause
@@ -328,6 +335,8 @@ audioElement.addEventListener("pause", () => {
 
     currentListItem.classList.remove("is-playing");
     removeIcon(currentListItem);
+
+    nowPlayingHeading.textContent = "Pista seleccionada";
 });
 
 // Evento loadedmetadata
@@ -424,9 +433,12 @@ function updateVolumeButtonUI(volume) {
 // UI, Track info
 function updateTrackInfoUI(track) {
 
-    trackTitle.textContent = track.title;
+    // trackTitle.textContent = track.title;
+    // trackArtist.textContent = track.artist;
 
-    trackArtist.textContent = track.artist;
+    nowPlayingHeading.textContent = "Pista seleccionada";
+    nowPlayingTitle.textContent = track.title;
+    nowPlayingArtist.textContent = track.artist;
 }
 
 // UI, X número de track de Y número total de tracks
@@ -434,10 +446,10 @@ function updateTrackCounterUI(track) {
 
     const originalIndex = playerState.trackIndexMap.get(track.id);
 
-    trackCurrentIndex.textContent = playerState.originalPlaylist.length > 0 ? originalIndex + 1 : 0;
+    currentTrackNumber.textContent = playerState.originalPlaylist.length > 0 ? originalIndex + 1 : 0;
 
     // La longitud siempre será la misma
-    tracksTotal.textContent = playerState.originalPlaylist.length;
+    totalTrackCount.textContent = playerState.originalPlaylist.length;
 }
 
 // UI, de valores de tiempo
@@ -693,8 +705,6 @@ function loadTrack(track) {
     pauseTrack();
 
     audioElement.currentTime = 0;
-
-    console.log(track);
 
     // Construimos el audio source
     const src = `${BASE_URL}${playlistName}/${track.audioUrl}`;

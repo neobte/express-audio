@@ -70,6 +70,7 @@ body {
     margin: 1rem 0;
     font-size: .875rem;
     font-variant-numeric: tabular-nums;
+    gap: .25rem;
 }
 
 /* Fin track progress */
