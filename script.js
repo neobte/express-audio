@@ -7,9 +7,6 @@ const d = document;
  */
 
 // Información acerca del track
-// const trackTitle = d.getElementById("track-title");
-// const trackArtist = d.getElementById("track-artist");
-// Nuevo nombre de variables
 const nowPlayingHeading = d.querySelector(".now-playing-heading");
 nowPlayingHeading.textContent = "Nada esta sonando";
 const nowPlayingTitle = d.querySelector(".now-playing-title");
@@ -213,6 +210,9 @@ function handleLoadPlaylist(response) {
 
     // Obtenemos el track y lo cargamos
     loadSelectedTrack();
+
+    // Cambiamos el estado del heading now playing, de nada esta sonando a "En pausa"
+    nowPlayingHeading.textContent = "En pausa";
 }
 
 function setPlaylistState(response) {
@@ -336,7 +336,7 @@ audioElement.addEventListener("pause", () => {
     currentListItem.classList.remove("is-playing");
     removeIcon(currentListItem);
 
-    nowPlayingHeading.textContent = "Pista seleccionada";
+    nowPlayingHeading.textContent = "En pausa";
 });
 
 // Evento loadedmetadata
@@ -433,10 +433,6 @@ function updateVolumeButtonUI(volume) {
 // UI, Track info
 function updateTrackInfoUI(track) {
 
-    // trackTitle.textContent = track.title;
-    // trackArtist.textContent = track.artist;
-
-    nowPlayingHeading.textContent = "Pista seleccionada";
     nowPlayingTitle.textContent = track.title;
     nowPlayingArtist.textContent = track.artist;
 }
