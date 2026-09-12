@@ -50,7 +50,7 @@ const volumeValue = d.getElementById("volume-value");
 const playlist = d.getElementById("playlist");
 
 const playingIcon = d.createElement('img');
-playingIcon.src = 'images/bars.svg';
+playingIcon.src = './images/bars.svg';
 playingIcon.alt = 'Playing';
 playingIcon.classList.add('playing-icon');
 
@@ -1062,7 +1062,7 @@ function getSizeInUnits(bytes) {
     const result = {};
 
     const exponent = Math.min(Math.floor(Math.log10(bytes) / 3), units.length - 1);
-    console.log("Unidad apropiada para mostrar resultado: " + units[exponent]);
+    console.log("Unidad apropiada para mostrar el tamaño total de la playlist: " + units[exponent]);
 
     let value = bytes;
 
