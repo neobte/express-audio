@@ -49,10 +49,10 @@ const volumeValue = d.getElementById("volume-value");
 // Playlist de tracks
 const playlist = d.getElementById("playlist");
 
-const playingIcon = d.createElement('img');
-playingIcon.src = './images/bars.svg';
-playingIcon.alt = 'Playing';
-playingIcon.classList.add('playing-icon');
+const equalizerBars = d.createElement('img');
+equalizerBars.src = './images/bars.svg';
+equalizerBars.alt = '';
+equalizerBars.classList.add('equalizer-bars');
 
 const playlists = d.querySelector(".playlists");
 
@@ -767,15 +767,15 @@ function attachIcon(listItem) {
     const container = listItem.querySelector('.playlist-track__number');
 
     // mover icono (no clonar)
-    container.appendChild(playingIcon);
+    container.appendChild(equalizerBars);
 }
 
-// Función que remueve el icoo de las barras a la canción en reproducción
+// Función que remueve el icono de las barras de la canción en reproducción
 function removeIcon(listItem) {
 
-    const playingIcon = listItem.querySelector('.playing-icon');
+    const equalizerBars = listItem.querySelector('.equalizer-bars');
 
-    if (playingIcon) playingIcon.remove();
+    if (equalizerBars) equalizerBars.remove();
 }
 
 // Resetea al primer track
