@@ -412,7 +412,7 @@ function updateSelectedTrackUI(track) {
 
     currentListItem = selectedListItem;
 
-    scrollIntoView(selectedListItem);
+    scrollIntoItem(selectedListItem);
 }
 
 // UI, botón volumen
@@ -611,15 +611,20 @@ function bindPlaylistEvents() {
         // Obtenemos el track buscando POR SU ID en el tracksMap
         const track = playerState.tracksMap.get(trackId);
 
-        // Cargamos el audio
-        // Al momento de cargar el audio, tambien estamos desplazando el scroll hacia el elemento
-        // Pero, aquí no hace falta desplazarlo, ya que el usuario puede visualizar el área de los LI
+        /** 
+         * Cargamos el audio
+         * Al momento de cargar el track, no debemos desplazar el scroll hacia el track seleccionado manualmente
+         * por el usuario, ya que es lógico pensar que el usuario esta visualizando el track, o al buscar el track
+         * de su preferencia esta haciendo scroll manualmente.
+         * */
         loadTrack(track);
 
         // Actualizamos la UI
+        // Agregamos la clase is-selected
         li.classList.add("is-selected");
 
         // Reproducimos el audio
+        // En el evento play del objeto audio, agregamos la clase is-playing
         playTrack();
 
         // Buscamos el índice del track
@@ -722,8 +727,6 @@ function loadTrack(track) {
     // UI, actualizamos el título del documento con información del track
     updateDocumentTitle(track);
 
-    // UI, actualizamos en la playlist el track que ha sido seleccionado
-    updateSelectedTrackUI(track);
 }
 
 // Función para manejar en termino de una canción en el evento ended del objeto audio
@@ -882,27 +885,26 @@ function loadSelectedTrack() {
     const track = getSelectedTrack();
 
     loadTrack(track);
+
+    // UI, actualizamos en la playlist el track que ha sido seleccionado
+    updateSelectedTrackUI(track);
 }
 
 // Util functions
-
 const playlistContainer = d.querySelector(".playlist-container");
 
-const scrollIntoView = item => {
+const scrollIntoItem = item => {
 
     const containerRect = playlistContainer.getBoundingClientRect();
+    const targetRect = item.getBoundingClientRect();
 
-    const containerCenter = containerRect.top + containerRect.height / 2;
+    const delta = targetRect.top + targetRect.height / 2 - (containerRect.top + containerRect.height / 2);
 
-    const itemRect = item.getBoundingClientRect();
-
-    const itemCenter = itemRect.top + itemRect.height / 2;
-
-    playlistContainer.scrollTo({
-        top: playlistContainer.scrollTop + (itemCenter - containerCenter),
-        behavior: 'smooth'
+    playlistContainer.scrollBy({
+        top: delta,
+        behavior: "smooth"
     });
-}
+};
 
 // Request to server
 const sendFetchHttpRequest = async (url, callback, method = "GET", data = {}) => {
