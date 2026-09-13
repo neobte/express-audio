@@ -612,6 +612,8 @@ function bindPlaylistEvents() {
         const track = playerState.tracksMap.get(trackId);
 
         // Cargamos el audio
+        // Al momento de cargar el audio, tambien estamos desplazando el scroll hacia el elemento
+        // Pero, aquí no hace falta desplazarlo, ya que el usuario puede visualizar el área de los LI
         loadTrack(track);
 
         // Actualizamos la UI
@@ -885,10 +887,12 @@ function loadSelectedTrack() {
 // Util functions
 
 const playlistContainer = d.querySelector(".playlist-container");
-const containerRect = playlistContainer.getBoundingClientRect();
-const containerCenter = containerRect.top + containerRect.height / 2;
 
 const scrollIntoView = item => {
+
+    const containerRect = playlistContainer.getBoundingClientRect();
+
+    const containerCenter = containerRect.top + containerRect.height / 2;
 
     const itemRect = item.getBoundingClientRect();
 
@@ -898,8 +902,6 @@ const scrollIntoView = item => {
         top: playlistContainer.scrollTop + (itemCenter - containerCenter),
         behavior: 'smooth'
     });
-
-    // element.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 // Request to server
