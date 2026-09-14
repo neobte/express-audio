@@ -221,7 +221,7 @@ audioElement.addEventListener("play", () => {
 
     updatePlayPauseBtnUI();
 
-    // Update currentTrack
+    // Update currentTrackElement
     currentTrackElement.classList.add("is-playing");
     attachBarsImage(currentTrackElement);
 
