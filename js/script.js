@@ -47,13 +47,15 @@ const volumeSlider = d.getElementById("volume-slider");
 const volumeValue = d.getElementById("volume-value");
 
 // Playlist de tracks
-const playlist = d.getElementById("playlist");
+const playlistTracks = d.getElementById("playlist-tracks");
 
+// Imagen de barras de equalizador
 const equalizerBars = d.createElement('img');
 equalizerBars.src = './images/bars.svg';
 equalizerBars.alt = '';
 equalizerBars.classList.add('equalizer-bars');
 
+// Listas de reproducción
 const playlists = d.querySelector(".playlists");
 
 // Objeto audio
@@ -109,7 +111,7 @@ const repeatModes = {
     }
 }
 
-let currentListItem = null;
+let currentTrackElement = null;
 let playlistName = null;
 let currentPlaylist = null;
 
@@ -134,109 +136,8 @@ function init() {
     // Delegación de eventos en la lista de playlists para seleccionar una playlist
     bindPlaylistOptionsEvents();
 
-    // Delegación de eventos en la playlist para seleccionar un track
-    bindPlaylistEvents();
-}
-
-function syncPlayerUI() {
-
-    const player = d.querySelector(".player");
-
-    const isReady = playerState.status !== PLAYER_STATE.IDLE;
-
-    player.classList.toggle("is-idle", !isReady);
-    player.classList.toggle("is-ready", isReady);
-
-    d.querySelectorAll(".controls .btn").forEach(btn => {
-        btn.disabled = !isReady;
-    });
-
-    currentTimeSlider.disabled = !isReady;
-
-}
-
-function bindPlaylistOptionsEvents() {
-
-    playlists.addEventListener("click", (e) => {
-
-        const playlist = e.target.closest(".playlist-btn");
-
-        if (!playlist) return;
-
-        if (playlist === currentPlaylist) {
-            return;
-        }
-
-        if (currentPlaylist && currentPlaylist !== playlist) {
-            // currentPlaylist.setAttribute("aria-pressed", "false");
-            currentPlaylist.classList.remove("active");
-        }
-
-        // Asignamos la referencia a la variable currentPlaylist
-        currentPlaylist = playlist;
-
-        // playlist.setAttribute("aria-pressed", "true");
-        playlist.classList.add("active");
-
-        playlistName = playlist.dataset.playlist;
-
-        const request_url = BASE_URL + playlistName + "/playlist.json";
-
-        // Petición de los datos al servidor
-        sendFetchHttpRequest(request_url, handleLoadPlaylist);
-
-    });
-}
-
-function handleLoadPlaylist(response) {
-
-    setPlaylistState(response);
-
-    updatePlayPauseBtnUI();
-
-    // Actualiza valores iniciales de tiempo al inicio de la app
-    updateCurrentTimeValues();
-
-    // Renderizamos la playlist
-    renderPlaylist();
-
-    // Despues de renderizar la playlist verificamos el shuffle
-    if (playerState.isShuffle) {
-        enableShuffle();
-    }
-
-    // Mostramos en consola información de la playlist
-    getPlaylistStats(playerState.playbackQueue);
-
-    // Obtenemos el track y lo cargamos
-    loadSelectedTrack();
-
-    // Cambiamos el estado del heading now playing, de nada esta sonando a "En pausa"
-    nowPlayingHeading.textContent = "En pausa";
-}
-
-function setPlaylistState(response) {
-
-    // playerState.originalPlaylist = response.tracks.items.slice(0, 5);
-    playerState.originalPlaylist = response.tracks;
-
-    // Creamos un Mapper para ubicar los tracks más rapidamente por su ID
-    playerState.tracksMap = new Map(playerState.originalPlaylist.map(track => [track.id, track]));
-
-    // Creamos un Mapper para ubicar el índice del track más rapidamente por su ID
-    playerState.trackIndexMap = new Map(playerState.originalPlaylist.map((track, index) => [track.id, index]));
-
-    playerState.playbackQueue = [...playerState.originalPlaylist];
-
-    // Obtenemos un selectedTrackIndex distinto, cada vez que cargamos la página. No queremos que siempre inicie en 0
-    playerState.selectedTrackIndex = getRandomInt(0, playerState.playbackQueue.length - 1);
-
-    playerState.status = PLAYER_STATE.READY;
-
-    playerState.isPlaying = false;
-
-    syncPlayerUI();
-
+    // Delegación de eventos en la playlist de tracks para seleccionar un track
+    bindPlaylistTracksEvents();
 }
 
 /**
@@ -320,8 +221,9 @@ audioElement.addEventListener("play", () => {
 
     updatePlayPauseBtnUI();
 
-    currentListItem.classList.add("is-playing");
-    attachIcon(currentListItem);
+    // Update currentTrack
+    currentTrackElement.classList.add("is-playing");
+    attachBarsImage(currentTrackElement);
 
     nowPlayingHeading.textContent = "Ahora sonando";
 });
@@ -333,8 +235,8 @@ audioElement.addEventListener("pause", () => {
 
     updatePlayPauseBtnUI();
 
-    currentListItem.classList.remove("is-playing");
-    removeIcon(currentListItem);
+    currentTrackElement.classList.remove("is-playing");
+    removeBarsImage(currentTrackElement);
 
     nowPlayingHeading.textContent = "En pausa";
 });
@@ -400,19 +302,22 @@ volumeBtn.addEventListener("click", () => {
  */
 function updateSelectedTrackUI(track) {
 
-    if (currentListItem) {
-        currentListItem.classList.remove("is-selected", "is-playing");
+    // Si existe el elemento previamente, le quitamos las clases correspondientes
+    if (currentTrackElement) {
+        currentTrackElement.classList.remove("is-selected", "is-playing");
     }
 
     // Obtenemos el list item de la playlist
-    const selectedListItem = d.querySelector(`li[data-track-id="${track.id}"]`);
+    const trackElement = d.querySelector(`li[data-track-id="${track.id}"]`);
 
     // Agregamos la clase "is-selected"
-    selectedListItem.classList.add("is-selected");
+    trackElement.classList.add("is-selected");
 
-    currentListItem = selectedListItem;
+    // Asignamos la referencia a la variable currentTrackElement
+    currentTrackElement = trackElement;
 
-    scrollIntoItem(selectedListItem);
+    // Nos desplazamos hasta ese elemento
+    scrollIntoTrackElement(trackElement);
 }
 
 // UI, botón volumen
@@ -532,10 +437,111 @@ function updateRepeatButtonUI() {
 /**
  * Funciones
  */
-function renderPlaylist() {
+function syncPlayerUI() {
 
-    // Limpiamos todo lo que tiene el elemento playlist anteriormente
-    playlist.replaceChildren();
+    const player = d.querySelector(".player");
+
+    const isReady = playerState.status !== PLAYER_STATE.IDLE;
+
+    player.classList.toggle("is-idle", !isReady);
+    player.classList.toggle("is-ready", isReady);
+
+    d.querySelectorAll(".controls .btn").forEach(btn => {
+        btn.disabled = !isReady;
+    });
+
+    currentTimeSlider.disabled = !isReady;
+
+}
+
+function bindPlaylistOptionsEvents() {
+
+    playlists.addEventListener("click", (e) => {
+
+        const playlist = e.target.closest(".playlist-btn");
+
+        if (!playlist) return;
+
+        if (playlist === currentPlaylist) {
+            return;
+        }
+
+        if (currentPlaylist && currentPlaylist !== playlist) {
+            // currentPlaylist.setAttribute("aria-pressed", "false");
+            currentPlaylist.classList.remove("active");
+        }
+
+        // Asignamos la referencia a la variable currentPlaylist
+        currentPlaylist = playlist;
+
+        // playlist.setAttribute("aria-pressed", "true");
+        playlist.classList.add("active");
+
+        playlistName = playlist.dataset.playlist;
+
+        const request_url = BASE_URL + playlistName + "/playlist.json";
+
+        // Petición de los datos al servidor
+        sendFetchHttpRequest(request_url, handleLoadPlaylist);
+
+    });
+}
+
+function handleLoadPlaylist(response) {
+
+    setPlaylistState(response);
+
+    updatePlayPauseBtnUI();
+
+    // Actualiza valores iniciales de tiempo al inicio de la app
+    updateCurrentTimeValues();
+
+    // Renderizamos la playlist de tracks
+    renderPlaylistTracks();
+
+    // Despues de renderizar la playlist verificamos el shuffle
+    if (playerState.isShuffle) {
+        enableShuffle();
+    }
+
+    // Mostramos en consola información de la playlist
+    getPlaylistStats(playerState.playbackQueue);
+
+    // Obtenemos el track y lo cargamos
+    loadSelectedTrack();
+
+    // Cambiamos el estado del heading now playing, de nada esta sonando a "En pausa"
+    nowPlayingHeading.textContent = "En pausa";
+}
+
+function setPlaylistState(response) {
+
+    // playerState.originalPlaylist = response.tracks.items.slice(0, 5);
+    playerState.originalPlaylist = response.tracks;
+
+    // Creamos un Mapper para ubicar los tracks más rapidamente por su ID
+    playerState.tracksMap = new Map(playerState.originalPlaylist.map(track => [track.id, track]));
+
+    // Creamos un Mapper para ubicar el índice del track más rapidamente por su ID
+    playerState.trackIndexMap = new Map(playerState.originalPlaylist.map((track, index) => [track.id, index]));
+
+    playerState.playbackQueue = [...playerState.originalPlaylist];
+
+    // Obtenemos un selectedTrackIndex distinto, cada vez que cargamos la página. No queremos que siempre inicie en 0
+    playerState.selectedTrackIndex = getRandomInt(0, playerState.playbackQueue.length - 1);
+
+    playerState.status = PLAYER_STATE.READY;
+
+    playerState.isPlaying = false;
+
+    syncPlayerUI();
+
+}
+
+function renderPlaylistTracks() {
+
+    // Limpiamos todo lo que tiene el elemento playlist tracks anteriormente
+    playlistTracks.replaceChildren();
 
     // Creamos un fragmento para no esta haciendo appendchild en cada iteración del bucle
     const fragment = d.createDocumentFragment();
@@ -574,18 +580,19 @@ function renderPlaylist() {
     }
 
     // Aquí agregamos todos los list item contenidos en el fragmento al DOM, por lo tanto ahora ya existen
-    playlist.appendChild(fragment);
+    playlistTracks.appendChild(fragment);
 }
 
 // Delegación de eventos, cuando se hace click en una canción
-function bindPlaylistEvents() {
+function bindPlaylistTracksEvents() {
 
-    playlist.addEventListener("click", (e) => {
-        const li = e.target.closest(".playlist-track");
+    playlistTracks.addEventListener("click", (e) => {
 
-        if (!li) return;
+        const trackElement = e.target.closest(".playlist-track");
 
-        if (li === currentListItem) {
+        if (!trackElement) return;
+
+        if (trackElement === currentTrackElement) {
 
             if (playerState.isPlaying) {
                 pauseTrack();
@@ -597,16 +604,16 @@ function bindPlaylistEvents() {
         }
 
         // si ya había uno activo, lo desactivamos
-        if (currentListItem && currentListItem !== li) {
-            currentListItem.classList.remove("is-selected", "is-playing");
-            removeIcon(currentListItem);
+        if (currentTrackElement && currentTrackElement !== trackElement) {
+            currentTrackElement.classList.remove("is-selected", "is-playing");
+            removeBarsImage(currentTrackElement);
         }
 
-        // Asignamos la referencia a la variable currentListItem
-        currentListItem = li;
+        // Asignamos la referencia a la variable currentTrackElement
+        currentTrackElement = trackElement;
 
         // Obtenemos el ID del track seleccionado
-        const trackId = Number(li.dataset.trackId);
+        const trackId = Number(trackElement.dataset.trackId);
 
         // Obtenemos el track buscando POR SU ID en el tracksMap
         const track = playerState.tracksMap.get(trackId);
@@ -621,7 +628,7 @@ function bindPlaylistEvents() {
 
         // Actualizamos la UI
         // Agregamos la clase is-selected
-        li.classList.add("is-selected");
+        trackElement.classList.add("is-selected");
 
         // Reproducimos el audio
         // En el evento play del objeto audio, agregamos la clase is-playing
@@ -766,8 +773,8 @@ function handleEndedWithoutRepeat() {
     playSelectedTrack();
 }
 
-// Función que adjunta el icono de las barras a la canción en reproducción
-function attachIcon(listItem) {
+// Función que adjunta la imagen de las barras a la canción en reproducción
+function attachBarsImage(listItem) {
 
     const container = listItem.querySelector('.playlist-track__number');
 
@@ -775,8 +782,8 @@ function attachIcon(listItem) {
     container.appendChild(equalizerBars);
 }
 
-// Función que remueve el icono de las barras de la canción en reproducción
-function removeIcon(listItem) {
+// Función que remueve la imagen de las barras de la canción en reproducción
+function removeBarsImage(listItem) {
 
     const equalizerBars = listItem.querySelector('.equalizer-bars');
 
@@ -891,16 +898,16 @@ function loadSelectedTrack() {
 }
 
 // Util functions
-const playlistContainer = d.querySelector(".playlist-container");
+const playlistTracksContainer = d.querySelector(".playlist-tracks-container");
 
-const scrollIntoItem = item => {
+const scrollIntoTrackElement = trackElement => {
 
-    const containerRect = playlistContainer.getBoundingClientRect();
-    const targetRect = item.getBoundingClientRect();
+    const containerRect = playlistTracksContainer.getBoundingClientRect();
+    const targetRect = trackElement.getBoundingClientRect();
 
     const delta = targetRect.top + targetRect.height / 2 - (containerRect.top + containerRect.height / 2);
 
-    playlistContainer.scrollBy({
+    playlistTracksContainer.scrollBy({
         top: delta,
         behavior: "smooth"
     });
