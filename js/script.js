@@ -317,7 +317,7 @@ function updateSelectedTrackUI(track) {
     currentTrackElement = trackElement;
 
     // Nos desplazamos hasta ese elemento
-    scrollIntoTrackElement(trackElement);
+    scrollIfNecessary(trackElement);
 }
 
 // UI, botón volumen
@@ -619,10 +619,8 @@ function bindPlaylistTracksEvents() {
         const track = playerState.tracksMap.get(trackId);
 
         /** 
-         * Cargamos el audio
-         * Al momento de cargar el track, no debemos desplazar el scroll hacia el track seleccionado manualmente
-         * por el usuario, ya que es lógico pensar que el usuario esta visualizando el track, o al buscar el track
-         * de su preferencia esta haciendo scroll manualmente.
+         * Al momento de cargar el track, no debemos desplazar el scroll hacia el track que selecciona el usuario manualmente.
+         * Ya que es lógico pensar que el track esta en el área de visualización, por consiguiente no hace falta hacer scroll.
          * */
         loadTrack(track);
 
@@ -912,6 +910,21 @@ const scrollIntoTrackElement = trackElement => {
         behavior: "smooth"
     });
 };
+
+function scrollIfNecessary(trackElement) {
+    const containerRect = playlistTracksContainer.getBoundingClientRect();
+    const trackRect = trackElement.getBoundingClientRect();
+
+    // Si esta por arriba subimos
+    if (trackRect.top < containerRect.top) {
+        playlistTracksContainer.scrollTop -= containerRect.top - trackRect.top;
+        // Si esta por abajo bajamos
+    } else if (trackRect.bottom > containerRect.bottom) {
+        playlistTracksContainer.scrollTop += trackRect.bottom - containerRect.bottom;
+    } else {
+        console.log("No fue necesario hacer scroll");
+    }
+}
 
 // Request to server
 const sendFetchHttpRequest = async (url, callback, method = "GET", data = {}) => {
