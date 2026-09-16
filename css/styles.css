@@ -176,7 +176,7 @@ body {
 .playlist-track {
     display: grid;
     grid-template-columns: 48px auto 48px;
-    padding: .5rem 0;
+    padding: .5rem;
     align-items: center;
     cursor: pointer;
     border-radius: .25rem;

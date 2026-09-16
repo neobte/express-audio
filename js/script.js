@@ -922,7 +922,7 @@ function scrollIfNecessary(trackElement) {
     } else if (trackRect.bottom > containerRect.bottom) {
         playlistTracksContainer.scrollTop += trackRect.bottom - containerRect.bottom;
     } else {
-        console.log("No fue necesario hacer scroll");
+        // console.log("No fue necesario hacer scroll");
     }
 }
 
