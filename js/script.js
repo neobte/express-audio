@@ -56,19 +56,19 @@ equalizerBars.alt = '';
 equalizerBars.classList.add('equalizer-bars');
 
 // Botón de descarga de audio
-const downloadAudio = d.createElement("a");
-downloadAudio.classList.add("btn", "download-audio");
-downloadAudio.title = "Descargar audio";
-downloadAudio.target = "_blank";
-downloadAudio.download = "";
+const audioDownloadBtn = d.createElement("a");
+audioDownloadBtn.classList.add("btn", "download-audio");
+audioDownloadBtn.title = "Descargar audio";
+audioDownloadBtn.target = "_blank";
+audioDownloadBtn.download = "";
 
 const downloadIcon = d.createElement("img");
 downloadIcon.src = "./images/download.svg";
 downloadIcon.alt = '';
 
-downloadAudio.appendChild(downloadIcon);
+audioDownloadBtn.appendChild(downloadIcon);
 
-downloadAudio.addEventListener("click", (event) => {
+audioDownloadBtn.addEventListener("click", (event) => {
     event.stopPropagation();
 });
 
@@ -127,8 +127,6 @@ const repeatModes = {
         title: "Desactivar la repetición indefinida"
     }
 }
-
-// const downloadAudio = d.getElementById("download-audio");
 
 let currentTrackElement = null;
 let playlistName = null;
@@ -743,7 +741,7 @@ function loadTrack(track) {
     // Llamamos a la función que se encarga de setear el source
     setAudioSource(src);
 
-    downloadAudio.href = src;
+    audioDownloadBtn.href = src;
 
     // UI, actualizamos título y artista
     updateTrackInfoUI(track);
@@ -802,15 +800,15 @@ function attachDownloadButton(listItem) {
     const container = listItem.querySelector('.playlist-track__duration');
 
     // mover icono (no clonar)
-    container.appendChild(downloadAudio);
+    container.appendChild(audioDownloadBtn);
 }
 
 // Función que remueve el botón de descarga de audio de la canción en reproducción
 function removeDownloadButton(listItem) {
 
-    const downloadAudio = listItem.querySelector('.download-audio');
+    const audioDownloadBtn = listItem.querySelector('.download-audio');
 
-    if (downloadAudio) downloadAudio.remove();
+    if (audioDownloadBtn) audioDownloadBtn.remove();
 }
 
 // Función que adjunta la imagen de las barras a la canción en reproducción
