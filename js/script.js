@@ -111,6 +111,8 @@ const repeatModes = {
     }
 }
 
+const downloadAudio = d.getElementById("download-audio");
+
 let currentTrackElement = null;
 let playlistName = null;
 let currentPlaylist = null;
@@ -645,7 +647,7 @@ function setVolume(volume) {
 
     volumeSlider.value = volume;
     // console.log(`Volume slider: ${volumeSlider.value}`);
-    volumeValue.textContent = volume;
+    if (volumeValue) volumeValue.textContent = volume;
 
     if (volume > 0) {
         playerState.previousVolume = volume;
@@ -719,6 +721,8 @@ function loadTrack(track) {
 
     // Llamamos a la función que se encarga de setear el source
     setAudioSource(src);
+
+    downloadAudio.href = src;
 
     // UI, actualizamos título y artista
     updateTrackInfoUI(track);
@@ -1100,4 +1104,17 @@ function getSizeInUnits(bytes) {
     }
 
     return result;
+}
+
+function setBackgroundColor() {
+    document.body.style.backgroundColor = getRandomRGB();
+}
+
+function getRandomRGB(sup = 255) {
+    if (1 > sup) sup = 1;
+    if (sup > 255) sup = 255;
+    const red = getRandomInt(0, sup);
+    const green = getRandomInt(0, sup);
+    const blue = getRandomInt(0, sup);
+    return `rgb(${red}, ${green}, ${blue})`;
 }
