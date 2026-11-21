@@ -68,6 +68,10 @@ downloadIcon.alt = '';
 
 downloadAudio.appendChild(downloadIcon);
 
+downloadAudio.addEventListener("click", (event) => {
+    event.stopPropagation();
+});
+
 // Listas de reproducción
 const playlists = d.querySelector(".playlists");
 
