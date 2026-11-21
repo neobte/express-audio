@@ -88,6 +88,11 @@ body {
     gap: .25rem;
 }
 
+.track-progress .separator,
+#total-track-count {
+    color: hsl(253 10% 50%);
+}
+
 /* Fin track progress */
 
 /* Playlist options */
@@ -193,7 +198,8 @@ body {
     color: var(--text-secondary);
 }
 
-.playlist-track__number {
+.playlist-track__number,
+.playlist-track__duration {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -241,11 +247,21 @@ body {
     background-color: hsl(257, 40%, 27%);
 }
 
+/* Estas 4 clases siguientes se repiten, pero no encontre aún otra forma de solucionar el problema de
+que aparezca y que desaparezca la duratio */
 .playlist-track.is-playing .track-number {
     opacity: 0;
 }
 
 .playlist-track .track-number {
+    transition: opacity 120ms ease;
+}
+
+.playlist-track.is-playing .track-duration {
+    opacity: 0;
+}
+
+.playlist-track .track-duration {
     transition: opacity 120ms ease;
 }
 
@@ -439,6 +455,10 @@ body {
 .equalizer-bars {
     width: 14px;
     height: 14px;
+    position: absolute;
+}
+
+.download-audio {
     position: absolute;
 }
 

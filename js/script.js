@@ -55,6 +55,19 @@ equalizerBars.src = './images/bars.svg';
 equalizerBars.alt = '';
 equalizerBars.classList.add('equalizer-bars');
 
+// Botón de descarga de audio
+const downloadAudio = d.createElement("a");
+downloadAudio.classList.add("btn", "download-audio");
+downloadAudio.title = "Descargar audio";
+downloadAudio.target = "_blank";
+downloadAudio.download = "";
+
+const downloadIcon = d.createElement("img");
+downloadIcon.src = "./images/download.svg";
+downloadIcon.alt = '';
+
+downloadAudio.appendChild(downloadIcon);
+
 // Listas de reproducción
 const playlists = d.querySelector(".playlists");
 
@@ -111,7 +124,7 @@ const repeatModes = {
     }
 }
 
-const downloadAudio = d.getElementById("download-audio");
+// const downloadAudio = d.getElementById("download-audio");
 
 let currentTrackElement = null;
 let playlistName = null;
@@ -227,6 +240,8 @@ audioElement.addEventListener("play", () => {
     currentTrackElement.classList.add("is-playing");
     attachBarsImage(currentTrackElement);
 
+    attachDownloadButton(currentTrackElement);
+
     nowPlayingHeading.textContent = "Ahora sonando";
 });
 
@@ -239,6 +254,8 @@ audioElement.addEventListener("pause", () => {
 
     currentTrackElement.classList.remove("is-playing");
     removeBarsImage(currentTrackElement);
+
+    removeDownloadButton(currentTrackElement);
 
     nowPlayingHeading.textContent = "En pausa";
 });
@@ -574,7 +591,7 @@ function renderPlaylistTracks() {
                         <p class="playlist-track__artist">${track.artist}</p>
                     </div>
                     <div class="playlist-track__duration">
-                        <span>${formatDuration(track.durationSeconds)}</span>
+                        <span class="track-duration">${formatDuration(track.durationSeconds)}</span>
                     </div>
                 `;
         // Por cada iteración agregamos un list item al fragmento
@@ -773,6 +790,23 @@ function handleEndedWithoutRepeat() {
 
     setNextTrackIndex();
     playSelectedTrack();
+}
+
+// Función que adjunta el botón de descarga a la canción en reproducción
+function attachDownloadButton(listItem) {
+
+    const container = listItem.querySelector('.playlist-track__duration');
+
+    // mover icono (no clonar)
+    container.appendChild(downloadAudio);
+}
+
+// Función que remueve el botón de descarga de audio de la canción en reproducción
+function removeDownloadButton(listItem) {
+
+    const downloadAudio = listItem.querySelector('.download-audio');
+
+    if (downloadAudio) downloadAudio.remove();
 }
 
 // Función que adjunta la imagen de las barras a la canción en reproducción
