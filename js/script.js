@@ -74,6 +74,18 @@ audioDownloadBtn.addEventListener("click", (event) => {
 
 // Listas de reproducción
 const playlists = d.querySelector(".playlists");
+const playlistNames = ["My playlist", "Rock", "Salsa romántica", "Música cristiana"];
+
+for (let index = 0; index < playlistNames.length; index++) {
+    const name = playlistNames[index];
+
+    const button = d.createElement("button");
+    button.classList.add("playlist-btn");
+    button.dataset.playlist = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, "_");
+    button.textContent = (name === "My playlist") ? "Julify" : name;
+
+    playlists.appendChild(button);
+}
 
 // Objeto audio
 const audioElement = new Audio();
