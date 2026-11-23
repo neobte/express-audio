@@ -4,6 +4,7 @@
     --text-secondary: hsl(0, 0%, 69%);
     /* --text-tertiary: hsl(259, 100%, 76%); */
     --text-tertiary: hsl(258, 90%, 66%);
+    --text-tertiary: blueviolet;
 
     --bg: hsl(253, 31%, 6%);
 
@@ -136,7 +137,7 @@ body {
 
 .playlist-btn.active {
     /* background-color: rgba(139, 92, 246, .16); */
-    background-color: var(--surface);
+    background-color: var(--text-tertiary);
     /* color: var(--text-tertiary); */
 }
 
@@ -311,11 +312,13 @@ body {
 .slider {
     appearance: none;
     -webkit-appearance: none;
+    display: block;
     width: 100%;
-    background-color: transparent;
-    cursor: pointer;
-    flex: 1;
     height: 24px;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
 }
 
 .slider:focus {
