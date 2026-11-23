@@ -92,10 +92,15 @@
             </ul>
         </div>
 
-        <div class="current-time-container">
-            <span id="track-current-time" class="time">-:--</span>
-            <input id="current-time-slider" class="slider" type="range" min="0" value="0" step=".01">
-            <span id="track-duration" class="time">-:--</span>
+        <div class="audio-progress">
+
+            <input id="audio-progress-slider" class="slider" type="range" min="0" value="0" step=".01">
+
+            <div class="audio-progress-time">
+                <span id="audio-current-time">-:--</span>
+                <span id="audio-duration">-:--</span>
+            </div>
+
         </div>
 
         <div class="controls player">

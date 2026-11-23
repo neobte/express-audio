@@ -259,20 +259,22 @@ body {
 
 /* Fin de estilos de la playlist */
 
-/* Current time */
-.current-time-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: .25rem;
-    height: 48px;
+/* Audio progress time */
+.audio-progress {
+    width: 100%;
+    margin-top: .75rem;
 }
 
-.current-time-container .time {
-    min-width: 48px;
+.audio-progress .audio-progress-time {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
     font-size: .875rem;
-    text-align: center;
-    /* color: var(--text-secondary); */
+    font-weight: 500;
+    color: var(--text-secondary);
+
+    font-variant-numeric: tabular-nums;
 }
 
 /* Fin de current time */
@@ -282,7 +284,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: .25rem;
+    gap: .5rem;
 }
 
 /* Fin de estilos de controles */

@@ -13,9 +13,9 @@ const nowPlayingTitle = d.querySelector(".now-playing-title");
 const nowPlayingArtist = d.querySelector(".now-playing-artist");
 
 // Información acerca del tiempo del track
-const trackCurrentTime = d.getElementById("track-current-time");
-const currentTimeSlider = d.getElementById("current-time-slider");
-const trackDuration = d.getElementById("track-duration");
+const audioCurrentTime = d.getElementById("audio-current-time");
+const audioProgressSlider = d.getElementById("audio-progress-slider");
+const audioDuration = d.getElementById("audio-duration");
 
 // Controles
 const shuffleBtn = d.getElementById("shuffle-btn");
@@ -267,10 +267,10 @@ audioElement.addEventListener("loadedmetadata", () => {
 
     if (!Number.isFinite(audioElement.duration)) return;
 
-    currentTimeSlider.max = audioElement.duration;
+    audioProgressSlider.max = audioElement.duration;
 
     // UI
-    trackDuration.textContent = formatDuration(audioElement.duration);
+    audioDuration.textContent = formatDuration(audioElement.duration);
 });
 
 // Evento timeupdate
@@ -278,16 +278,16 @@ audioElement.addEventListener("timeupdate", () => {
 
     if (!Number.isFinite(audioElement.currentTime)) return;
 
-    currentTimeSlider.value = audioElement.currentTime;
+    audioProgressSlider.value = audioElement.currentTime;
 
     // UI
-    trackCurrentTime.textContent = formatDuration(audioElement.currentTime);
+    audioCurrentTime.textContent = formatDuration(audioElement.currentTime);
 });
 
 // Evento input del Slider de tiempo
-currentTimeSlider.addEventListener("input", () => {
+audioProgressSlider.addEventListener("input", () => {
 
-    audioElement.currentTime = Number(currentTimeSlider.value);
+    audioElement.currentTime = Number(audioProgressSlider.value);
 });
 
 // Evento input del Slider de volumen
@@ -377,13 +377,13 @@ function updateTrackCounterUI(track) {
 // UI, de valores de tiempo
 function updateCurrentTimeValues() {
 
-    trackCurrentTime.textContent = "0:00"; // Cambia su valor en el evento timeupdate del objeto audio
+    audioCurrentTime.textContent = "0:00"; // Cambia su valor en el evento timeupdate del objeto audio
 
-    currentTimeSlider.value = "0"; // Cambia su valor en el evento timeupdate del objeto audio
+    audioProgressSlider.value = "0"; // Cambia su valor en el evento timeupdate del objeto audio
 
-    currentTimeSlider.max = "0"; // Cambia su valor en el evento loadedmetadata del objeto audio
+    audioProgressSlider.max = "0"; // Cambia su valor en el evento loadedmetadata del objeto audio
 
-    trackDuration.textContent = "0:00"; // Cambia su valor en el evento loadedmetadata del objeto audio
+    audioDuration.textContent = "0:00"; // Cambia su valor en el evento loadedmetadata del objeto audio
 }
 
 // UI, de título de la página que mostrará el título y artista del track
@@ -471,15 +471,15 @@ function syncPlayerUI() {
         btn.disabled = !isReady;
     });
 
-    currentTimeSlider.disabled = !isReady;
+    audioProgressSlider.disabled = !isReady;
 
 }
 
 function bindPlaylistOptionsEvents() {
 
-    playlists.addEventListener("click", (e) => {
+    playlists.addEventListener("click", ({ target }) => {
 
-        const playlist = e.target.closest(".playlist-btn");
+        const playlist = target.closest(".playlist-btn");
 
         if (!playlist) return;
 
@@ -607,9 +607,17 @@ function renderPlaylistTracks() {
 // Delegación de eventos, cuando se hace click en una canción
 function bindPlaylistTracksEvents() {
 
-    playlistTracks.addEventListener("click", (e) => {
+    // https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-a-element
+    // playlistTracks.onclick = ({ target }) => {
+    //     if (target.parentElement.parentElement.localName === "li") {
+    //         const trackElement = target.parentElement.parentElement;
+    //         console.log(trackElement);
+    //     }
+    // }
 
-        const trackElement = e.target.closest(".playlist-track");
+    playlistTracks.addEventListener("click", ({ target }) => {
+
+        const trackElement = target.closest(".playlist-track");
 
         if (!trackElement) return;
 
@@ -741,6 +749,7 @@ function loadTrack(track) {
     // Llamamos a la función que se encarga de setear el source
     setAudioSource(src);
 
+    // Seteamos el enlace de descarga de audio
     audioDownloadBtn.href = src;
 
     // UI, actualizamos título y artista
