@@ -22,6 +22,7 @@
 
     <main class="container">
 
+        <!-- Now playing section -->
         <section class="now-playing" aria-labelledby="now-playing-heading">
             <h2 class="now-playing-heading" id="now-playing-heading">Nada esta sonando</h2>
             <div class="now-playing-info">
@@ -30,12 +31,14 @@
             </div>
         </section>
 
+        <!-- Progress x of y tracks -->
         <div class="track-progress" aria-live="polite">
             <span id="current-track-number">-</span>
             <span aria-hidden="true" class="separator">/</span>
             <span id="total-track-count">-</span>
         </div>
 
+        <!-- Playlist tracks -->
         <div class="playlist-tracks-container">
             <ul id="playlist-tracks">
                 <!-- <li class="playlist-track">
@@ -77,6 +80,7 @@
             </ul>
         </div>
 
+        <!-- Audio progress -->
         <div class="audio-progress">
 
             <input id="audio-progress-slider" class="slider" type="range" min="0" value="0" step=".01">
@@ -88,6 +92,7 @@
 
         </div>
 
+        <!-- Player controls -->
         <div class="controls player">
             <!-- Shuffle btn -->
             <button id="shuffle-btn" class="btn" type="button" title="Activar reproducción aleatoria">
@@ -147,6 +152,7 @@
             </button>
         </div>
 
+        <!-- Volume control -->
         <div class="volume-container">
             <!-- Volume btn -->
             <button id="volume-btn" class="btn" title="Silenciar">
